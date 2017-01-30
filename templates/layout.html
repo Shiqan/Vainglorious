@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>{% block title %} {{ appname }} {% endblock %}</title>
+
+		<!-- BEGIN META -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="keywords" content="your,keywords">
+		<meta name="description" content="Short explanation about this website">
+		<!-- END META -->
+
+		<!-- BEGIN FAVICON -->
+		<link rel="apple-touch-icon" sizes="180x180" href="/static/favicon/apple-touch-icon.png">
+		<link rel="icon" type="image/png" href="/static/favicon/favicon-32x32.png" sizes="32x32">
+		<link rel="icon" type="image/png" href="/static/favicon/favicon-16x16.png" sizes="16x16">
+		<link rel="manifest" href="/static/favicon/manifest.json">
+		<link rel="mask-icon" href="/static/favicon/safari-pinned-tab.svg" color="#0aa89e">
+		<meta name="apple-mobile-web-app-title" content="Vainglorious Secret">
+		<meta name="application-name" content="Vainglorious Secret">
+		<meta name="theme-color" content="#0aa89e">
+		<!-- END FAVICON -->
+
+		<!-- BEGIN STYLESHEETS -->
+		<link href='http://fonts.googleapis.com/css?family=Roboto:300italic,400italic,300,400,500,700,900' rel='stylesheet' type='text/css'/>
+		<link type="text/css" rel="stylesheet" href="/static/css/theme-default/bootstrap.css?1422792965" />
+		<link type="text/css" rel="stylesheet" href="/static/css/theme-default/materialadmin.css?1425466319" />
+		<link type="text/css" rel="stylesheet" href="/static/css/theme-default/font-awesome.min.css?1422529194" />
+		<link type="text/css" rel="stylesheet" href="/static/css/theme-default/material-design-iconic-font.min.css?1421434286" />
+		{% block css %} {% endblock %}
+		<!-- END STYLESHEETS -->
+
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+		<script type="text/javascript" src="/static/js/libs/utils/html5shiv.js?1403934957"></script>
+		<script type="text/javascript" src="/static/static/js/libs/utils/respond.min.js?1403934956"></script>
+		<![endif]-->
+	</head>
+	<body class="menubar-hoverable header-fixed ">
+
+		<!-- BEGIN HEADER-->
+		<header id="header" >
+			<div class="headerbar">
+				<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="headerbar-left">
+					<ul class="header-nav header-nav-options">
+						<li class="header-nav-brand" >
+							<div class="brand-holder">
+								<a href="/index">
+									<img src="/static/img/icon.png	">
+									<span class="text-lg text-bold text-primary"> {{ appname }} </span>
+								</a>
+							</div>
+						</li>
+					</ul>
+				</div>
+				<!-- Collect the nav links, forms, and other content for toggling -->
+				<div class="headerbar-right">
+					<!--<form class="form form-inverse">-->
+						<!--<div class="form-group">-->
+							<!--<div class="input-group input-group-lg">-->
+								<!--<div class="input-group-content">-->
+									<!--<input type="text" class="form-control" id="searchInput" placeholder="Enter your search here">-->
+									<!--<div class="form-control-line"></div>-->
+								<!--</div>-->
+								<!--<div class="input-group-btn">-->
+									<!--<button class="btn btn-floating-action btn-default-bright" type="button"><i class="fa fa-search"></i></button>-->
+								<!--</div>-->
+							<!--</div>-->
+						<!--</div>-->
+					<!--</form>-->
+
+					<ul class="header-nav header-nav-profile">
+					    {% if current_user.is_authenticated %}
+						<li class="dropdown">
+							<a href="javascript:void(0);" class="dropdown-toggle ink-reaction" data-toggle="dropdown">
+								<img src="/static/img/avatar.png" alt="" />
+								<span class="profile-info">
+									{{ current_user.username }}
+									<small>Administrator</small>
+								</span>
+							</a>
+							<ul class="dropdown-menu animation-dock">
+								<li class="dropdown-header">Config</li>
+								<li><a href="/addgame/">Add game</a></li>
+								<li><a href="/settings/">Settings</a></li>
+								<li><a href="/calender/">My appointments</a></li>
+								<li class="divider"></li>
+								<li><a href="/logout"><i class="fa fa-fw fa-power-off text-danger"></i> Logout</a></li>
+							</ul>
+						</li>
+						{% else %}
+							<li class="dropdown">
+							<a href="javascript:void(0);" class="dropdown-toggle ink-reaction" data-toggle="dropdown">
+								<img src="/static/img/avatar.png" alt="" />
+								<span class="profile-info">
+									Guest
+								</span>
+							</a>
+							<ul class="dropdown-menu animation-dock">
+								<li><a href="/login/">Login</a></li>
+							</ul>
+						</li>
+						{% endif %}
+					</ul>
+				</div>
+			</div>
+		</header>
+		<!-- END HEADER-->
+
+	    {% block content %}{% endblock %}
+
+	    {% block js %}{% endblock %}
+	</body>
+</html>

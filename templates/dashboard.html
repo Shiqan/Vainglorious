@@ -1,0 +1,718 @@
+{% extends "layout.html" %}
+{% block title %} Dashboard {% endblock %}
+{% block css %}
+ 	<link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/rickshaw/rickshaw.css?1422792967" />
+	<link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/morris/morris.core.css?1420463396" />
+    <link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/DataTables/jquery.dataTables.css?1423553989" />
+    <link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/DataTables/extensions/dataTables.colVis.css?1423553990" />
+    <link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/DataTables/extensions/dataTables.tableTools.css?1423553990" />
+    <style>
+        #datatable1 tr td.alert-callout {
+            border-bottom:0px;
+            border-right:0px;
+            border-top:1px solid rgba(189, 193, 193, 0.2);;
+        }
+
+        .small-hero, #datatable2 tr td img {
+            width: 30px;
+            height: 30px;
+            border-radius: 30px;
+            margin-right: 10px;
+            float: left;
+        }
+
+        .mbox {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            margin: 10px 0px 0px 25px;
+            padding-left: 4px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <!-- BEGIN BASE-->
+	<div id="base">
+
+		<!-- BEGIN CONTENT-->
+		<div id="content">
+			<section>
+				<div class="section-body">
+					<div class="row">
+
+						<!-- BEGIN ALERT - GOLD -->
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-info no-margin">
+										<strong class="text-xl">$ {{ avg_gold }}</strong><br/>
+										<span class="opacity-50">Avg. Gold</span>
+										<div class="stick-bottom-left-right">
+											<div class="height-2 sparkline-revenue" data-line-color="#bdc1c1"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- END ALERT - GOLD -->
+
+						<!-- BEGIN ALERT - KDA -->
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-warning no-margin">
+									     {% if kill_participation_diff < 0 %}
+										    <strong class="pull-right text-danger text-lg">{{ kill_participation_diff }}%<i class="md md-trending-down"></i></strong>
+										{% else %}
+										    <strong class="pull-right text-success text-lg">{{ kill_participation_diff }}%<i class="md md-trending-up"></i></strong>
+										{% endif %}
+										<strong class="text-xl">{{ kill_participation }}%</strong><br/>
+										<span class="opacity-50">Kill participation</span>
+										<div class="stick-bottom-left-right">
+											<div class="progress progress-hairline no-margin">
+												<div class="progress-bar progress-bar-warning" style="width:{{ kill_participation }}%"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- END ALERT - KDA -->
+
+						<!-- BEGIN ALERT - WIN RATE -->
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-danger no-margin">
+									    {% if win_rate_diff < 0 %}
+										    <strong class="pull-right text-danger text-lg">{{ win_rate_diff }}%<i class="md md-trending-down"></i></strong>
+										{% else %}
+										    <strong class="pull-right text-success text-lg">{{ win_rate_diff }}%<i class="md md-trending-up"></i></strong>
+										{% endif %}
+										<strong class="text-xl">{{ win_rate }}%</strong><br/>
+										<span class="opacity-50">Win rate</span>
+										<div class="stick-bottom-left-right">
+											<div class="progress progress-hairline no-margin">
+												<div class="progress-bar progress-bar-danger" style="width:{{ win_rate }}%"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- END ALERT - WIN RATE -->
+
+						<!-- BEGIN ALERT - AVG GAME LENGTH -->
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-success no-margin">
+										<h1 class="pull-right text-success"><i class="md md-timer"></i></h1>
+										<strong class="text-xl">{{ avg_length | convert_time }}</strong><br/>
+										<span class="opacity-50">Avg. game length</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- END ALERT - AVG GAME LENGTH -->
+					</div>
+
+					<div class="row">
+
+					    <!-- BEGIN TODAY STATS -->
+					    <div class="col-md-3">
+						    <div class="card">
+						        <div class="row">
+						            <div class="col-md-12">
+										<div class="card-head">
+											<header class="text-primary">Today's stats</header>
+										</div>
+										<div class="card-body height-8">
+										    {% if games_today | length > 0 %}
+    											<strong>{{ win_rate_today }}% </strong> Win rate
+    											<div class="progress progress-hairline">
+    												<div class="progress-bar progress-bar-primary-dark" style="width:{{win_rate_today}}%"></div>
+    											</div>
+
+    											{{ kill_participation_today }}% Kill participation
+    											<div class="progress progress-hairline">
+    												<div class="progress-bar progress-bar-primary-dark" style="width:{{kill_participation_today}}%"></div>
+    											</div>
+
+    											{{ avg_gold_today }} Avg Gold
+                                                <div class="progress progress-hairline">
+    												<div class="progress-bar progress-bar-primary-dark" style="width:0%"></div>
+    											</div>
+    											{{ avg_length_today | convert_time }} Avg game length
+                                                <div class="progress progress-hairline">
+    												<div class="progress-bar progress-bar-primary-dark" style="width:0%"></div>
+    											</div>
+
+                                                {% if games_today | length == 1 %}
+                                                    {{ games_today | length }} game played.
+                                                {% else %}
+                                                    {{ games_today | length }} games played.
+                                                {% endif %}
+
+    										{% else %}
+    										    <i> No games played yet today. </i>
+    										{% endif %}
+										</div>
+						            </div>
+						        </div>
+						    </div>
+						</div>
+					    <!-- END TODAY STATS -->
+
+						<!-- BEGIN HERO STATS -->
+						<div class="col-md-9">
+							<div class="card">
+								<div class="row">
+									<div class="col-md-8">
+										<div class="card-head">
+											<header class="text-primary"></header>
+										</div>
+										<div class="card-body height-8">
+											<div id="flot-visitors-legend" class="flot-legend-horizontal stick-top-right no-y-padding"></div>
+											<div id="flot-visitors" class="flot height-7" data-color="#0aa89e,#7dd8d2"></div>
+										</div>
+									</div>
+									<div class="col-md-4">
+        								<div class="card-head">
+        									<header class="text-primary"></header>
+        								</div>
+        								<div class="card-body">
+        									<div id="morris-donut-graph" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+        								</div>
+            						</div>
+								</div>
+							</div>
+						</div>
+						<!-- END HERO STATS -->
+					</div>
+
+					<!-- BEGIN GAME TABLE -->
+					<div class="row">
+					    <div class="col-md-12">
+					        <div class="card">
+					            <div class="card-head">
+                                    <header class="text-primary">My games</header>
+         <!--                           <div class="tools">-->
+									<!--	<div class="btn-group">-->
+									<!--		<a href="/addgame/" class="btn btn-icon-toggle"><i class="md md-add"></i></a>-->
+									<!--	</div>-->
+									<!--</div>-->
+					            </div>
+					            <div class="card-body">
+					                <div class="table-responsive">
+    									<table id="datatable1" class="table table-striped table-hover">
+    										<thead>
+    											<tr>
+    												<th>Hero</th>
+    												<th>Position</th>
+    												<th>Kills</th>
+    												<th>Deaths</th>
+    												<th>Assists</th>
+    												<th>Gold</th>
+    												<th>CS</th>
+    												<th>Time</th>
+    												<th>Mode</th>
+    											</tr>
+    										</thead>
+    										<tbody>
+    										    {% for game in games | reverse %}
+    										        <tr data-url="/game/{{game.id}}/">
+    										            <td class="ink-reaction alert alert-callout {% if game.result %} alert-success  {% else %} alert-danger {% endif %} "> {{ game.hero_id | id_to_hero }} </td>
+    										            <td class="ink-reaction"> {{ game.position | id_to_position }} </td>
+    										            <td class="ink-reaction"> {{ game.kills }} </td>
+    										            <td class="ink-reaction"> {{ game.deaths }} </td>
+    										            <td class="ink-reaction"> {{ game.assists }} </td>
+    										            <td class="ink-reaction"> {{ game.gold }} </td>
+    										            <td class="ink-reaction"> {{ game.cs }} </td>
+    										            <td class="ink-reaction"> {{ game.time | convert_time }} </td>
+    										            <td class="ink-reaction"> {{ game.mode | id_to_mode }} </td>
+    										        </tr>
+    										    {% endfor %}
+    										</tbody>
+    									</table>
+    								</div>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+					<!-- END GAME TABLE -->
+
+					<!-- BEGIN HERO TABLE -->
+					<div class="row">
+					    <div class="col-md-12">
+					        <div class="card">
+					            <div class="card-head">
+                                    <header class="text-primary">My heroes</header>
+					            </div>
+					            <div class="card-body">
+					                <div class="table-responsive">
+    									<table id="datatable2" class="table table-striped table-hover">
+    										<thead>
+    											<tr>
+    												<th>Hero</th>
+    												<th>Games</th>
+    												<th>Winrate</th>
+    												<th>Kills</th>
+    												<th>Deaths</th>
+    												<th>Assists</th>
+    												<th>Gold</th>
+    											</tr>
+    										</thead>
+    										<tbody>
+    										     {% for hero in heroes %}
+    										        <tr data-url="/hero/{{hero.id}}/">
+    										            <td class="ink-reaction">
+    										                <img src="/static/img/{{ hero.img }}" alt="">
+    										                {{ hero.name }}
+    										            </td>
+    										            <td class="ink-reaction"> {{ hero_stats[hero]['games'] }} </td>
+    										            <td class="ink-reaction"> {{ hero_stats[hero]['winrate'] }} </td>
+    										            <td class="ink-reaction"> {{ hero_stats[hero]['kills'] }} </td>
+    										            <td class="ink-reaction"> {{ hero_stats[hero]['deaths'] }} </td>
+    										            <td class="ink-reaction"> {{ hero_stats[hero]['assists'] }} </td>
+    										            <td class="ink-reaction"> {{ hero_stats[hero]['gold'] }} </td>
+    										        </tr>
+    										    {% endfor %}
+    										</tbody>
+    									</table>
+    								</div>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+					<!-- END HERO TABLE -->
+
+					<!-- BEGIN POSITION STATS -->
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="row">
+								    {% for p in pos_stats %}
+                						<div class="col-md-4">
+    										<div class="card-head">
+    											<header class="text-primary"> {{ p | id_to_position }}</header>
+    										</div>
+    										<div class="card-body height-8">
+    										    {% if pos_stats[p]['games'] > 0 %}
+        											<strong>{{ pos_stats[p]['winrate'] }}% </strong> Win rate
+        											<div class="progress progress-hairline">
+        												<div class="progress-bar progress-bar-primary-dark" style="width:{{pos_stats[p]['winrate']}}%"></div>
+        											</div>
+
+        											{{ pos_stats[p]['kda'] }}% Kill participation
+        											<div class="progress progress-hairline">
+        												<div class="progress-bar progress-bar-primary-dark" style="width:{{pos_stats[p]['kda']}}%"></div>
+        											</div>
+
+        											{{ pos_stats[p]['kills'] }} / {{ pos_stats[p]['deaths'] }} / {{ pos_stats[p]['assists'] }} KDA
+                                                    <div class="progress progress-hairline">
+        												<div class="progress-bar progress-bar-primary-dark" style="width:0%"></div>
+        											</div>
+
+
+                                                    {% if pos_stats[p]['games'] == 1 %}
+                                                        {{ pos_stats[p]['games'] }} game played.
+                                                    {% else %}
+                                                        {{ pos_stats[p]['games'] }} games played.
+                                                    {% endif %}
+                                                    <div class="progress progress-hairline">
+    												    <div class="progress-bar progress-bar-primary-dark" style="width:0%"></div>
+    											    </div>
+
+                                                    {% for h in pos_stats[p]["heroes"] %}
+        											    {% if h[2] > 0 %}
+        											        <img class="small-hero" src="/static/img/{{ h[0].img }}" alt="" data-toggle="tooltip" data-placement="top" data-original-title="Games: {{ h[2] }}">
+        											    {% endif %}
+        											{% endfor %}
+
+
+        										{% else %}
+        										    <i> No games played as {{ p | id_to_position }} yet.</i>
+        										{% endif %}
+    										</div>
+    						            </div>
+    						        {% endfor %}
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- END POSITION STATS -->
+
+					<!-- BEGIN GAME MODE STATS -->
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="row">
+									<div class="col-md-3">
+        								<div class="card-head">
+        									<header class="text-primary"></header>
+        								</div>
+        								<div class="card-body">
+        									<div id="morris-donut-graph2" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+        								</div>
+            						</div>
+            						<div class="col-md-4">
+										<div class="card-head">
+											<header class="text-primary">Ranked</header>
+										</div>
+										<div class="card-body height-8">
+										    {% if ranked_stats['games'] > 0 %}
+    											<strong>{{ ranked_stats['winrate'] }}% </strong> Win rate
+    											<div class="progress progress-hairline">
+    												<div class="progress-bar progress-bar-primary-dark" style="width:{{ranked_stats['winrate']}}%"></div>
+    											</div>
+
+    											{{ ranked_stats['kda'] }}% Kill participation
+    											<div class="progress progress-hairline">
+    												<div class="progress-bar progress-bar-primary-dark" style="width:{{ranked_stats['kda']}}%"></div>
+    											</div>
+
+    											{{ ranked_stats['kills'] }} / {{ ranked_stats['deaths'] }} / {{ ranked_stats['assists'] }} KDA
+                                                <div class="progress progress-hairline">
+    												<div class="progress-bar progress-bar-primary-dark" style="width:0%"></div>
+    											</div>
+
+    											{% for p in ranked_stats['positions'] %}
+    											    {{ p | id_to_position }}: {{ ranked_stats['positions'][p]}}
+    											{% endfor %}
+                                                <div class="progress progress-hairline">
+    												<div class="progress-bar progress-bar-primary-dark" style="width:0%"></div>
+    											</div>
+
+                                                {% if ranked_stats['games'] == 1 %}
+                                                    {{ ranked_stats['games'] }} game played.
+                                                {% else %}
+                                                    {{ ranked_stats['games'] }} games played.
+                                                {% endif %}
+
+    										{% else %}
+    										    <i> No ranked games played yet today. </i>
+    										{% endif %}
+										</div>
+						            </div>
+						            <div class="col-md-4">
+										<div class="card-head">
+											<header class="text-primary">Casual</header>
+										</div>
+										<div class="card-body height-8">
+										    {% if casual_stats['games'] > 0 %}
+    											<strong>{{ casual_stats['winrate'] }}% </strong> Win rate
+    											<div class="progress progress-hairline">
+    												<div class="progress-bar progress-bar-primary-dark" style="width:{{casual_stats['winrate']}}%"></div>
+    											</div>
+
+    											{{ casual_stats['kda'] }}% Kill participation
+    											<div class="progress progress-hairline">
+    												<div class="progress-bar progress-bar-primary-dark" style="width:{{casual_stats['kda']}}%"></div>
+    											</div>
+
+    											{{ casual_stats['kills'] }} / {{ casual_stats['deaths'] }} / {{ casual_stats['assists'] }} KDA
+                                                <div class="progress progress-hairline">
+    												<div class="progress-bar progress-bar-primary-dark" style="width:0%"></div>
+    											</div>
+
+    											{% for p in casual_stats['positions'] %}
+    											    {{ p | id_to_position }}: {{ casual_stats['positions'][p]}}
+    											{% endfor %}
+                                                <div class="progress progress-hairline">
+    												<div class="progress-bar progress-bar-primary-dark" style="width:0%"></div>
+    											</div>
+
+                                                {% if casual_stats['games'] == 1 %}
+                                                    {{ casual_stats['games'] }} game played.
+                                                {% else %}
+                                                    {{ casual_stats['games'] }} games played.
+                                                {% endif %}
+
+    										{% else %}
+    										    <i> No casual games played yet. </i>
+    										{% endif %}
+										</div>
+						            </div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- END GAME MODE STATS -->
+
+					<!-- BEGIN HERO STATS -->
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+							    <div class="card-head">
+							        <header class="text-primary">Heroes played by teammates &amp; opponents</header>
+							    </div>
+							    <div class="card-body">
+							        <div id="morris-bar-graph" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+							        <div id="legend">
+							            <div class="mbox" style="background-color: #9C27B0"></div> <span>Winrate with hero in team</span>
+							            <div class="mbox" style="background-color: #2196F3"></div> <span>Winrate against hero</span>
+							            <div class="mbox" style="background-color: #0aa89e"></div> <span>Number of games</span>
+							        </div>
+                                </div>
+							</div>
+						</div>
+					</div>
+					<!-- END HERO STATS -->
+				</div>
+			</section>
+		</div>
+		<!-- END CONTENT -->
+	</div>
+	<!-- END BASE -->
+{% endblock %}
+
+
+{% block js %}
+  	<!-- BEGIN JAVASCRIPT -->
+	<script src="/static/js/libs/jquery/jquery-1.11.2.min.js"></script>
+	<script src="/static/js/libs/jquery/jquery-migrate-1.2.1.min.js"></script>
+	<script src="/static/js/libs/bootstrap/bootstrap.min.js"></script>
+	<script src="/static/js/libs/spin.js/spin.min.js"></script>
+	<script src="/static/js/libs/autosize/jquery.autosize.min.js"></script>
+	<script src="/static/js/libs/moment/moment.min.js"></script>
+	<script src="/static/js/libs/flot/jquery.flot.min.js"></script>
+	<script src="/static/js/libs/flot/jquery.flot.time.min.js"></script>
+	<script src="/static/js/libs/flot/jquery.flot.resize.min.js"></script>
+	<script src="/static/js/libs/flot/jquery.flot.orderBars.js"></script>
+	<script src="/static/js/libs/flot/jquery.flot.pie.js"></script>
+	<script src="/static/js/libs/flot/curvedLines.js"></script>
+	<script src="/static/js/libs/jquery-knob/jquery.knob.min.js"></script>
+	<script src="/static/js/libs/sparkline/jquery.sparkline.min.js"></script>
+	<script src="/static/js/libs/nanoscroller/jquery.nanoscroller.min.js"></script>
+	<script src="/static/js/libs/d3/d3.min.js"></script>
+	<script src="/static/js/libs/d3/d3.v3.js"></script>
+	<script src="/static/js/libs/raphael/raphael-min.js"></script>
+	<script src="/static/js/libs/morris.js/morris.min.js"></script>
+	<script src="/static/js/libs/rickshaw/rickshaw.min.js"></script>
+	<script src="/static/js/libs/DataTables/jquery.dataTables.min.js"></script>
+	<script src="/static/js/libs/DataTables/extensions/ColVis/js/dataTables.colVis.min.js"></script>
+	<script src="/static/js/libs/DataTables/extensions/TableTools/js/dataTables.tableTools.min.js"></script>
+	<script src="/static/js/core/source/App.js"></script>
+	<script src="/static/js/core/source/AppNavigation.js"></script>
+	<script src="/static/js/core/source/AppOffcanvas.js"></script>
+	<script src="/static/js/core/source/AppCard.js"></script>
+	<script src="/static/js/core/source/AppForm.js"></script>
+	<script src="/static/js/core/source/AppNavSearch.js"></script>
+	<script src="/static/js/core/source/AppVendor.js"></script>
+	<script>
+	window.addEventListener("resize", generateGoldGraph);
+	window.addEventListener("load", generateGoldGraph);
+	window.addEventListener("load", generateStats);
+
+	function generateGoldGraph() {
+	    // Generate gold line graph
+		var points = [{% for g in gold %} {{ g }} {% if not loop.last %},{% endif %}{% endfor %}];
+
+        var options = $('.sparkline-revenue').data();
+		options.type = 'line';
+		options.width = '100%';
+		options.height = $('.sparkline-revenue').height() + 'px';
+		options.fillColor = false;
+		$('.sparkline-revenue').sparkline(points, options);
+	}
+
+	function generateStats() {
+
+	    var chart = $("#flot-visitors");
+
+		// Elements check
+		if (!$.isFunction($.fn.plot) || chart.length === 0) {
+			return;
+		}
+
+		// Chart data
+		var data = [
+			{
+				label: 'Games played',
+				data: [
+				    {% for i in games_played %}
+				        [moment('{{ i[0] }}',  "YYYY-MM-DD"), {{ i[1] }}]{% if not loop.last %},{% endif %}
+				    {% endfor %}
+				],
+				last: true
+			}
+		];
+
+		// Chart options
+		var labelColor = chart.css('color');
+		var options = {
+			colors: chart.data('color').split(','),
+			series: {
+				shadowSize: 0,
+				lines: {
+					show: true,
+					lineWidth: false,
+					fill: true
+				},
+				curvedLines: {
+					apply: true,
+					active: true,
+					monotonicFit: false
+			   }
+			},
+			legend: {
+				container: $('#flot-visitors-legend')
+			},
+			xaxis: {
+				mode: "time",
+				timeformat: "%d %b",
+				font: {color: labelColor}
+			},
+			yaxis: {
+				font: {color: labelColor}
+			},
+			grid: {
+				borderWidth: 0,
+				color: labelColor,
+				hoverable: true
+			}
+		};
+		chart.width('100%');
+
+		// Create chart
+		var plot = $.plot(chart, data, options);
+
+		// Hover function
+		var tip, previousPoint = null;
+		chart.bind("plothover", function (event, pos, item) {
+			if (item) {
+				if (previousPoint !== item.dataIndex) {
+					previousPoint = item.dataIndex;
+
+					var x = item.datapoint[0];
+					var y = item.datapoint[1];
+					var tipContent = Math.round(y) + " " + item.series.label.toLowerCase() + " on " + moment(x).format('dddd');
+
+					if (tip !== undefined) {
+						$(tip).popover('destroy');
+					}
+					tip = $('<div></div>').appendTo('body').css({left: item.pageX, top: item.pageY - 5, position: 'absolute'});
+					tip.popover({html: true, content: tipContent, placement: 'top'}).popover('show');
+				}
+			}
+			else {
+				if (tip !== undefined) {
+					$(tip).popover('destroy');
+				}
+				previousPoint = null;
+			}
+		});
+
+	    // Games datatable
+	    $('#datatable1').DataTable({
+			"dom": 'lCfrtip',
+			"order": [],
+			"colVis": {
+				"buttonText": "Columns",
+				"overlayFade": 0,
+				"align": "right"
+			},
+			"language": {
+				"lengthMenu": '_MENU_ entries per page',
+				"search": '<i class="fa fa-search"></i>',
+				"paginate": {
+					"previous": '<i class="fa fa-angle-left"></i>',
+					"next": '<i class="fa fa-angle-right"></i>'
+				}
+			}
+		});
+
+		$('#datatable1 tbody').on('click', 'tr', function() {
+			window.location.href = $(this).data( "url" );
+		});
+
+		// Heroes datatable
+	    $('#datatable2').DataTable({
+			"dom": 'lCfrtip',
+			"order": [[ 1, "desc" ]],
+			"colVis": {
+				"buttonText": "Columns",
+				"overlayFade": 0,
+				"align": "right"
+			},
+			"language": {
+				"lengthMenu": '_MENU_ entries per page',
+				"search": '<i class="fa fa-search"></i>',
+				"paginate": {
+					"previous": '<i class="fa fa-angle-left"></i>',
+					"next": '<i class="fa fa-angle-right"></i>'
+				}
+			}
+		});
+
+		$('#datatable2 tbody').on('click', 'tr', function() {
+			window.location.href = $(this).data( "url" );
+		});
+
+        // Generate hero donut graph
+		if ($('#morris-donut-graph').length > 0) {
+			Morris.Donut({
+				element: 'morris-donut-graph',
+				data: [
+				    {% for i in heroes_played %}
+				        {value: {{ i[1] }}, label: '{{ i[0].name }}', formatted: '{{ i[2] }} games'} {% if not loop.last %},{%endif%}
+				    {% endfor %}
+				],
+                colors: $('#morris-donut-graph').data('colors').split(','),
+				formatter: function (x, data) {
+					return data.formatted;
+				}
+			});
+		}
+
+		// Generate game mode graph
+		{% if ranked_stats and casual_stats %}
+    		if ($('#morris-donut-graph2').length > 0) {
+    			Morris.Donut({
+    				element: 'morris-donut-graph2',
+    				data: [
+    				    {value: {{ ranked_stats['games'] }}, label: 'Ranked', formatted: '{{ ranked_stats["games"] }} games'},
+    				    {value: {{ casual_stats['games'] }}, label: 'Casual', formatted: '{{ casual_stats["games"] }} games'}
+    				],
+                    colors: $('#morris-donut-graph2').data('colors').split(','),
+    				formatter: function (x, data) {
+    					return data.formatted;
+    				}
+    			});
+    		}
+    	{% endif %}
+	}
+	</script>
+	<script>
+	    $(function() {
+	            	// test
+    	if ($('#morris-bar-graph').length > 0) {
+    	    var morrisChart = Morris.Bar({
+				element: 'morris-bar-graph',
+				data: [
+				    {% for hero, stats in lose_rate %}
+				        {label: '<img class="img-circle img-responsive" src="/static/img/{{ hero | id_to_hero_img }}" style="display: block;  margin-left: auto; margin-right: auto;" width="30px" height="30px" alt=""></img>',
+				         w: '{{ stats["total_with"] }}',
+				         x: '{{ hero | id_to_hero }}',
+				         y:'{{ stats["winrate_with"] }}',
+				         z: '{{stats["winrate_against"] }}' } {% if not loop.last %},{%endif%}
+				    {% endfor %}
+				],
+				xkey: 'x',
+				xLabelAngle: 60,
+                hoverCallback: function(index, options, content) {
+                  var data = options.data[index];
+            	  return (data.label + content);
+                },
+                hideHover: true,
+				ykeys: ['y', 'z', 'w'],
+				labels: ['Winrate with', 'Winrate against', 'Games'],
+				barColors: $('#morris-bar-graph').data('colors').split(',')
+			});
+        }
+	    });
+	</script>
+	<!-- END JAVASCRIPT -->
+{% endblock %}
