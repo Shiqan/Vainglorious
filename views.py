@@ -132,6 +132,11 @@ def te():
                            heroes_played=heroes_played,
                            heroes_winrates=heroes_winrates)
 
+@app.route('/hero/<hero>')
+def view_hero(hero):
+
+    return render_template('blank.html', hero="Adagio")
+
 
 # ------------------
 # ERROR HANDLERS
