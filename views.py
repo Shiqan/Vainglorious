@@ -85,13 +85,17 @@ def logout():
 @app.route('/')
 @app.route('/index/')
 def index():
+    return render_template('blank.html')
+
+@app.route('/query')
+def query_matches():
     api = VaingloryApi("aaa.bbb.ccc")
 
     # split request to batches of 50
     max_limit = 50
-    limit = 20000
+    limit = 10000
     matches = []
-    for batch in range(10000, limit, max_limit):
+    for batch in range(0, limit, max_limit):
         response = api.matches(offset=batch, limit=max_limit, sort="-createdAt")
         matches.append(dict(response))
         limit -= max_limit
@@ -109,32 +113,6 @@ def index():
     # match = api.match("f78917d2-d7cf-11e6-ad79-062445d3d668")
 
     return render_template('200.html')
-
-
-@app.route('/test/')
-def te():
-    # m = db.session.query(Match).get("f78917d2-d7cf-11e6-ad79-062445d3d668")
-    # print m.rosters[0].participants
-
-    p = db.session.query(Player).get("2537169e-2619-11e5-91a4-06eb725f8a76")
-    print p.name
-    print p.participated[0].roster.match.duration
-
-    t = db.session.query(Participant).get("00123cd2-e4d2-11e6-9872-0242ac110006")
-    print t.actor
-    print t.items
-
-    heroes_played = db.session.query(Participant.actor, func.count(Participant.actor)).group_by(Participant.actor).all()
-    heroes_won = db.session.query(Participant.actor, func.count(Participant.actor))\
-        .filter(Participant.winner == 1).group_by(Participant.actor).all()
-
-    heroes_winrates = [(actor2[1] / actor1[1])*100 for actor1 in heroes_played for actor2 in heroes_won if actor1[0] == actor2[0]]
-
-    best_comps = []
-
-    return render_template('blank.html',
-                           heroes_played=heroes_played,
-                           heroes_winrates=heroes_winrates)
 
 
 @app.route('/hero/<hero>/')
