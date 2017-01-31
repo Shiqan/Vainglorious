@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block title %} {{ hero }} {% endblock %}
+{% block title %} {{ hero|title  }} {% endblock %}
 {% block css %}
 	<style>
         .hero-icon img {
@@ -10,34 +10,39 @@
     </style>
 {% endblock %}
 {% block content %}
+
 	<!-- BEGIN CONTENT-->
 		<div id="content">
 
 			<!-- BEGIN HERO HEADER -->
 			<section class="full-bleed">
 				<div class="section-body style-default-dark force-padding text-shadow">
-					<div class="img-backdrop" style="background-image: url('/static/img/adagio_splash.png')"></div>
+					<div class="img-backdrop" style="background-image: url('/static/img/{{ hero|lower }}_splash.png')"></div>
 					<div class="overlay overlay-shade-top stick-top-left height-3"></div>
 					<div class="row">
 						<div class="col-md-3 col-xs-5">
-							<img class="img-circle border-white border-xl img-responsive auto-width" src="/static/img/adagio.png" alt="" />
-							<h3> {{ hero }} <br/><small>Jungle, protector</small></h3>
+							<img class="img-circle border-white border-xl img-responsive auto-width" src="/static/img/{{ hero|lower }}.png" alt="" />
+							<h3> {{ hero|title }} <br/><small>Jungle, protector</small></h3>
 						</div>
 						<div class="col-md-9 col-xs-7">
 							<div class="width-3 text-center pull-right">
-								<strong class="text-xl">{{ games_played }}</strong><br/>
+								<strong class="text-xl">{{ matches_played }}</strong><br/>
 								<span class="text-light opacity-75">Games</span>
 							</div>
 							<div class="width-3 text-center pull-right">
-								<strong class="text-xl">{{ games_played }}</strong><br/>
+								<strong class="text-xl">{{'%0.2f'| format((matches_won / matches_played) * 100|float)}}</strong>%<br/>
+								<span class="text-light opacity-75">Winrate</span>
+							</div>
+							<div class="width-3 text-center pull-right">
+								<strong class="text-xl">{{ kda['assists'] }}</strong><br/>
 								<span class="text-light opacity-75">Assists</span>
 							</div>
 							<div class="width-3 text-center pull-right">
-								<strong class="text-xl">{{ games_played }}</strong><br/>
+								<strong class="text-xl">{{ kda['deaths'] }}</strong><br/>
 								<span class="text-light opacity-75">Deaths</span>
 							</div>
 							<div class="width-3 text-center pull-right">
-								<strong class="text-xl">108</strong><br/>
+								<strong class="text-xl">{{ kda['kills'] }}</strong><br/>
 								<span class="text-light opacity-75">Kills</span>
 							</div>
 						</div>
@@ -49,304 +54,109 @@
 			<section>
 				<div class="section-body no-margin">
 					<div class="row">
-						<div class="col-md-8">
-							<h2>Timeline</h2>
+						<div class="col-lg-8 col-xs-12">
+							<h2>Best {{ hero|title }} players </h2>
 
-							<!-- BEGIN ENTER MESSAGE -->
-							<form class="form">
-								<div class="card no-margin">
-									<div class="card-body">
-										<div class="form-group floating-label">
-											<textarea name="status" id="status" class="form-control autosize" rows="1"></textarea>
-											<label for="status">What's on your mind?</label>
-										</div>
-									</div>
-									<div class="card-actionbar">
-										<div class="card-actionbar-row">
-											<div class="pull-left">
-												<a class="btn btn-icon-toggle ink-reaction btn-default"><i class="md md-camera-alt"></i></a>
-												<a class="btn btn-icon-toggle ink-reaction btn-default"><i class="md md-location-on"></i></a>
-												<a class="btn btn-icon-toggle ink-reaction btn-default"><i class="md md-attach-file"></i></a>
-											</div>
-											<a href="javascript:void(0);" class="btn btn-flat btn-accent ink-reaction">Post</a>
-										</div>
-									</div>
-								</div>
-							</form>
+							<table id="best_players" class="table table-striped table-hover no-margin">
+								<thead>
+									<tr>
+										<th>#</th>
+										<th>Player</th>
+										<th>Games</th>
+										<th>Wins</th>
+										<th>Winrate%</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for p, v in players %}
+										<tr data-url="http://alpha.vain.gg/#/{{p}}">
+											<td> {{ loop.index }} </td>
+											<td> {{ p }}</td>
+											<td> {{ v['total'] }}</td>
+											<td> {{ v['win'] }}</td>
+											<td> {{'%0.2f'| format(v['ratio'])}}% </td>
 
-							<!-- BEGIN ENTER MESSAGE -->
-
-							<!-- BEGIN MESSAGE ACTIVITY -->
-							<div class="tab-pane" id="activity">
-								<ul class="timeline collapse-lg timeline-hairline">
-									<li class="timeline-inverted">
-										<div class="timeline-circ circ-xl style-primary"><i class="md md-event"></i></div>
-										<div class="timeline-entry">
-											<div class="card style-default-light">
-												<div class="card-body small-padding">
-													<span class="text-medium">Received a <a class="text-primary" href="../../html/mail/inbox.html">message</a> from <span class="text-primary">Ann Lauren</span></span><br/>
-													<span class="opacity-50">
-														Saturday, Oktober 18, 2014
-													</span>
-												</div>
-											</div>
-										</div>
-									</li>
-									<li>
-										<div class="timeline-circ circ-xl style-primary-dark"><i class="md md-access-time"></i></div>
-										<div class="timeline-entry">
-											<div class="card style-default-light">
-												<div class="card-body small-padding">
-													<p>
-														<span class="text-medium">User login at <span class="text-primary">8:15 pm</span></span><br/>
-														<span class="opacity-50">
-															Saturday, August 2, 2014
-														</span>
-													</p>
-													Check out my new location.
-												</div>
-											</div>
-										</div>
-									</li>
-									<li>
-										<div class="timeline-circ circ-xl style-primary"><i class="md md-location-on"></i></div>
-										<div class="timeline-entry">
-											<div class="card style-default-light">
-												<div class="card-body small-padding">
-													<img class="img-circle img-responsive pull-left width-1" src="../../assets/img/avatar2.jpg?1404026449" alt="" />
-													<span class="text-medium">Meeting in the <span class="text-primary">conference room</span></span><br/>
-													<span class="opacity-50">
-														Saturday, Juli 29, 2014
-													</span>
-												</div>
-												<div class="card-body">
-													<p><em>Walked all the way home...</em></p>
-													<img class="img-responsive" src="../../assets/img/img14.jpg?1404589160" alt="" />
-												</div>
-											</div>
-										</div>
-									</li>
-								</ul>
-							</div>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
 						</div>
-						<!-- END MESSAGE ACTIVITY -->
+						<!-- END BEST PLAYERS -->
 
-						<!-- BEGIN PROFILE SIDEBAR -->
-						<div class="col-lg-offset-1 col-lg-3 col-md-4">
+						<!-- BEGIN HERO SIDEBAR -->
+						<div class="col-lg-offset-1 col-lg-3 col-xs-12">
 							<div class="card card-underline style-default-dark">
 								<div class="card-head">
 									<header class="opacity-75"><small>Most common builds</small></header>
 								</div>
 								<div class="card-body no-padding">
 									<ul class="list">
-										<li class="tile">
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-											</a>
-										</li>
-										<li class="divider-inset"></li>
-										<li class="tile">
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-											</a>
-										</li>
+										{% for build, _ in builds %}
+											<li class="tile">
+											{% for item in build.split(', ') %}
+												<a class="tile-content ink-reaction" data-toggle="tooltip" title="{{ item }}">
+													<div class="tile-icon hero-icon">
+														<img src="/static/img/items/{{ item|lower|replace(' ', '-')|replace('\'', '') }}.png" alt="" />
+													</div>
+												</a>
+											{% endfor %}
+											</li>
+											<li class="divider-inset"></li>
+										{% endfor %}
 									</ul>
 								</div>
 							</div>
 							<div class="card card-underline style-default-dark">
 								<div class="card-head">
-									<header class="opacity-75"><small>Most common teammates</small></header>
+									<header class="opacity-75"><small>Most common team compositions</small></header>
 								</div>
 								<div class="card-body no-padding">
 									<ul class="list">
-										<li class="tile">
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/lance.png" alt="" />
-												</div>
-												<div class="tile-text">
-													Lance
-													<small>Protector</small>
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/lance.png" alt="" />
-												</div>
-												<div class="tile-text">
-													Lance
-													<small>Protector</small>
-												</div>
-											</a>
-										</li>
-										<li class="tile">
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-												<div class="tile-text">
-													Phinn
-													<small>Protector</small>
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-												<div class="tile-text">
-													Phinn
-													<small>Protector</small>
-												</div>
-											</a>
-										</li>
-										<li class="tile">
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/corpus.png" alt="" />
-												</div>
-												<div class="tile-text">
-													Corpus
-													<small>God</small>
-												</div>
-											</a>
-
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/corpus.png" alt="" />
-												</div>
-												<div class="tile-text">
-													Corpus
-													<small>God</small>
-												</div>
-											</a>
-										</li>
+										{% for team, _ in teammates %}
+											<li class="tile">
+												{% for actor in team.split(', ') %}
+													<a class="tile-content ink-reaction" href="hero/{{ actor|lower }}">
+														<div class="tile-icon hero-icon">
+															<img src="/static/img/{{ actor|lower }}.png" alt="" />
+														</div>
+														<div class="tile-text">
+															{{ actor }}
+															<small>Protector</small>
+														</div>
+													</a>
+												{% endfor %}
+											</li>
+										{% endfor %}
 									</ul>
 								</div>
 							</div>
 
 							<div class="card card-underline style-default-dark">
 								<div class="card-head">
-									<header class="opacity-75"><small>Most common enemies</small></header>
+									<header class="opacity-75"><small>Most common enemy compositions</small></header>
 								</div>
 								<div class="card-body no-padding hero-icon">
 									<ul class="list">
-										<li class="tile">
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/lance.png" alt="" />
-												</div>
-												<div class="tile-text">
-													Lance
-													<small>Protector</small>
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/lance.png" alt="" />
-												</div>
-												<div class="tile-text">
-													Lance
-													<small>Protector</small>
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/lance.png" alt="" />
-												</div>
-												<div class="tile-text">
-													Lance
-													<small>Protector</small>
-												</div>
-											</a>
-										</li>
-										<li class="tile">
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-												<div class="tile-text">
-													Phinn
-													<small>Protector</small>
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-												<div class="tile-text">
-													Phinn
-													<small>Protector</small>
-												</div>
-											</a>
-											<a class="tile-content ink-reaction">
-												<div class="tile-icon hero-icon">
-													<img src="/static/img/phinn.png" alt="" />
-												</div>
-												<div class="tile-text">
-													Phinn
-													<small>Protector</small>
-												</div>
-											</a>
-										</li>
+										{% for team, _ in enemies %}
+											<li class="tile">
+												{% for actor in team.split(', ') %}
+													<a class="tile-content ink-reaction" href="hero/{{ actor|lower }}">
+														<div class="tile-icon hero-icon">
+															<img src="/static/img/{{ actor|lower }}.png" alt="" />
+														</div>
+														<div class="tile-text">
+															{{ actor }}
+															<small>Protector</small>
+														</div>
+													</a>
+												{% endfor %}
+											</li>
+										{% endfor %}
 									</ul>
 								</div>
 							</div>
 						</div>
-						<!-- END PROFILE MENUBAR -->
+						<!-- END HERO SIDEBAR -->
 
 					</div>
 				</div>
@@ -376,6 +186,7 @@
 $(function() {
     console.log( "ready!" );
 
+	/**
 	var options = {
 	  useEasing : true,
 	  useGrouping : true,
@@ -385,7 +196,11 @@ $(function() {
 	  suffix : ''
 	};
 	var demo = new CountUp("myTargetElement", 0, 108, 0, 2.5, options);
-	demo.start();
+	demo.start(); */
+
+	$("#best_players tr").click(function() {
+	 	window.open($(this).data('url'), '_blank');
+	 });
 });
 </script>
 

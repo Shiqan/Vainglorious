@@ -12,6 +12,9 @@ from models import *
 from commons import *
 import process_data
 import pprint
+import operator
+import strings
+from collections import Counter
 
 @lm.user_loader
 def load_user(id):
@@ -85,18 +88,19 @@ def index():
     api = VaingloryApi("aaa.bbb.ccc")
 
     # split request to batches of 50
-    # max_limit = 50
-    # limit = 15000
-    # matches = []
-    # for batch in range(10000, limit, max_limit):
-    #     response = api.matches(offset=batch, limit=max_limit)
-    #     matches.append(dict(response))
-    #     limit -= max_limit
-    #
-    # print len(matches)
-    # process_data.process_batch_query(matches)
+    max_limit = 50
+    limit = 20000
+    matches = []
+    for batch in range(10000, limit, max_limit):
+        response = api.matches(offset=batch, limit=max_limit, sort="-createdAt")
+        matches.append(dict(response))
+        limit -= max_limit
 
-    # matches = api.matches(player="Shiqan")
+    print len(matches)
+    process_data.process_batch_query(matches)
+
+    # matches = api.matches(sort="-createdAt")
+    # pprint.pprint(matches['data'])
     # process_data.process_query(matches)
 
     # pprint.pprint(matches)
@@ -104,7 +108,7 @@ def index():
     # api.player("6abb30de-7cb8-11e4-8bd3-06eb725f8a76")
     # match = api.match("f78917d2-d7cf-11e6-ad79-062445d3d668")
 
-    return render_template('404.html')
+    return render_template('200.html')
 
 
 @app.route('/test/')
@@ -132,10 +136,82 @@ def te():
                            heroes_played=heroes_played,
                            heroes_winrates=heroes_winrates)
 
-@app.route('/hero/<hero>')
-def view_hero(hero):
 
-    return render_template('blank.html', hero="Adagio")
+@app.route('/hero/<hero>/')
+def view_hero(hero):
+    app.logger.info(hero)
+
+    actor = strings.heroes_inv[hero]
+
+    matches = db.session.query(Participant).filter_by(actor=actor).all()
+    matches_won = 0
+    kda = {'assists': 0, 'deaths': 0, 'kills': 0}
+    cs = {'lane': 0, 'jungle': 0}
+    items = Counter()
+    builds = Counter()
+    teammates = Counter()
+    enemies = Counter()
+    skins = Counter()
+    players = {}
+
+    for m in matches:
+        matches_won += m.winner
+        kda['assists'] += m.assists
+        kda['deaths'] += m.deaths
+        kda['kills'] += m.kills
+
+        cs['lane'] += m.nonJungleMinionKills
+        cs['jungle'] += m.jungleKills
+
+        skins[m.skinKey] += 1
+
+        p = m.player.name
+        if p in players:
+            players[p]['total'] += 1
+            players[p]['win'] += m.winner
+        else:
+            players[p] = {'total': 1, 'win': m.winner }
+
+        _items = [strings.items[i] for i in m.items]
+        _items.sort()
+        if _items:
+            for i in _items:
+                items[i] += 1
+            _items = ', '.join(_items)
+            builds[_items] += 1
+
+        _team = [strings.heroes[x.actor] for x in m.roster.participants]
+        _team.sort()
+        _team = ', '.join(_team)
+        if _team:
+            teammates[_team] += 1
+
+        r = m.roster
+        x = [i for i in m.roster.match.rosters if i.id != r.id][0]
+
+        _team = [strings.heroes[x.actor] for x in x.participants]
+        _team.sort()
+        _team = ', '.join(_team)
+        if _team:
+            enemies[_team] += 1
+
+    threshold = 3
+    players2 = {}
+    for p, v in players.iteritems():
+        if v['total'] > threshold:
+            w = v['win'] / v['total'] * 100
+            players2[p] = {'total': v['total'], 'win': v['win'], 'ratio': w}
+
+    items = items.most_common(5)
+    builds = builds.most_common(5)
+    teammates = teammates.most_common(5)
+    players2 = sorted(players2.iteritems(), key=lambda x: x[1]['ratio'], reverse=True)[:25]
+    skins = skins.most_common(5)
+    enemies = enemies.most_common(5)
+
+    return render_template('blank.html', hero=hero, matches_played=len(matches), matches_won=matches_won,
+                           kda=kda, items=items, builds=builds, players=players2,
+                           teammates=teammates, skins=skins, enemies=enemies)
 
 
 # ------------------

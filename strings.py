@@ -31,6 +31,8 @@ heroes = {
     "*Vox*": "Vox"
 }
 
+heroes_inv = {v.lower(): k for k, v in heroes.iteritems()}
+
 items = {
     "Aftershock": "Aftershock",
     "Armor2": "Coat of Plates",
@@ -94,10 +96,7 @@ items = {
     "Void Battery": "Void Battery",
     "War Treads": "War Treads",
     "Weapon3": "Sorrowblade",
-    "Weapon Blade": "Weapon Blade"
-}
-
-item_ids = {
+    "Weapon Blade": "Weapon Blade",
     "*1000_Item_HalcyonPotion*": "Halcyon Potion",
     "*1002_Item_WeaponBlade*": "Weapon Blade",
     "*1003_Item_CrystalBit*": "Crystal Bit",
@@ -164,15 +163,10 @@ item_ids = {
     "*1092_Item_PoisonedShiv*": "Poisoned Shiv",
     "*1095_Item_NullwaveGauntlet*": "Nullwave Gauntlet",
     "*1097_Item_Echo*": "Echo",
-    "*1105_Item_SlumberingHusk*": "Slumbering Husk"
+    "*1105_Item_SlumberingHusk*": "Slumbering Husk",
+    "Dragonblood Contract": "Dragonblood Contract",
+    "Ironguard Contract": "Ironguard Contract",
+    "BookOfEulogies": "Book of Eulogies",
+    "Weapon Infusion": "Weapon Infusion",
+    "Crystal Infusion": "Crystal Infusion"
 }
-
-def get_item(item):
-    if item in items:
-        return items[item]
-    elif item in item_ids:
-        return item_ids[item]
-    elif item in heroes:
-        return heroes[item]
-    else:
-        return item
