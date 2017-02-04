@@ -1,10 +1,10 @@
 from __future__ import division
 from flask import redirect, render_template, request, url_for, flash
-from flask_app import lm, admin
+from flask_app import lm, admin, cache
 from flask_login import login_user, logout_user, current_user
 from flask_admin.contrib.sqla import ModelView
 
-from sqlalchemy import func
+from sqlalchemy import func, case
 from functools import wraps
 
 from api import VaingloryApi
@@ -82,10 +82,67 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
+@app.route('/clear_cache')
+def clear_cache():
+    cache.clear()
+    return redirect(url_for('index'))
+
+
 @app.route('/')
 @app.route('/index/')
+@cache.cached(86400)
 def index():
-    return render_template('blank.html')
+    app.logger.info("Request index 00")
+
+    games = Match.query.count()
+    players = Player.query.count()
+    potions = sum([i["*1000_Item_HalcyonPotion*"] for i, in db.session.query(Participant.itemUses).all() if "*1000_Item_HalcyonPotion*" in i])
+    krakens, = db.session.query(func.count(Participant.krakenCaptures)).all()
+    duration, = db.session.query(func.sum(Match.duration).label("duration")).all()
+    heroes = db.session.query(Participant.actor, func.count(Participant.actor))\
+        .group_by(Participant.actor).order_by(func.count(Participant.actor)).all()
+
+    app.logger.info("Request index 01")
+
+    heroes_win_rate = db.session.query(Participant.actor, func.sum(case([(Participant.winner == True, 1)], else_=0)).label("winrate"))\
+        .group_by(Participant.actor).order_by("winrate").all()
+
+    heroes_win_rate = [(hero[0], (herowr[1] / hero[1]) * 100)for hero in heroes for herowr in heroes_win_rate if hero[0] == herowr[0]]
+    heroes_win_rate = sorted(heroes_win_rate, key=operator.itemgetter(1), reverse=True)
+
+    app.logger.info("Request index 02")
+
+    # most_wins = db.session.query(Participant.player_id, Participant.wins).group_by(Participant.player_id)\
+    #     .order_by(Participant.wins.desc()).limit(25)
+    # most_wins = [(db.session.query(Player.name).filter_by(id=i[0]).one()[0], i[1]) for i in most_wins]
+
+    heroes_kda = db.session.query(Participant.actor, func.sum(Participant.kills).label("kills"),
+                                  func.sum(Participant.deaths).label("deaths"),
+                                  func.sum(Participant.assists).label("assists"))\
+        .group_by(Participant.actor).all()
+
+    hero_stats = []
+    for hero in heroes:
+        stats = {'hero': strings.heroes[hero[0]], 'games': hero[1], 'playrate': (hero[1] / games) * 100 }
+        for hero2 in heroes_win_rate:
+            if hero[0] == hero2[0]:
+                stats['winrate'] = hero2[1]
+
+        for hero2 in heroes_kda:
+            if hero[0] == hero2[0]:
+                stats['kills'] = hero2.kills
+                stats['deaths'] = hero2.deaths
+                stats['assists'] = hero2.assists
+
+        hero_stats.append(stats)
+
+
+    app.logger.info("Request index 03")
+
+    return render_template('blank.html', games=games, players=players, potions=potions, krakens=krakens[0], duration=duration[0]*6,
+                           heroes=heroes, most_wins=0, heroes_win_rate=heroes_win_rate, hero_stats=hero_stats)
+
 
 @app.route('/query')
 def query_matches():
@@ -112,10 +169,12 @@ def query_matches():
     # api.player("6abb30de-7cb8-11e4-8bd3-06eb725f8a76")
     # match = api.match("f78917d2-d7cf-11e6-ad79-062445d3d668")
 
+    cache.clear()
     return render_template('200.html')
 
 
 @app.route('/hero/<hero>/')
+@cache.memoize(86400)
 def view_hero(hero):
     app.logger.info(hero)
 
@@ -187,7 +246,7 @@ def view_hero(hero):
     skins = skins.most_common(5)
     enemies = enemies.most_common(5)
 
-    return render_template('blank.html', hero=hero, matches_played=len(matches), matches_won=matches_won,
+    return render_template('hero.html', hero=hero, matches_played=len(matches), matches_won=matches_won,
                            kda=kda, items=items, builds=builds, players=players2,
                            teammates=teammates, skins=skins, enemies=enemies)
 

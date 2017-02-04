@@ -33,6 +33,39 @@ heroes = {
 
 heroes_inv = {v.lower(): k for k, v in heroes.iteritems()}
 
+hero_roles = {
+    "*Adagio*": "Lane, Jungle, Protector",
+    "*Alpha*": "Jungle, Warrior",
+    "*Ardan*": "Jungle, Protector",
+    "*Baron*": "Lane, Sniper",
+    "*Blackfeather*": "Lane, Assassin",
+    "*Catherine*": "Jungle, Protector",
+    "*Celeste*": "Lane, Mage",
+    "*Flicker*": "Jungle, Protector",
+    "*Fortress*": "Jungle, Protector",
+    "*Glaive*": "Jungle, Warrior",
+    "*Gwen*": "Lane, Sniper",
+    "*Hero009*": "Jungle, Warrior",
+    "*Hero010*": "Lane, Mage",
+    "*Hero016*": "Jungle, Warrior",
+    "*Idris*": "Jungle, Assassin",
+    "*Joule*": "Jungle, Warrior",
+    "*Kestrel*": "Lane, Sniper",
+    "*Koshka*": "Jungle, Assassin",
+    "*Lance*": "Jungle, Protector",
+    "*Lyra*": "Jungle, Protector",
+    "*Ozo*": "Jungle, Assassin",
+    "*Petal*": "Jungle, Sniper",
+    "*Phinn*": "Jungle, Protector",
+    "*Reim*": "Jungle, Mage",
+    "*Ringo*": "Lane, Sniper",
+    "*Samuel*": "Lane, Mage",
+    "*SAW*": "Lane, Sniper",
+    "*Sayoc*": "Jungle, Assassin",
+    "*Skye*": "Lane, Sniper",
+    "*Vox*": "Lane, Sniper "
+}
+
 items = {
     "Aftershock": "Aftershock",
     "Armor2": "Coat of Plates",

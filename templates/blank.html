@@ -1,7 +1,44 @@
 {% extends "layout.html" %}
-{% block title %} Add game {% endblock %}
+{% block title %} Dashboard {% endblock %}
 
-{% block css %}{% endblock %}
+{% block css %}
+<link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/DataTables/jquery.dataTables.css?1423553989" />
+<link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/DataTables/extensions/dataTables.colVis.css?1423553990" />
+<link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/DataTables/extensions/dataTables.tableTools.css?1423553990" />
+<link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/rickshaw/rickshaw.css?1422792967" />
+<link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/morris/morris.core.css?1420463396" />
+<style>
+    .hero-icon {
+		border-radius: 40px;
+	}
+
+	.item img.hero-icon {
+		width: 40px;
+		height: 40px;
+		cursor: pointer;
+		border-radius: 40px;
+		margin-right: 5px;
+		margin-bottom: 5px;
+	}
+
+	.col-md-4.item img.hero-icon {
+		width: 60px;
+		height: 60px;
+		border-radius: 60px;
+	}
+
+	.mixitup-control-active {
+        color: #0aa89e !important;
+        background-color: rgba(12, 12, 12, 0.07);
+	}
+
+	#datatable1 tr td.alert-callout {
+		border-bottom:0px;
+		border-right:0px;
+		border-top:1px solid rgba(189, 193, 193, 0.2);;
+	}
+</style>
+{% endblock %}
 
 {% block content %}
 	<!-- BEGIN CONTENT-->
@@ -9,22 +46,256 @@
 
 		<section>
 
-			<div class="section-body contain-lg">
+			<div class="section-body">
 				<div class="row">
-					<div class="col-lg-12 text-center">
+					<!-- BEGIN ALERT - GOLD -->
+					<div class="col-md-3 col-sm-6">
+						<div class="card">
+							<div class="card-body no-padding">
+								<div class="alert alert-callout alert-info no-margin">
+									<img class="pull-right text-success hero-icon" src="https://s-media-cache-ak0.pinimg.com/564x/9a/b8/a5/9ab8a5d52931e8528f617cb18f7fd483.jpg" width="75px" height="75px"/>
+									<strong id="games" class="text-xl"> {{ games }}</strong><br/>
+									<span class="opacity-50">Vain crystals destroyed</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- END ALERT - GOLD -->
 
+					<!-- BEGIN ALERT - KDA -->
+					<div class="col-md-3 col-sm-6">
+						<div class="card">
+							<div class="card-body no-padding">
+								<div class="alert alert-callout alert-warning no-margin">
+									<strong id="players" class="text-xl">{{ players }}%</strong><br/>
+									<span class="opacity-50">Number of players </span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- END ALERT - KDA -->
+
+					<!-- BEGIN ALERT - WIN RATE -->
+					<div class="col-md-3 col-sm-6">
+						<div class="card">
+							<div class="card-body no-padding">
+								<div class="alert alert-callout alert-danger no-margin">
+									<img class="pull-right text-success hero-icon" src="http://i.imgur.com/2EPwPt7.jpg" width="75px" height="75px"/>
+									<strong id="krakens" class="text-xl">{{ krakens }}</strong><br/>
+									<span class="opacity-50">Krakens unleashed</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- END ALERT - WIN RATE -->
+
+					<!-- BEGIN ALERT - AVG GAME LENGTH -->
+					<div class="col-md-3 col-sm-6">
+						<div class="card">
+							<div class="card-body no-padding">
+								<div class="alert alert-callout alert-success no-margin">
+									<h1 class="pull-right text-success"><i class="md md-timer"></i></h1>
+									<strong id="potions" class="text-xl">{{ duration | convert_time }}</strong><br/>
+									<span class="opacity-50">Hours well spent</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- END ALERT - AVG GAME LENGTH -->
+				</div>
+
+
+				<div class="row">
+					<!-- BEGIN HERO STATS -->
+					<div class="col-md-12">
+						<div class="card">
+							<div class="card-head">
+								<header class="text-primary">Hero winrates</header>
+								<div class="tools">
+									<div class="btn-group">
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter="all">All</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".assassin">Assassin</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".mage">Mage</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".protector">Protector</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".sniper">Sniper</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".warrior">Warrior</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".lane">Lane</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".jungle">Jungle</button>
+									</div>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="col-md-9">
+									<div id="winrates">
+										{% for i in heroes_win_rate %}
+											{% set roles = i[0] | get_hero_roles %}
+
+												<div class="{% if loop.index < 4 %}col-md-4{% else %}col-md-3{% endif %} item {% for r in roles.split(',') %}{{ r | lower }}{% endfor %}">
+													<img class="hero-icon" data-url="/hero/{{ i[0] | convert_hero_name | lower }}" src="/static/img/{{ i[0] | convert_hero_name | lower }}.png" alt="" />
+													<span>{{ i[0] | convert_hero_name }} | <small> {{'%0.2f'| format(i[1])}} <small> % </small> </small></span>
+												</div>
+										{% endfor %}
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div id="morris-donut-graph" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
+
+
+				<!-- BEGIN GAME TABLE -->
+					<div class="row">
+					    <div class="col-md-12">
+					        <div class="card">
+					            <div class="card-head">
+                                    <header class="text-primary">Hero stats</header>
+					            </div>
+					            <div class="card-body">
+					                <div class="table-responsive">
+    									<table id="datatable1" class="table table-striped table-hover">
+    										<thead>
+    											<tr>
+    												<th>Hero</th>
+    												<th>Winrate</th>
+    												<th>Playrate</th>
+    												<th>Games</th>
+    												<th>Kills</th>
+    												<th>Deaths</th>
+													<th>Assists</th>
+    											</tr>
+    										</thead>
+    										<tbody>
+    										    {% for game in hero_stats %}
+    										        <tr data-url="/hero/{{game.hero | lower }}/">
+    										            <td class="ink-reaction alert alert-callout {% if game.winrate > 50 %} alert-success  {% else %} alert-danger {% endif %} "> {{ game.hero }} </td>
+    										            <td class="ink-reaction"> {{'%0.2f'| format(game.winrate)}}% </td>
+    										            <td class="ink-reaction"> {{'%0.2f'| format(game.playrate)}}% </td>
+    										            <td class="ink-reaction"> {{ game.games }} </td>
+    										            <td class="ink-reaction"> {{ game.kills }} </td>
+    										            <td class="ink-reaction"> {{ game.deaths }} </td>
+    										            <td class="ink-reaction"> {{ game.assists }} </td>
+    										        </tr>
+    										    {% endfor %}
+    										</tbody>
+    									</table>
+    								</div>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+					<!-- END GAME TABLE -->
 			</div>
 		</section>
-
 	</div>
 	<!-- END CONTENT -->
 {% endblock %}
 
 
 {% block js %}
-	<!-- BEGIN JAVASCRIPT -->
-	<!-- END JAVASCRIPT -->
+<!-- BEGIN JAVASCRIPT -->
+<script src="/static/js/libs/jquery/jquery-1.11.2.min.js"></script>
+<script src="/static/js/libs/jquery/jquery-migrate-1.2.1.min.js"></script>
+<script src="/static/js/libs/bootstrap/bootstrap.min.js"></script>
+<script src="/static/js/libs/spin.js/spin.min.js"></script>
+<script src="/static/js/libs/autosize/jquery.autosize.min.js"></script>
+<script src="/static/js/libs/nanoscroller/jquery.nanoscroller.min.js"></script>
+<script src="/static/js/core/source/App.js"></script>
+<script src="/static/js/core/source/AppNavigation.js"></script>
+<script src="/static/js/core/source/AppCard.js"></script>
+<script src="/static/js/core/source/AppNavSearch.js"></script>
+<script src="/static/js/core/source/AppVendor.js"></script>
+<script src="/static/js/libs/toastr/toastr.js"></script>
+<script src="/static/js/libs/countup/countUp.js"></script>
+<script src="/static/js/libs/d3/d3.min.js"></script>
+<script src="/static/js/libs/d3/d3.v3.js"></script>
+<script src="/static/js/libs/raphael/raphael-min.js"></script>
+<script src="/static/js/libs/morris.js/morris.min.js"></script>
+<script src="/static/js/libs/rickshaw/rickshaw.min.js"></script>
+<script src="/static/js/libs/mixitup.min.js"></script>
+<script src="/static/js/libs/DataTables/jquery.dataTables.min.js"></script>
+<script src="/static/js/libs/DataTables/extensions/ColVis/js/dataTables.colVis.min.js"></script>
+<script src="/static/js/libs/DataTables/extensions/TableTools/js/dataTables.tableTools.min.js"></script>
+<script>
+$(function() {
+	var options = {
+	  useEasing : true,
+	  useGrouping : true,
+	  separator : ',',
+	  decimal : '.',
+	  prefix : '',
+	  suffix : ''
+	};
+	var demo = new CountUp("games", 0, {{ games }}, 0, 2.5, options);
+	var demo1 = new CountUp("players", 0, {{ players }}, 0, 2.5, options);
+	var demo2 = new CountUp("krakens", 0, {{ krakens }}, 0, 2.5, options);
+	var demo3 = new CountUp("potions", 0, {{ '%0.2f'| format(duration | convert_time) }}, 0, 2.5, options);
+	demo.start();
+	demo1.start();
+	demo2.start();
+	demo3.start();
+
+
+
+	 // Generate hero donut graph
+	if ($('#morris-donut-graph').length > 0) {
+		Morris.Donut({
+			element: 'morris-donut-graph',
+			data: [
+				{% for i in heroes %}
+					{value: {{ i[1] }}, label: '{{ i[0] | convert_hero_name }}', formatted: '{{ i[1] }} games'} {% if not loop.last %},{%endif%}
+				{% endfor %}
+			],
+			colors: $('#morris-donut-graph').data('colors').split(','),
+			formatter: function (x, data) {
+				return data.formatted;
+			}
+		});
+	}
+
+	var mixer = mixitup('#winrates', {
+		selectors: {
+			target: '.item'
+		},
+		"animation": {
+			"duration": 250,
+			"nudge": true,
+			"reverseOut": false,
+			"effects": "fade translateZ(-100px)"
+		}
+	});
+
+	$("#winrates img").click(function() {
+		window.location.href = $(this).data( "url" );
+	});
+
+	 // Games datatable
+	$('#datatable1').DataTable({
+		"dom": 'lCfrtip',
+		"order": [[ 1, "desc" ]],
+		"pageLength": 50,
+		"colVis": {
+			"buttonText": "Columns",
+			"overlayFade": 0,
+			"align": "right"
+		},
+		"language": {
+			"lengthMenu": '_MENU_ entries per page',
+			"search": '<i class="fa fa-search"></i>',
+			"paginate": {
+				"previous": '<i class="fa fa-angle-left"></i>',
+				"next": '<i class="fa fa-angle-right"></i>'
+			}
+		}
+	});
+
+	$('#datatable1 tbody').on('click', 'tr', function() {
+		window.location.href = $(this).data( "url" );
+	});
+
+});
+</script>
 {% endblock %}
 

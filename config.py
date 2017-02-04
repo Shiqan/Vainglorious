@@ -2,6 +2,7 @@ class Config(object):
     DEBUG = False
     TESTING = False
     SQLALCHEMY_POOL_RECYCLE = 299
+    SQLALCHEMY_TRACK_MODIFACTION = False
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(

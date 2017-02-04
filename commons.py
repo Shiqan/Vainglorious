@@ -1,5 +1,7 @@
 from flask_app import app, appname
 import time
+from decimal import *
+import strings
 
 
 @app.context_processor
@@ -68,17 +70,29 @@ def utility_processor():
 # # ---------
 @app.template_filter('convert_time')
 def seconds_to_minutes(time):
-    m, s = divmod(time, 60)
-    if s < 10:
-        s = "0"+str(s)
-    return "{0}:{1}".format(m, s)
+    # m, s = divmod(time, 60)
+    # if s < 10:
+    #     s = "0"+str(s)
+    # return "{0}:{1}".format(m, s)
+    return time / Decimal(3600)
 
-def convert_time(time_str):
-    m, s = time_str.split(':')
-    return int(m) * 60 + int(s)
-#
+
+@app.template_filter('convert_hero_name')
+def id_to_hero(id):
+    return strings.heroes[id]
+
+
+@app.template_filter('get_hero_roles')
+def hero_to_role(id):
+    if id in strings.hero_roles:
+        return strings.hero_roles[id]
+    else:
+        return strings.hero_roles[strings.heroes_inv[id]]
+
+
 def convert_date(date_str):
     return time.strptime(date_str, "%m/%d/%Y")
+
 
 def get_today():
     return time.strftime("%m/%d/%Y")

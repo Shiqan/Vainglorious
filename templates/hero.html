@@ -22,7 +22,7 @@
 					<div class="row">
 						<div class="col-md-3 col-xs-5">
 							<img class="img-circle border-white border-xl img-responsive auto-width" src="/static/img/{{ hero|lower }}.png" alt="" />
-							<h3> {{ hero|title }} <br/><small>Jungle, protector</small></h3>
+							<h3> {{ hero|title }} <br/><small>{{ hero|get_hero_roles }}</small></h3>
 						</div>
 						<div class="col-md-9 col-xs-7">
 							<div class="width-3 text-center pull-right">
@@ -115,13 +115,12 @@
 										{% for team, _ in teammates %}
 											<li class="tile">
 												{% for actor in team.split(', ') %}
-													<a class="tile-content ink-reaction" href="hero/{{ actor|lower }}">
+													<a class="tile-content ink-reaction" href="/hero/{{ actor|lower }}">
 														<div class="tile-icon hero-icon">
 															<img src="/static/img/{{ actor|lower }}.png" alt="" />
 														</div>
 														<div class="tile-text">
 															{{ actor }}
-															<small>Protector</small>
 														</div>
 													</a>
 												{% endfor %}
@@ -140,13 +139,12 @@
 										{% for team, _ in enemies %}
 											<li class="tile">
 												{% for actor in team.split(', ') %}
-													<a class="tile-content ink-reaction" href="hero/{{ actor|lower }}">
+													<a class="tile-content ink-reaction" href="/hero/{{ actor|lower }}">
 														<div class="tile-icon hero-icon">
 															<img src="/static/img/{{ actor|lower }}.png" alt="" />
 														</div>
 														<div class="tile-text">
 															{{ actor }}
-															<small>Protector</small>
 														</div>
 													</a>
 												{% endfor %}
