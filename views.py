@@ -1,6 +1,6 @@
 from __future__ import division
 from flask import redirect, render_template, request, url_for, flash
-from flask_app import lm, admin, cache
+from flask_app import lm, admin
 from flask_login import login_user, logout_user, current_user
 from flask_admin.contrib.sqla import ModelView
 
@@ -83,23 +83,16 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/clear_cache')
-def clear_cache():
-    cache.clear()
-    return redirect(url_for('index'))
-
-
 @app.route('/')
 @app.route('/index/')
-@cache.cached(86400)
 def index():
     app.logger.info("Request index 00")
 
     games = Match.query.count()
     players = Player.query.count()
     potions = sum([i["*1000_Item_HalcyonPotion*"] for i, in db.session.query(Participant.itemUses).all() if "*1000_Item_HalcyonPotion*" in i])
-    krakens, = db.session.query(func.count(Participant.krakenCaptures)).all()
-    duration, = db.session.query(func.sum(Match.duration).label("duration")).all()
+    krakens = sum([i[0] for i in db.session.query(Participant.krakenCaptures,).group_by(Participant.roster_id).all()])
+    duration, = db.session.query(func.sum(Match.duration).label("duration")).all()[0]
     heroes = db.session.query(Participant.actor, func.count(Participant.actor))\
         .group_by(Participant.actor).order_by(func.count(Participant.actor)).all()
 
@@ -140,7 +133,7 @@ def index():
 
     app.logger.info("Request index 03")
 
-    return render_template('blank.html', games=games, players=players, potions=potions, krakens=krakens[0], duration=duration[0]*6,
+    return render_template('blank.html', games=games, players=players, potions=potions, krakens=krakens, duration=duration,
                            heroes=heroes, most_wins=0, heroes_win_rate=heroes_win_rate, hero_stats=hero_stats)
 
 
@@ -160,21 +153,15 @@ def query_matches():
     print len(matches)
     process_data.process_batch_query(matches)
 
-    # matches = api.matches(sort="-createdAt")
-    # pprint.pprint(matches['data'])
-    # process_data.process_query(matches)
+    # shiqan = api.player("6abb30de-7cb8-11e4-8bd3-06eb725f8a76")
+    # match = api.match("25faa85e-f5a5-11e6-8e3b-0671096b3e30")
 
-    # pprint.pprint(matches)
-
-    # api.player("6abb30de-7cb8-11e4-8bd3-06eb725f8a76")
-    # match = api.match("f78917d2-d7cf-11e6-ad79-062445d3d668")
-
-    cache.clear()
+    # match = api.matches(limit=1, sort="-createdAt")
+    # pprint.pprint(match)
     return render_template('200.html')
 
 
 @app.route('/hero/<hero>/')
-@cache.memoize(86400)
 def view_hero(hero):
     app.logger.info(hero)
 
@@ -232,7 +219,7 @@ def view_hero(hero):
         if _team:
             enemies[_team] += 1
 
-    threshold = 3
+    threshold = 0
     players2 = {}
     for p, v in players.iteritems():
         if v['total'] > threshold:

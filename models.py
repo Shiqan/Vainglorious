@@ -135,7 +135,7 @@ class Participant(db.Model):
     skinKey = db.Column(db.String(128))
     karmaLevel = db.Column(db.Integer)
     level = db.Column(db.Integer)
-    wins = db.Column(db.Integer)
+    skillTier = db.Column(db.Integer)
 
     def __init__(self, **kwargs):
         super(Participant, self).__init__(**kwargs)
@@ -147,9 +147,13 @@ class Player(db.Model):
 
     id = db.Column(db.String(128), primary_key=True)
     name = db.Column(db.String(128))
-    lifetimeGold = db.Column(db.Integer())
-    lossStreak = db.Column(db.Integer())
-    winStreak = db.Column(db.Integer())
+    lifetimeGold = db.Column(db.Integer)
+    lossStreak = db.Column(db.Integer)
+    winStreak = db.Column(db.Integer)
+    played = db.Column(db.Integer)
+    played_ranked = db.Column(db.Integer)
+    wins = db.Column(db.Integer)
+    xp = db.Column(db.Integer)
 
     participated = db.relationship("Participant", backref="player")
 
