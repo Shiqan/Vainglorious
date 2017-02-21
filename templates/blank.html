@@ -112,15 +112,15 @@
 							<div class="card-head">
 								<header class="text-primary">Hero winrates</header>
 								<div class="tools">
-									<div class="btn-group mixitup-control">
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter="all">All</button>
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".assassin">Assassin</button>
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".mage">Mage</button>
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".protector">Protector</button>
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".sniper">Sniper</button>
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".warrior">Warrior</button>
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".lane">Lane</button>
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright" data-filter=".jungle">Jungle</button>
+									<div class="btn-group controls">
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter="all">All</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".assassin">Assassin</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".mage">Mage</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".protector">Protector</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".sniper">Sniper</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".warrior">Warrior</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".lane">Lane</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".jungle">Jungle</button>
 									</div>
 								</div>
 							</div>
@@ -258,7 +258,7 @@ $(function() {
 	var mixer = mixitup('#winrates', {
 		selectors: {
 			target: '.item',
-			control: '.mixitup-control'
+			control: '.filter'
 		},
 		"animation": {
 			"duration": 250,

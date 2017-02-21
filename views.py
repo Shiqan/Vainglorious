@@ -101,7 +101,7 @@ def index():
     heroes_win_rate = db.session.query(Participant.actor, func.sum(case([(Participant.winner == True, 1)], else_=0)).label("winrate"))\
         .group_by(Participant.actor).order_by("winrate").all()
 
-    heroes_win_rate = [(hero[0], (herowr[1] / hero[1]) * 100)for hero in heroes for herowr in heroes_win_rate if hero[0] == herowr[0]]
+    heroes_win_rate = [(hero[0], (herowr[1] / hero[1]) * 100) for hero in heroes for herowr in heroes_win_rate if hero[0] == herowr[0]]
     heroes_win_rate = sorted(heroes_win_rate, key=operator.itemgetter(1), reverse=True)
 
     app.logger.info("Request index 02")
@@ -117,7 +117,7 @@ def index():
 
     hero_stats = []
     for hero in heroes:
-        stats = {'hero': strings.heroes[hero[0]], 'games': hero[1], 'playrate': (hero[1] / games) * 100 }
+        stats = {'hero': strings.heroes[hero[0]], 'games': hero[1], 'playrate': (hero[1] / games) * 100}
         for hero2 in heroes_win_rate:
             if hero[0] == hero2[0]:
                 stats['winrate'] = hero2[1]
@@ -219,7 +219,7 @@ def view_hero(hero):
         if _team:
             enemies[_team] += 1
 
-    threshold = 0
+    threshold = 3
     players2 = {}
     for p, v in players.iteritems():
         if v['total'] > threshold:
