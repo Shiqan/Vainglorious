@@ -18,6 +18,7 @@ lm.init_app(app)
 # cache = Cache(app,config={'CACHE_TYPE': 'simple'})
 
 app.config.from_object('config.DevelopmentConfig')
+app.config.from_envvar('YOURAPPLICATION_SETTINGS')
 app.secret_key = 'anotherplaintextpasswordftw'
 
 #

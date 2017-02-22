@@ -1,0 +1,1 @@
+WERKZEUG_DEBUG_PIN = 'off'

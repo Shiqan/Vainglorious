@@ -143,7 +143,7 @@ def query_matches():
 
     # split request to batches of 50
     max_limit = 50
-    limit = 10000
+    limit = 5000
     matches = []
     for batch in range(0, limit, max_limit):
         response = api.matches(offset=batch, limit=max_limit, sort="-createdAt")
