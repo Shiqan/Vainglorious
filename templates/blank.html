@@ -7,125 +7,7 @@
 <link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/DataTables/extensions/dataTables.tableTools.css?1423553990" />
 <link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/rickshaw/rickshaw.css?1422792967" />
 <link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/morris/morris.core.css?1420463396" />
-<style>
-    .hero-icon {
-		border-radius: 40px;
-	}
-
-	.mix {
-		padding: 12px;
-	}
-
-	.mix img {
-	  	max-height:250px;
-	  	height: auto;
-	}
-
-	.mix img.hero-icon {
-		width: 40px;
-		height: 40px;
-		cursor: pointer;
-		border-radius: 40px;
-		margin-right: 5px;
-		margin-bottom: 5px;
-	}
-
-	.col-md-4.mix img.hero-icon {
-		width: 60px;
-		height: 60px;
-		border-radius: 60px;
-	}
-
-	.mixitup-control-active {
-        color: #0aa89e !important;
-        background-color: rgba(12, 12, 12, 0.07);
-	}
-
-	.hovereffect {
-  width: 100%;
-  height: 100%;
-  float: left;
-  overflow: hidden;
-  position: relative;
-  text-align: center;
-  cursor: default;
-  background: -webkit-linear-gradient(45deg, #ff89e9 0%, #05abe0 100%);
-  background: linear-gradient(45deg, #ff89e9 0%,#05abe0 100%);
-}
-
-.hovereffect .overlay {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  overflow: hidden;
-  top: 0;
-  left: 0;
-  padding: 3em;
-  text-align: left;
-}
-
-.hovereffect img {
-  display: block;
-  position: relative;
-  max-width: none;
-  width: calc(100% + 60px);
-  -webkit-transition: opacity 0.35s, -webkit-transform 0.45s;
-  transition: opacity 0.35s, transform 0.45s;
-  -webkit-transform: translate3d(-40px,0,0);
-  transform: translate3d(-40px,0,0);
-}
-
-.hovereffect h2 {
-  text-transform: uppercase;
-  color: #fff;
-  position: relative;
-  font-size: 17px;
-  background-color: transparent;
-  padding: 15% 0 10px 0;
-  text-align: left;
-}
-
-.hovereffect .overlay:before {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  bottom: 20px;
-  left: 20px;
-  border: 1px solid #fff;
-  content: '';
-  opacity: 0;
-  filter: alpha(opacity=0);
-  -webkit-transition: opacity 0.35s, -webkit-transform 0.45s;
-  transition: opacity 0.35s, transform 0.45s;
-  -webkit-transform: translate3d(-20px,0,0);
-  transform: translate3d(-20px,0,0);
-}
-
-.hovereffect a, .hovereffect p {
-  color: #FFF;
-  opacity: 0;
-  filter: alpha(opacity=0);
-  -webkit-transition: opacity 0.35s, -webkit-transform 0.45s;
-  transition: opacity 0.35s, transform 0.45s;
-  -webkit-transform: translate3d(-10px,0,0);
-  transform: translate3d(-10px,0,0);
-}
-
-.hovereffect:hover img {
-  opacity: 0.6;
-  filter: alpha(opacity=60);
-  -webkit-transform: translate3d(0,0,0);
-  transform: translate3d(0,0,0);
-}
-
-.hovereffect:hover .overlay:before,
-.hovereffect:hover a, .hovereffect:hover p {
-  opacity: 1;
-  filter: alpha(opacity=100);
-  -webkit-transform: translate3d(0,0,0);
-  transform: translate3d(0,0,0);
-}
-</style>
+<link type="text/css" rel="stylesheet" href="/static/css/dashboard.css" />
 {% endblock %}
 
 {% block content %}
@@ -136,60 +18,109 @@
 
 			<div class="section-body">
 				<div class="row">
-					<!-- BEGIN ALERT - GOLD -->
-					<div class="col-md-3 col-sm-6">
-						<div class="card">
-							<div class="card-body no-padding">
-								<div class="alert alert-callout alert-info no-margin">
-									<img class="pull-right text-success hero-icon" src="https://s-media-cache-ak0.pinimg.com/564x/9a/b8/a5/9ab8a5d52931e8528f617cb18f7fd483.jpg" width="75px" height="75px"/>
-									<strong id="games" class="text-xl"> {{ games }}</strong><br/>
-									<span class="opacity-50">Vain crystals destroyed</span>
+					<div class="css-carousel">
+						<!-- BEGIN ALERT - GOLD -->
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-info no-margin">
+										<img class="pull-right text-success hero-icon" src="https://s-media-cache-ak0.pinimg.com/564x/9a/b8/a5/9ab8a5d52931e8528f617cb18f7fd483.jpg" width="75px" height="75px"/>
+										<strong id="games" class="text-xl"> {{ games }}</strong><br/>
+										<span class="opacity-50">Vain crystals destroyed</span>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-					<!-- END ALERT - GOLD -->
+						<!-- END ALERT - GOLD -->
 
-					<!-- BEGIN ALERT - KDA -->
-					<div class="col-md-3 col-sm-6">
-						<div class="card">
-							<div class="card-body no-padding">
-								<div class="alert alert-callout alert-warning no-margin">
-									<strong id="players" class="text-xl">{{ players }}%</strong><br/>
-									<span class="opacity-50">Number of players </span>
+						<!-- BEGIN ALERT - KDA -->
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-warning no-margin">
+										<strong id="players" class="text-xl">{{ players }}%</strong><br/>
+										<span class="opacity-50">Number of players </span>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-					<!-- END ALERT - KDA -->
+						<!-- END ALERT - KDA -->
 
-					<!-- BEGIN ALERT - WIN RATE -->
-					<div class="col-md-3 col-sm-6">
-						<div class="card">
-							<div class="card-body no-padding">
-								<div class="alert alert-callout alert-danger no-margin">
-									<img class="pull-right text-success hero-icon" src="http://i.imgur.com/2EPwPt7.jpg" width="75px" height="75px"/>
-									<strong id="krakens" class="text-xl">{{ krakens }}</strong><br/>
-									<span class="opacity-50">Krakens unleashed</span>
+						<!-- BEGIN ALERT - WIN RATE -->
+						<div class="col-md-3 col-sm-6 hidden-xs">
+							<div class="card css-img">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-danger no-margin">
+										<img class="pull-right text-success hero-icon" src="http://i.imgur.com/2EPwPt7.jpg" width="75px" height="75px"/>
+										<strong id="krakens" class="text-xl">{{ krakens | format_number }}</strong><br/>
+										<span class="opacity-50">Krakens unleashed</span>
+									</div>
 								</div>
 							</div>
-						</div>
-					</div>
-					<!-- END ALERT - WIN RATE -->
 
-					<!-- BEGIN ALERT - AVG GAME LENGTH -->
-					<div class="col-md-3 col-sm-6">
-						<div class="card">
-							<div class="card-body no-padding">
-								<div class="alert alert-callout alert-success no-margin">
-									<h1 class="pull-right text-success"><i class="md md-timer"></i></h1>
-									<strong id="potions" class="text-xl">{{ duration | convert_time }}</strong><br/>
-									<span class="opacity-50">Hours well spent</span>
+							<div class="card css-img">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-success no-margin">
+										<img class="pull-right text-success hero-icon" src="/static/img/items/halcyon-potion.png" width="75px" height="75px"/>
+										<strong id="potions" class="text-xl">{{ potions | format_number }}</strong><br/>
+										<span class="opacity-50">Potions used</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="card css-img">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-info no-margin">
+										<img class="pull-right text-success hero-icon" src="/static/img/items/fountain-of-renewal.png" width="75px" height="75px"/>
+										<strong id="fountains" class="text-xl">{{ fountains | format_number }}</strong><br/>
+										<span class="opacity-50">Fountains used</span>
+									</div>
+								</div>
+							</div>
+							<div class="card css-img">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-warning no-margin">
+										<img class="pull-right text-success hero-icon" src="/static/img/minion.png" width="75px" height="75px"/>
+										<strong class="text-xl">{{ minions | format_number }}</strong><br/>
+										<span class="opacity-50">Minions killed</span>
+									</div>
+								</div>
+							</div>
+							<div class="card css-img">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-danger no-margin">
+										<img class="pull-right text-success hero-icon" src="/static/img/items/scout-trap.png" width="75px" height="75px"/>
+										<strong id="scouttraps" class="text-xl">{{ mines | format_number }}</strong><br/>
+										<span class="opacity-50">Scout trap placed</span>
+									</div>
+								</div>
+							</div>
+							<div class="card css-img">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-success no-margin">
+										<img class="pull-right text-success hero-icon" src="/static/img/items/weapon-infusion.png" width="75px" height="75px"/>
+										<strong id="infusions" class="text-xl">{{ infusions | format_number }}</strong><br/>
+										<span class="opacity-50">Infusions used</span>
+									</div>
 								</div>
 							</div>
 						</div>
+						<!-- END ALERT - WIN RATE -->
+
+						<!-- BEGIN ALERT - AVG GAME LENGTH -->
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-success no-margin">
+										<h1 class="pull-right text-success"><i class="md md-timer"></i></h1>
+										<strong id="duration" class="text-xl">{{ duration | convert_time }}</strong><br/>
+										<span class="opacity-50">Hours well spent</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- END ALERT - AVG GAME LENGTH -->
 					</div>
-					<!-- END ALERT - AVG GAME LENGTH -->
 				</div>
 
 
@@ -202,7 +133,7 @@
 							</div>
 							<div class="card-body">
 								<div class="col-xs-12">
-									<div class="btn-group controls">
+									<div class="controls">
 										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter="all">All</button>
 										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".assassin">Assassin</button>
 										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".mage">Mage</button>
@@ -212,11 +143,11 @@
 										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".lane">Lane</button>
 										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".jungle">Jungle</button>
 
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-sort="order:asc">Ascending</button>
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter mixitup-control-active" data-sort="order:descending">Descending</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright pull-right filter mixitup-control-active" data-sort="order:descending">Descending</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright pull-right filter" data-sort="order:asc">Ascending</button>
 
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-sort="name:asc">Ascending</button>
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-sort="name:descending">Descending</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright pull-right filter" data-sort="playrate:descending">Descending</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright pull-right filter" data-sort="playrate:asc">Ascending</button>
 									</div>
 									<input type="text" class="form-control" id="filter" placeholder="Search hero"/>
 								</div>
@@ -232,16 +163,23 @@
 													 data-kills="{{ hero.kills }}"
 													 data-assists="{{ hero.assists }}"
 													 data-deaths="{{ hero.deaths }}"
-													 data-playrate="{{ hero.playrate }}">
+													 data-playrate="{{ hero.playrate }}"
+													 data-url="/hero/{{ name | lower }}/">
 														<div class="hovereffect">
 															<img class="img-responsive" src="/static/img/{{ name | lower }}_splash.png"  alt="">
 															<div class="overlay">
 																<h2 class="hero-name"> {{ name }} </h2>
-																<p>
-																	<span>{{ name }} | <small> {{'%0.2f'| format(hero.winrate)}} <small> % </small> </small></span>
-																	<span>{{ name }} | <small> {{'%0.2f'| format(hero.winrate)}} <small> % </small> </small></span>
-																	<span>{{ name }} | <small> {{'%0.2f'| format(hero.winrate)}} <small> % </small> </small></span>
-																</p>
+
+																<dl class="dl-horizontal">
+																	<dt>Win rate </dt>
+																	<dd>{{'%0.2f'| format(hero.winrate)}} <small> % </small></dd>
+																	<dt>Pick rate</dt>
+																	<dd>{{'%0.2f'| format(hero.playrate)}} <small> % </small></dd>
+																	<dt>Games</dt>
+																	<dd>{{ hero.games }}</dd>
+																	<dt>Kills / Deaths / Assists</dt>
+																	<dd> {{ hero.kills }} / {{ hero.deaths }} / {{ hero.assists }} </dd>
+																</dl>
 															</div>
 														</div>
 												</div>
@@ -296,7 +234,7 @@ $(function() {
 	var demo = new CountUp("games", 0, {{ games }}, 0, 2.5, options);
 	var demo1 = new CountUp("players", 0, {{ players }}, 0, 2.5, options);
 	var demo2 = new CountUp("krakens", 0, {{ krakens }}, 0, 2.5, options);
-	var demo3 = new CountUp("potions", 0, {{ '%0.2f'| format(duration | convert_time) }}, 0, 2.5, options);
+	var demo3 = new CountUp("duration", 0, {{ '%0.2f'| format(duration | convert_time) }}, 0, 2.5, options);
 	demo.start();
 	demo1.start();
 	demo2.start();
@@ -344,10 +282,6 @@ $(function() {
            			if($(this).data("name").toLowerCase().match(inputText)) {
             			$matching = $matching.add(this);
           			} else {
-          				console.log($(this).children('.hero-name').text().toLowerCase());
-          				console.log(inputText);
-          				console.log(this);
-          				console.log("---");
             			// removes any previously matched item
             			$matching = $matching.not(this);
           			}
@@ -361,7 +295,7 @@ $(function() {
     	}, 200 );
   	});
 
-	$("#winrates img").click(function() {
+	$("#winrates .mix").click(function() {
 		window.location.href = $(this).data( "url" );
 	});
 

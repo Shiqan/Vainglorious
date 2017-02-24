@@ -91,7 +91,11 @@ def index():
     games = Match.query.count()
     players = Player.query.count()
     potions = sum([i["*1000_Item_HalcyonPotion*"] for i, in db.session.query(Participant.itemUses).all() if "*1000_Item_HalcyonPotion*" in i])
-    krakens = sum([i[0] for i in db.session.query(Participant.krakenCaptures,).group_by(Participant.roster_id).all()])
+    infusions = sum([i["*1052_Item_WeaponInfusion*"] for i, in db.session.query(Participant.itemUses).all() if "*1052_Item_WeaponInfusion*" in i])
+    fountains = sum([i["*1045_Item_FountainOfRenewal*"] for i, in db.session.query(Participant.itemUses).all() if "*1045_Item_FountainOfRenewal*" in i])
+    mines = sum([i["*1054_Item_ScoutTrap*"] for i, in db.session.query(Participant.itemUses).all() if "*1054_Item_ScoutTrap*" in i])
+    krakens = sum([i[0] for i in db.session.query(Participant.krakenCaptures, ).group_by(Participant.roster_id).all()])
+    minions, = db.session.query(func.sum(Participant.minionKills)).all()[0]
     duration, = db.session.query(func.sum(Match.duration).label("duration")).all()[0]
     heroes = db.session.query(Participant.actor, func.count(Participant.actor))\
         .group_by(Participant.actor).order_by(func.count(Participant.actor)).all()
@@ -134,6 +138,7 @@ def index():
     app.logger.info("Request index 03")
 
     return render_template('blank.html', games=games, players=players, potions=potions, krakens=krakens, duration=duration,
+                           infusions=infusions, fountains=fountains, mines=mines, minions=minions,
                            heroes=heroes, most_wins=0, heroes_win_rate=heroes_win_rate, hero_stats=hero_stats)
 
 

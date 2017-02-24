@@ -82,6 +82,11 @@ def id_to_hero(id):
     return strings.heroes[id]
 
 
+@app.template_filter('format_number')
+def format_currency(value):
+    return "{:,}".format(value)
+
+
 @app.template_filter('get_hero_roles')
 def hero_to_role(id):
     if id in strings.hero_roles:
