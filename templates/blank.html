@@ -17,37 +17,36 @@
 		<section>
 
 			<div class="section-body">
+
+				<!-- BEGIN GAME FACTS -->
 				<div class="row">
-					<div class="css-carousel">
-						<!-- BEGIN ALERT - GOLD -->
-						<div class="col-md-3 col-sm-6">
-							<div class="card">
-								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-info no-margin">
-										<img class="pull-right text-success hero-icon" src="https://s-media-cache-ak0.pinimg.com/564x/9a/b8/a5/9ab8a5d52931e8528f617cb18f7fd483.jpg" width="75px" height="75px"/>
-										<strong id="games" class="text-xl"> {{ games }}</strong><br/>
-										<span class="opacity-50">Vain crystals destroyed</span>
-									</div>
+					<!-- TODO show all page -->
+
+					<div class="col-md-3 col-sm-6">
+						<div class="card">
+							<div class="card-body no-padding">
+								<div class="alert alert-callout alert-info no-margin">
+									<img class="pull-right text-success hero-icon" src="https://s-media-cache-ak0.pinimg.com/564x/9a/b8/a5/9ab8a5d52931e8528f617cb18f7fd483.jpg" width="75px" height="75px"/>
+									<strong id="games" class="text-xl"> {{ games }}</strong><br/>
+									<span class="opacity-50">Vain crystals destroyed</span>
 								</div>
 							</div>
 						</div>
-						<!-- END ALERT - GOLD -->
+					</div>
 
-						<!-- BEGIN ALERT - KDA -->
-						<div class="col-md-3 col-sm-6">
-							<div class="card">
-								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-warning no-margin">
-										<strong id="players" class="text-xl">{{ players }}%</strong><br/>
-										<span class="opacity-50">Number of players </span>
-									</div>
+					<div class="col-md-3 col-sm-6">
+						<div class="card">
+							<div class="card-body no-padding">
+								<div class="alert alert-callout alert-warning no-margin">
+									<strong id="players" class="text-xl">{{ players }}%</strong><br/>
+									<span class="opacity-50">Number of players </span>
 								</div>
 							</div>
 						</div>
-						<!-- END ALERT - KDA -->
+					</div>
 
-						<!-- BEGIN ALERT - WIN RATE -->
-						<div class="col-md-3 col-sm-6 hidden-xs">
+					<div class="col-md-3 col-sm-6 hidden-xs">
+						<div class="css-carousel col-sm-12">
 							<div class="card css-img">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-danger no-margin">
@@ -105,31 +104,84 @@
 								</div>
 							</div>
 						</div>
-						<!-- END ALERT - WIN RATE -->
+					</div>
 
-						<!-- BEGIN ALERT - AVG GAME LENGTH -->
-						<div class="col-md-3 col-sm-6">
-							<div class="card">
+					<div class="col-md-3 col-sm-6 hidden-xs">
+						<div class="css-carousel2 col-sm-12">
+							<div class="card css-img2">
 								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-success no-margin">
-										<h1 class="pull-right text-success"><i class="md md-timer"></i></h1>
+									<div class="alert alert-callout alert-info no-margin">
+										<h1 class="pull-right text-info"><i class="md md-timer"></i></h1>
 										<strong id="duration" class="text-xl">{{ duration | convert_time }}</strong><br/>
 										<span class="opacity-50">Hours well spent</span>
 									</div>
 								</div>
 							</div>
+							<div class="card css-img2">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-warning no-margin">
+										<h1 class="pull-right text-warning"><i class="md md-timer"></i></h1>
+										<strong class="text-xl">{{ avg_duration | convert_game_time }}</strong><br/>
+										<span class="opacity-50">Avg duration</span>
+									</div>
+								</div>
+							</div>
+							<div class="card css-img2">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-danger no-margin">
+										<h1 class="pull-right text-danger"><i class="md md-error"></i></h1>
+										<strong class="text-xl">{{ died_by_minions | format_number }}</strong><br/>
+										<span class="opacity-50">Player died by minions!</span>
+									</div>
+								</div>
+							</div>
+							<div class="card css-img2">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-success no-margin">
+										<h1 class="pull-right text-success"><i class="md md-trending-up"></i></h1>
+										<strong class="text-xl">{{ max_kills | format_number }}</strong><br/>
+										<span class="opacity-50">Most kills in a game</span>
+									</div>
+								</div>
+							</div>
+							<div class="card css-img2">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-warning no-margin">
+										<h1 class="pull-right text-warning"><i class="md md-trending-down"></i></h1>
+										<strong class="text-xl">{{ max_deaths | format_number }}</strong><br/>
+										<span class="opacity-50">Most deaths in a game</span>
+									</div>
+								</div>
+							</div>
+							<div class="card css-img2">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-info no-margin">
+										<h1 class="pull-right text-info"><i class="md md-star"></i></h1>
+										<strong class="text-xl">{{ avg_cs | format_number }}</strong><br/>
+										<span class="opacity-50">Avg CS for laners per game</span>
+									</div>
+								</div>
+							</div>
 						</div>
-						<!-- END ALERT - AVG GAME LENGTH -->
 					</div>
 				</div>
+				<!-- END GAME FACTS -->
 
-
+				<!-- BEGIN HERO STATS -->
 				<div class="row">
-					<!-- BEGIN HERO STATS -->
+
 					<div class="col-md-12">
 						<div class="card">
 							<div class="card-head">
 								<header class="text-primary">Hero winrates</header>
+								<div class="tools">
+									<form class="navbar-search">
+										<div class="form-group">
+											<input id="filter" type="text" class="form-control" placeholder="Search hero">
+										</div>
+										<button type="button" class="btn btn-icon-toggle ink-reaction"><i class="fa fa-search"></i></button>
+									</form>
+								</div>
 							</div>
 							<div class="card-body">
 								<div class="col-xs-12">
@@ -149,7 +201,7 @@
 										<button type="button" class="btn ink-reaction btn-flat btn-default-bright pull-right filter" data-sort="playrate:descending">Descending</button>
 										<button type="button" class="btn ink-reaction btn-flat btn-default-bright pull-right filter" data-sort="playrate:asc">Ascending</button>
 									</div>
-									<input type="text" class="form-control" id="filter" placeholder="Search hero"/>
+									<!--<input type="text" class="form-control" id="filter" placeholder="Search hero"/>-->
 								</div>
 								<div class="col-xs-12">
 									<div id="winrates">
@@ -190,6 +242,8 @@
 						</div>
 					</div>
 				</div>
+				<!-- END HERO STATS -->
+
 			</div>
 		</section>
 	</div>
@@ -223,6 +277,7 @@
 <script src="/static/js/libs/DataTables/extensions/TableTools/js/dataTables.tableTools.min.js"></script>
 <script>
 $(function() {
+	// CountUp
 	var options = {
 	  useEasing : true,
 	  useGrouping : true,
@@ -240,6 +295,7 @@ $(function() {
 	demo2.start();
 	demo3.start();
 
+	// Mixitup
 	var mixer = mixitup('#winrates', {
 		load: {
 		   sort: 'order:desc'
@@ -259,7 +315,7 @@ $(function() {
 	var inputText;
 	var $matching = $();
 
-	// Delay function
+	// Mixitup search function
 	var delay = (function(){
 		var timer = 0;
 		return function(callback, ms){
@@ -295,6 +351,7 @@ $(function() {
     	}, 200 );
   	});
 
+	// hero redirect
 	$("#winrates .mix").click(function() {
 		window.location.href = $(this).data( "url" );
 	});

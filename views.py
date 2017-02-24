@@ -95,8 +95,19 @@ def index():
     fountains = sum([i["*1045_Item_FountainOfRenewal*"] for i, in db.session.query(Participant.itemUses).all() if "*1045_Item_FountainOfRenewal*" in i])
     mines = sum([i["*1054_Item_ScoutTrap*"] for i, in db.session.query(Participant.itemUses).all() if "*1054_Item_ScoutTrap*" in i])
     krakens = sum([i[0] for i in db.session.query(Participant.krakenCaptures, ).group_by(Participant.roster_id).all()])
-    minions, = db.session.query(func.sum(Participant.minionKills)).all()[0]
-    duration, = db.session.query(func.sum(Match.duration).label("duration")).all()[0]
+    minions = db.session.query(func.sum(Participant.minionKills)).scalar()
+    kills = db.session.query(func.sum(Participant.kills)).scalar()
+    max_kills = db.session.query(func.max(Participant.kills)).scalar()
+    deaths = db.session.query(func.sum(Participant.deaths)).scalar()
+    max_deaths = db.session.query(func.max(Participant.deaths)).scalar()
+    died_by_minions = deaths - kills
+    duration = db.session.query(func.sum(Match.duration).label("duration")).scalar()
+    avg_duration = duration / games
+
+    avg_cs = [i[0] for i in db.session.query(Participant.farm).filter(Participant.actor.in_([h for h, r in strings.hero_roles.iteritems() if "Lane" in r])).all()]
+    avg_cs = sum(avg_cs) / len(avg_cs)
+
+    app.logger.info(avg_duration)
     heroes = db.session.query(Participant.actor, func.count(Participant.actor))\
         .group_by(Participant.actor).order_by(func.count(Participant.actor)).all()
 
@@ -137,7 +148,9 @@ def index():
 
     app.logger.info("Request index 03")
 
-    return render_template('blank.html', games=games, players=players, potions=potions, krakens=krakens, duration=duration,
+    return render_template('blank.html', games=games, players=players, potions=potions, krakens=krakens,
+                           duration=duration, avg_duration=avg_duration, died_by_minions=died_by_minions,
+                           max_kills=max_kills, max_deaths=max_deaths, avg_cs=avg_cs,
                            infusions=infusions, fountains=fountains, mines=mines, minions=minions,
                            heroes=heroes, most_wins=0, heroes_win_rate=heroes_win_rate, hero_stats=hero_stats)
 

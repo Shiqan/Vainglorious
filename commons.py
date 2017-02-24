@@ -69,12 +69,20 @@ def utility_processor():
 #
 # # ---------
 @app.template_filter('convert_time')
-def seconds_to_minutes(time):
+def seconds_to_hours(time):
     # m, s = divmod(time, 60)
     # if s < 10:
     #     s = "0"+str(s)
     # return "{0}:{1}".format(m, s)
     return time / Decimal(3600)
+
+
+@app.template_filter('convert_game_time')
+def seconds_to_minutes(time):
+    m, s = divmod(time, 60)
+    if s < 10:
+        s = "0"+str(s)
+    return "{0}:{1:.2}".format(m, s)
 
 
 @app.template_filter('convert_hero_name')

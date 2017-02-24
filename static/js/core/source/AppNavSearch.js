@@ -64,10 +64,10 @@
 		else {
 			// When there is a keyword, submit the keyword
 			form.addClass('expanded');
-			form.submit();
+//			form.submit();
 
 			// Clear the timer that removes the keyword
-			clearTimeout(this._clearSearchTimer);
+//			clearTimeout(this._clearSearchTimer);
 		}
 	};
 
@@ -84,10 +84,10 @@
 		form.removeClass('expanded');
 
 		// Clear the textfield after 300 seconds (the time it takes to collapse the field)
-		clearTimeout(this._clearSearchTimer);
-		this._clearSearchTimer = setTimeout(function () {
-			input.val('');
-		}, 300);
+//		clearTimeout(this._clearSearchTimer);
+//		this._clearSearchTimer = setTimeout(function () {
+//			input.val('');
+//		}, 300);
 	};
 
 	// =========================================================================
