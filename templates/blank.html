@@ -157,7 +157,7 @@
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-info no-margin">
 										<h1 class="pull-right text-info"><i class="md md-star"></i></h1>
-										<strong class="text-xl">{{ avg_cs | format_number }}</strong><br/>
+										<strong class="text-xl">{{ '%0.2f'| format(avg_cs) }}</strong><br/>
 										<span class="opacity-50">Avg CS for laners per game</span>
 									</div>
 								</div>
@@ -194,12 +194,24 @@
 										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".warrior">Warrior</button>
 										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".lane">Lane</button>
 										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".jungle">Jungle</button>
+										<div class="btn-group pull-right">
+											<button type="button" class="btn ink-reaction btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+												Sort <i class="fa fa-caret-down text-default-light"></i>
+											</button>
+											<ul class="dropdown-menu animation-expand" role="menu">
+												<li class="dropdown-header">Winrate</li>
+												<li><button type="button" class="btn ink-reaction btn-flat btn-default-bright filter mixitup-control-active" data-sort="order:descending">Descending</button></li>
+												<li><button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-sort="order:asc">Ascending</button></li>
+												<li class="dropdown-header">Pickrate</li>
+												<li><button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-sort="playrate:descending">Descending</button></li>
+												<li><button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-sort="playrate:asc">Ascending</button></li>
+												<li class="dropdown-header">Games</li>
+												<li><button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-sort="games:descending">Descending</button></li>
+												<li><button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-sort="games:asc">Ascending</button></li>
+											</ul>
+										</div>
 
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright pull-right filter mixitup-control-active" data-sort="order:descending">Descending</button>
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright pull-right filter" data-sort="order:asc">Ascending</button>
 
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright pull-right filter" data-sort="playrate:descending">Descending</button>
-										<button type="button" class="btn ink-reaction btn-flat btn-default-bright pull-right filter" data-sort="playrate:asc">Ascending</button>
 									</div>
 									<!--<input type="text" class="form-control" id="filter" placeholder="Search hero"/>-->
 								</div>
@@ -253,17 +265,6 @@
 
 {% block js %}
 <!-- BEGIN JAVASCRIPT -->
-<script src="/static/js/libs/jquery/jquery-1.11.2.min.js"></script>
-<script src="/static/js/libs/jquery/jquery-migrate-1.2.1.min.js"></script>
-<script src="/static/js/libs/bootstrap/bootstrap.min.js"></script>
-<script src="/static/js/libs/spin.js/spin.min.js"></script>
-<script src="/static/js/libs/autosize/jquery.autosize.min.js"></script>
-<script src="/static/js/libs/nanoscroller/jquery.nanoscroller.min.js"></script>
-<script src="/static/js/core/source/App.js"></script>
-<script src="/static/js/core/source/AppNavigation.js"></script>
-<script src="/static/js/core/source/AppCard.js"></script>
-<script src="/static/js/core/source/AppNavSearch.js"></script>
-<script src="/static/js/core/source/AppVendor.js"></script>
 <script src="/static/js/libs/toastr/toastr.js"></script>
 <script src="/static/js/libs/countup/countUp.js"></script>
 <script src="/static/js/libs/d3/d3.min.js"></script>

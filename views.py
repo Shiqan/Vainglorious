@@ -155,27 +155,22 @@ def index():
                            heroes=heroes, most_wins=0, heroes_win_rate=heroes_win_rate, hero_stats=hero_stats)
 
 
-@app.route('/query')
+@app.route('/query/')
 def query_matches():
-    api = VaingloryApi("aaa.bbb.ccc")
+    api = VaingloryApi("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJkNzYzYTkyMC1kYzMyLTAxMzQtYTc1NC0wMjQyYWMxMTAwMDMiLCJpc3MiOiJnYW1lbG9ja2VyIiwib3JnIjoiZmVycm9uLXNhYW4tbGl2ZS1ubCIsImFwcCI6ImQ3NjFjZDUwLWRjMzItMDEzNC1hNzUzLTAyNDJhYzExMDAwMyIsInB1YiI6InNlbWMiLCJ0aXRsZSI6InZhaW5nbG9yeSIsInNjb3BlIjoiY29tbXVuaXR5IiwibGltaXQiOjEwfQ.o6z5i-2pfAjrcaw_NAchOzWm2ZcGvmNfwA7U7Hgd0Lg")
+    # s = api.sample()
+    # process_data.process_samples(s)
 
     # split request to batches of 50
     max_limit = 50
-    limit = 5000
+    limit = 100
     matches = []
     for batch in range(0, limit, max_limit):
         response = api.matches(offset=batch, limit=max_limit, sort="-createdAt")
         matches.append(dict(response))
         limit -= max_limit
 
-    print len(matches)
     process_data.process_batch_query(matches)
-
-    # shiqan = api.player("6abb30de-7cb8-11e4-8bd3-06eb725f8a76")
-    # match = api.match("25faa85e-f5a5-11e6-8e3b-0671096b3e30")
-
-    # match = api.matches(limit=1, sort="-createdAt")
-    # pprint.pprint(match)
     return render_template('200.html')
 
 
