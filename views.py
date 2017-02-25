@@ -180,14 +180,18 @@ def view_hero(hero):
 
     actor = strings.heroes_inv[hero]
 
+    total_matches = Match.query.count()
     matches = db.session.query(Participant).filter_by(actor=actor).all()
+    playrate = (len(matches) / total_matches) * 100
     matches_won = 0
     kda = {'assists': 0, 'deaths': 0, 'kills': 0}
     cs = {'lane': 0, 'jungle': 0}
     items = Counter()
     builds = Counter()
     teammates = Counter()
+    single_teammates = Counter()
     enemies = Counter()
+    single_enemies = Counter()
     skins = Counter()
     players = {}
 
@@ -219,6 +223,14 @@ def view_hero(hero):
 
         _team = [strings.heroes[x.actor] for x in m.roster.participants]
         _team.sort()
+
+        for i in _team:
+            if hero != i.lower():
+                if i in single_teammates:
+                    single_teammates[i] += 1
+                else:
+                    single_teammates[i] = 1
+
         _team = ', '.join(_team)
         if _team:
             teammates[_team] += 1
@@ -228,6 +240,14 @@ def view_hero(hero):
 
         _team = [strings.heroes[x.actor] for x in x.participants]
         _team.sort()
+
+        for i in _team:
+            if hero != i.lower():
+                if i in single_enemies:
+                    single_enemies[i] += 1
+                else:
+                    single_enemies[i] = 1
+
         _team = ', '.join(_team)
         if _team:
             enemies[_team] += 1
@@ -246,9 +266,13 @@ def view_hero(hero):
     skins = skins.most_common(5)
     enemies = enemies.most_common(5)
 
-    return render_template('hero.html', hero=hero, matches_played=len(matches), matches_won=matches_won,
+    single_enemies = single_enemies.most_common(10)
+    single_teammates = single_teammates.most_common(10)
+
+    return render_template('hero.html', hero=hero, matches_played=len(matches), matches_won=matches_won, playrate=playrate,
                            kda=kda, items=items, builds=builds, players=players2,
-                           teammates=teammates, skins=skins, enemies=enemies)
+                           teammates=teammates, skins=skins, enemies=enemies,
+                           single_teammates=single_teammates, single_enemies=single_enemies, cs=cs)
 
 
 # ------------------

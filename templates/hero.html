@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 {% block title %} {{ hero|title  }} {% endblock %}
 {% block css %}
+ 	<link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/rickshaw/rickshaw.css?1422792967" />
+	<link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/morris/morris.core.css?1420463396" />
 	<style>
         .hero-icon img {
         	width: 40px;
@@ -42,6 +44,10 @@
 							<div class="width-3 text-center pull-right">
 								<strong class="text-xl">{{'%0.2f'| format((matches_won / matches_played) * 100|float)}}</strong>%<br/>
 								<span class="text-light opacity-75">Winrate</span>
+							</div>
+							<div class="width-3 text-center pull-right">
+								<strong class="text-xl">{{'%0.2f'| format(playrate)}}</strong>%<br/>
+								<span class="text-light opacity-75">Pickrate</span>
 							</div>
 							<div class="width-3 text-center pull-right">
 								<strong class="text-xl">{{ kda['assists'] }}</strong><br/>
@@ -89,7 +95,7 @@
 						<div class="col-md-6 col-lg-4">
 							<div class="card">
 								<div class="card-head">
-									<header class="text-primary">Most common team compositions</header>
+									<header class="text-primary">Most common teammates </header>
 								</div>
 								<div class="card-body height-7 no-padding">
 									<div class="col-xs-12 col-sm-6">
@@ -107,7 +113,7 @@
 										{% endfor %}
 									</div>
 									<div class="col-xs-12 col-sm-6">
-
+										<div id="common-teammates" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
 									</div>
 								</div>
 							</div>
@@ -134,7 +140,7 @@
 										{% endfor %}
 									</div>
 									<div class="col-xs-12 col-sm-6">
-
+										<div id="common-enemies" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
 									</div>
 								</div>
 							</div>
@@ -175,6 +181,16 @@
 							</table>
 						</div>
 						<!-- END BEST PLAYERS -->
+
+						<div class="col-lg-offset-1 col-lg-3 col-xs-12">
+							<div class="card">
+								<div id="skins" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+							</div>
+							<div class="card">
+								<div id="cs" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+							</div>
+
+						</div>
 					</div>
 				</div>
 			</section>
@@ -184,6 +200,11 @@
 
 {% block js %}
 <!-- BEGIN JAVASCRIPT -->
+<script src="/static/js/libs/d3/d3.min.js"></script>
+<script src="/static/js/libs/d3/d3.v3.js"></script>
+<script src="/static/js/libs/raphael/raphael-min.js"></script>
+<script src="/static/js/libs/morris.js/morris.min.js"></script>
+<script src="/static/js/libs/rickshaw/rickshaw.min.js"></script>
 <script src="/static/js/libs/toastr/toastr.js"></script>
 <script src="/static/js/libs/countup/countUp.js"></script>
 <script>
@@ -192,6 +213,66 @@ $(function() {
 	$("table .btn-icon-toggle").click(function() {
 	 	window.open($(this).data('url'), '_blank');
 	 });
+
+	 if ($('#common-teammates').length > 0) {
+		Morris.Donut({
+			element: 'common-teammates',
+			data: [
+				 {% for hero, n in single_teammates %}
+				        {value: {{ n }}, label: '{{ hero }}', formatted: '{{ n }} games'} {% if not loop.last %},{%endif%}
+				    {% endfor %}
+			],
+			colors: $('#common-teammates').data('colors').split(','),
+			formatter: function (x, data) {
+				return data.formatted;
+			}
+		});
+	}
+
+	if ($('#common-enemies').length > 0) {
+		Morris.Donut({
+			element: 'common-enemies',
+			data: [
+				 {% for hero, n in single_enemies %}
+				        {value: {{ n }}, label: '{{ hero }}', formatted: '{{ n }} games'} {% if not loop.last %},{%endif%}
+				    {% endfor %}
+			],
+			colors: $('#common-enemies').data('colors').split(','),
+			formatter: function (x, data) {
+				return data.formatted;
+			}
+		});
+	}
+
+	if ($('#cs').length > 0) {
+		Morris.Donut({
+			element: 'cs',
+			data: [
+				 {% for i, n in cs.iteritems() %}
+				        {value: {{ n }}, label: '{{ i|title }}', formatted: '{{ n }} minions'} {% if not loop.last %},{%endif%}
+				    {% endfor %}
+			],
+			colors: $('#cs').data('colors').split(','),
+			formatter: function (x, data) {
+				return data.formatted;
+			}
+		});
+	}
+
+	if ($('#skins').length > 0) {
+		Morris.Donut({
+			element: 'skins',
+			data: [
+				 {% for i, n in skins %}
+				        {value: {{ n }}, label: '{{ i|title }}', formatted: '{{ n }} games'} {% if not loop.last %},{%endif%}
+				    {% endfor %}
+			],
+			colors: $('#skins').data('colors').split(','),
+			formatter: function (x, data) {
+				return data.formatted;
+			}
+		});
+	}
 });
 </script>
 

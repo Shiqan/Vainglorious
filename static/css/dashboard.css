@@ -36,11 +36,14 @@
     background-color: rgba(12, 12, 12, 0.07);
 }
 
+#datatable1 tr {
+    cursor: pointer;
+}
 
 #datatable1 tr td.alert-callout {
     border-bottom:0px;
     border-right:0px;
-    border-top:1px solid rgba(189, 193, 193, 0.2);;
+    border-top:1px solid rgba(189, 193, 193, 0.2);
 }
 
 /** hero hover **/
