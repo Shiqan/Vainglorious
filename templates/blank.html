@@ -181,6 +181,7 @@
 										</div>
 										<button type="button" class="btn btn-icon-toggle ink-reaction"><i class="fa fa-search"></i></button>
 									</form>
+									<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
 								</div>
 							</div>
 							<div class="card-body">
@@ -255,6 +256,51 @@
 					</div>
 				</div>
 				<!-- END HERO STATS -->
+
+				<!-- BEGIN GAME TABLE -->
+					<div class="row">
+					    <div class="col-md-12">
+					        <div class="card">
+					            <div class="card-head">
+                                    <header class="text-primary">Hero stats</header>
+									<div class="tools">
+										<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
+									</div>
+					            </div>
+					            <div class="card-body">
+					                <div class="table-responsive">
+    									<table id="datatable1" class="table table-striped table-hover">
+    										<thead>
+    											<tr>
+    												<th>Hero</th>
+    												<th>Winrate</th>
+    												<th>Playrate</th>
+    												<th>Games</th>
+    												<th>Kills</th>
+    												<th>Deaths</th>
+													<th>Assists</th>
+    											</tr>
+    										</thead>
+    										<tbody>
+    										    {% for game in hero_stats %}
+    										        <tr data-url="/hero/{{game.hero | lower }}/">
+    										            <td class="ink-reaction alert alert-callout {% if game.winrate > 50 %} alert-success  {% else %} alert-danger {% endif %} "> {{ game.hero }} </td>
+    										            <td class="ink-reaction"> {{'%0.2f'| format(game.winrate)}}% </td>
+    										            <td class="ink-reaction"> {{'%0.2f'| format(game.playrate)}}% </td>
+    										            <td class="ink-reaction"> {{ game.games }} </td>
+    										            <td class="ink-reaction"> {{ game.kills }} </td>
+    										            <td class="ink-reaction"> {{ game.deaths }} </td>
+    										            <td class="ink-reaction"> {{ game.assists }} </td>
+    										        </tr>
+    										    {% endfor %}
+    										</tbody>
+    									</table>
+    								</div>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+					<!-- END GAME TABLE -->
 
 			</div>
 		</section>
@@ -359,6 +405,34 @@ $(function() {
 
 
 
+	 // Games datatable
+	$('#datatable1').DataTable({
+		"dom": 'lCfrtip',
+		"order": [[ 1, "desc" ]],
+		"pageLength": 50,
+		"colVis": {
+			"buttonText": "Columns",
+			"overlayFade": 0,
+			"align": "right"
+		},
+		"language": {
+			"lengthMenu": '_MENU_ entries per page',
+			"search": '<i class="fa fa-search"></i>',
+			"paginate": {
+				"previous": '<i class="fa fa-angle-left"></i>',
+				"next": '<i class="fa fa-angle-right"></i>'
+			}
+		}
+	});
+
+	$('#datatable1 tbody').on('click', 'tr', function() {
+		window.location.href = $(this).data( "url" );
+	});
+
+	$('.card-head .tools .btn-collapse').on('click', function (e) {
+			var card = $(e.currentTarget).closest('.card');
+			materialadmin.AppCard.toggleCardCollapse(card);
+		});
 });
 </script>
 {% endblock %}

@@ -8,6 +8,12 @@
     		border-radius: 40px;
         }
 
+        .item-icon {
+        	width: 40px;
+    		height: 40px;
+    		border-radius: 40px;
+        }
+
         h3 small {
         	color: #ffffff;
         }
@@ -58,6 +64,86 @@
 			<section>
 				<div class="section-body no-margin">
 					<div class="row">
+						<div class="col-md-6 col-lg-4">
+							<div class="card">
+								<div class="card-head">
+									<header class="text-primary">Most common builds</header>
+								</div>
+								<div class="card-body height-7 no-padding">
+									{% for build, _ in builds %}
+										<div class="col-xs-12">
+										{% for item in build.split(', ') %}
+											<div class="col-sm-2 col-xs-4">
+												<a class="ink-reaction" data-toggle="tooltip" title="{{ item }}">
+													<img class="item-icon" src="/static/img/items/{{ item|lower|replace(' ', '-')|replace('\'', '') }}.png" alt="" />
+												</a>
+											</div>
+										{% endfor %}
+											<hr>
+										</div>
+									{% endfor %}
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-6 col-lg-4">
+							<div class="card">
+								<div class="card-head">
+									<header class="text-primary">Most common team compositions</header>
+								</div>
+								<div class="card-body height-7 no-padding">
+									<div class="col-xs-12 col-sm-6">
+										{% for team, _ in teammates %}
+											<div class="col-xs-12">
+												{% for actor in team.split(', ') %}
+													<div class="col-xs-4">
+														<a class="ink-reaction" href="/hero/{{ actor|lower }}" data-toggle="tooltip" title="{{ actor }}">
+															<img class="item-icon" src="/static/img/{{ actor|lower }}.png" alt="" />
+														</a>
+													</div>
+												{% endfor %}
+												<hr>
+											</div>
+										{% endfor %}
+									</div>
+									<div class="col-xs-12 col-sm-6">
+
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-6 col-lg-4">
+							<div class="card">
+								<div class="card-head">
+									<header class="text-primary">Most common enemy compositions</header>
+								</div>
+								<div class="card-body height-7 no-padding">
+									<div class="col-xs-12 col-sm-6">
+										{% for team, _ in enemies %}
+											<div class="col-xs-12">
+												{% for actor in team.split(', ') %}
+													<div class="col-xs-4">
+														<a class="ink-reaction" href="/hero/{{ actor|lower }}" data-toggle="tooltip" title="{{ actor }}">
+															<img class="item-icon" src="/static/img/{{ actor|lower }}.png" alt="" />
+														</a>
+													</div>
+												{% endfor %}
+												<hr>
+											</div>
+										{% endfor %}
+									</div>
+									<div class="col-xs-12 col-sm-6">
+
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+					<div class="row">
+						<!-- BEGIN BEST PLAYERS -->
 						<div class="col-lg-8 col-xs-12">
 							<h2>Best {{ hero|title }} players </h2>
 							<table class="table table-hover">
@@ -89,80 +175,6 @@
 							</table>
 						</div>
 						<!-- END BEST PLAYERS -->
-
-						<!-- BEGIN HERO SIDEBAR -->
-						<div class="col-lg-offset-1 col-lg-3 col-xs-12">
-							<div class="card card-underline style-default-dark">
-								<div class="card-head">
-									<header class="opacity-75"><small>Most common builds</small></header>
-								</div>
-								<div class="card-body no-padding">
-									<ul class="list">
-										{% for build, _ in builds %}
-											<li class="tile">
-											{% for item in build.split(', ') %}
-												<a class="tile-content ink-reaction" data-toggle="tooltip" title="{{ item }}">
-													<div class="tile-icon hero-icon">
-														<img src="/static/img/items/{{ item|lower|replace(' ', '-')|replace('\'', '') }}.png" alt="" />
-													</div>
-												</a>
-											{% endfor %}
-											</li>
-											<li class="divider-inset"></li>
-										{% endfor %}
-									</ul>
-								</div>
-							</div>
-							<div class="card card-underline style-default-dark">
-								<div class="card-head">
-									<header class="opacity-75"><small>Most common team compositions</small></header>
-								</div>
-								<div class="card-body no-padding">
-									<ul class="list">
-										{% for team, _ in teammates %}
-											<li class="tile">
-												{% for actor in team.split(', ') %}
-													<a class="tile-content ink-reaction" href="/hero/{{ actor|lower }}">
-														<div class="tile-icon hero-icon">
-															<img src="/static/img/{{ actor|lower }}.png" alt="" />
-														</div>
-														<div class="tile-text">
-															{{ actor }}
-														</div>
-													</a>
-												{% endfor %}
-											</li>
-										{% endfor %}
-									</ul>
-								</div>
-							</div>
-
-							<div class="card card-underline style-default-dark">
-								<div class="card-head">
-									<header class="opacity-75"><small>Most common enemy compositions</small></header>
-								</div>
-								<div class="card-body no-padding hero-icon">
-									<ul class="list">
-										{% for team, _ in enemies %}
-											<li class="tile">
-												{% for actor in team.split(', ') %}
-													<a class="tile-content ink-reaction" href="/hero/{{ actor|lower }}">
-														<div class="tile-icon hero-icon">
-															<img src="/static/img/{{ actor|lower }}.png" alt="" />
-														</div>
-														<div class="tile-text">
-															{{ actor }}
-														</div>
-													</a>
-												{% endfor %}
-											</li>
-										{% endfor %}
-									</ul>
-								</div>
-							</div>
-						</div>
-						<!-- END HERO SIDEBAR -->
-
 					</div>
 				</div>
 			</section>
