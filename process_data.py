@@ -3,6 +3,15 @@ import datetime
 from flask_app import app, db
 from models import Match, Roster, Participant, Player
 from sqlalchemy.exc import SQLAlchemyError
+import requests
+import urllib
+
+def process_samples(samples):
+    for sample in samples['data']:
+        pprint.pprint(sample)
+
+        url = sample['attributes']['URL']
+        break
 
 
 def process_batch_query(matches):
@@ -17,9 +26,7 @@ def process_batch_query(matches):
                         participant_data = [i for i in batch['included'] if i['id'] == participant['id']]
                         skill.append(participant_data[0]['attributes']['stats']['skillTier'])
 
-                if (sum(skill)/len(skill)) < 25:
-                    app.logger.info("NOPE")
-                else:
+                if (sum(skill)/len(skill)) > 25:
                     process_match(m)
 
                     for roster in m['relationships']['rosters']['data']:

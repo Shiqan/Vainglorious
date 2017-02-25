@@ -2,17 +2,17 @@ import requests
 from flask_app import app
 
 class VaingloryApi(object):
-    def __init__(self, key, title="semc-vainglory", datacenter="dc01", region="eu"):
+    def __init__(self, key, datacenter="dc01", region="eu"):
         self.key = key
         self.region = region
-        self.title = title
-        self.url = "https://api.{datacenter}.gamelockerapp.com/shards/{region}/".format(datacenter=datacenter, region=region)
+        self.datacenter = datacenter
+        self.url = "https://api.{datacenter}.gamelockerapp.com/shards/{region}/".format(datacenter=self.datacenter, region=self.region)
 
     def request(self, endpoint, params=None):
         app.logger.info("Request {0} with params: {1}".format(endpoint, params))
         headers = {
-            "Authorization": "Bearer " + self.key,
-            "X-TITLE-ID": self.title,
+            "Authorization": "Bearer {}".format(self.key),
+            "X-TITLE-ID": "semc-vainglory",
             "Accept": "application/vnd.api+json"
         }
         response = requests.get(self.url + endpoint,
@@ -29,6 +29,9 @@ class VaingloryApi(object):
 
     def player(self, player_id):
         return self.query("players", player_id)
+
+    def sample(self):
+        return self.query("samples")
 
     def matches(self,
                 offset=None, limit=None, sort=None,
