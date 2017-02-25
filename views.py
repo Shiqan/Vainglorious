@@ -193,6 +193,7 @@ def view_hero(hero):
     enemies = Counter()
     single_enemies = Counter()
     skins = Counter()
+    roles_played = Counter()
     players = {}
 
     for m in matches:
@@ -206,6 +207,7 @@ def view_hero(hero):
 
         skins[m.skinKey] += 1
 
+        # best players
         p = m.player.name
         if p in players:
             players[p]['total'] += 1
@@ -213,6 +215,7 @@ def view_hero(hero):
         else:
             players[p] = {'total': 1, 'win': m.winner }
 
+        # common builds
         _items = [strings.items[i] for i in m.items]
         _items.sort()
         if _items:
@@ -224,17 +227,16 @@ def view_hero(hero):
         _team = [strings.heroes[x.actor] for x in m.roster.participants]
         _team.sort()
 
+        # common teammates
         for i in _team:
             if hero != i.lower():
-                if i in single_teammates:
-                    single_teammates[i] += 1
-                else:
-                    single_teammates[i] = 1
+                single_teammates[i] += 1
 
         _team = ', '.join(_team)
         if _team:
             teammates[_team] += 1
 
+        # common enemies
         r = m.roster
         x = [i for i in m.roster.match.rosters if i.id != r.id][0]
 
@@ -243,14 +245,15 @@ def view_hero(hero):
 
         for i in _team:
             if hero != i.lower():
-                if i in single_enemies:
-                    single_enemies[i] += 1
-                else:
-                    single_enemies[i] = 1
+                single_enemies[i] += 1
 
         _team = ', '.join(_team)
         if _team:
             enemies[_team] += 1
+
+        # roles played
+        role = hero_determine_role(_items, m.assists, m.kills, m.nonJungleMinionKills, m.jungleKills)
+        roles_played[role] += 1
 
     threshold = 3
     players2 = {}
@@ -265,14 +268,14 @@ def view_hero(hero):
     players2 = sorted(players2.iteritems(), key=lambda x: x[1]['ratio'], reverse=True)[:25]
     skins = skins.most_common(5)
     enemies = enemies.most_common(5)
-
     single_enemies = single_enemies.most_common(10)
     single_teammates = single_teammates.most_common(10)
 
     return render_template('hero.html', hero=hero, matches_played=len(matches), matches_won=matches_won, playrate=playrate,
                            kda=kda, items=items, builds=builds, players=players2,
                            teammates=teammates, skins=skins, enemies=enemies,
-                           single_teammates=single_teammates, single_enemies=single_enemies, cs=cs)
+                           single_teammates=single_teammates, single_enemies=single_enemies, cs=cs,
+                           roles_played=roles_played)
 
 
 # ------------------

@@ -102,6 +102,14 @@ def hero_to_role(id):
     else:
         return strings.hero_roles[strings.heroes_inv[id]]
 
+def hero_determine_role(build, assists, kills, cs_lane, cs_jungle):
+    if "Fountain of Renewal" in build and "Crucible" in build and assists > kills:
+        return "Protector"
+    if cs_lane > cs_jungle:
+        return "Lane"
+
+    return "Jungle"
+
 
 def convert_date(date_str):
     return time.strptime(date_str, "%m/%d/%Y")
