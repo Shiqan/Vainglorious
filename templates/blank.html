@@ -20,7 +20,7 @@
 
 				<!-- BEGIN GAME FACTS -->
 				<div class="row">
-					<!-- TODO show all page -->
+					<!-- TODO show all page? -->
 
 					<div class="col-md-3 col-sm-6">
 						<div class="card">
@@ -167,6 +167,25 @@
 				</div>
 				<!-- END GAME FACTS -->
 
+				<!-- BEGIN GAME TABLE -->
+					<div class="row">
+					    <div class="col-md-12">
+					        <div class="card">
+					            <div class="card-head">
+                                    <header class="text-primary">Graphs</header>
+									<div class="tools">
+										<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
+									</div>
+					            </div>
+					            <div class="card-body">
+									<div id="winrate-chart" class="flot height-6" data-color="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+					<!-- END GAME TABLE -->
+
+
 				<!-- BEGIN HERO STATS -->
 				<div class="row">
 
@@ -214,7 +233,6 @@
 
 
 									</div>
-									<!--<input type="text" class="form-control" id="filter" placeholder="Search hero"/>-->
 								</div>
 								<div class="col-xs-12">
 									<div id="winrates">
@@ -302,6 +320,8 @@
 					</div>
 					<!-- END GAME TABLE -->
 
+
+
 			</div>
 		</section>
 	</div>
@@ -322,6 +342,10 @@
 <script src="/static/js/libs/DataTables/jquery.dataTables.min.js"></script>
 <script src="/static/js/libs/DataTables/extensions/ColVis/js/dataTables.colVis.min.js"></script>
 <script src="/static/js/libs/DataTables/extensions/TableTools/js/dataTables.tableTools.min.js"></script>
+<script src="/static/js/libs/moment/moment.min.js"></script>
+<script src="/static/js/libs/flot/jquery.flot.min.js"></script>
+<script src="/static/js/libs/flot/jquery.flot.time.min.js"></script>
+<script src="/static/js/libs/flot/jquery.flot.resize.min.js"></script>
 <script>
 $(function() {
 	// CountUp
@@ -403,8 +427,6 @@ $(function() {
 		window.location.href = $(this).data( "url" );
 	});
 
-
-
 	 // Games datatable
 	$('#datatable1').DataTable({
 		"dom": 'lCfrtip',
@@ -430,9 +452,88 @@ $(function() {
 	});
 
 	$('.card-head .tools .btn-collapse').on('click', function (e) {
-			var card = $(e.currentTarget).closest('.card');
-			materialadmin.AppCard.toggleCardCollapse(card);
-		});
+		var card = $(e.currentTarget).closest('.card');
+		materialadmin.AppCard.toggleCardCollapse(card);
+	});
+
+
+	// Winrate chart
+	var chart = $("#winrate-chart");
+	var labelColor = chart.css('color');
+	var data = [
+		{% for hero, stats in winrate_stats.iteritems() %}
+			{ label: '{{ hero }}',
+			  data: [
+			  	{% for date, winrate in stats.iteritems() %}
+			  		[ new Date("{{ date }}"), {{ winrate }} ]{% if not loop.last %},{% endif %}
+			  	{% endfor %}
+			  		],
+			  last: true
+			}{% if not loop.last %},{% endif %}
+		{% endfor %}
+	];
+
+	var options = {
+		colors: chart.data('color').split(','),
+		series: {
+			shadowSize: 0,
+			lines: {
+				show: true,
+				lineWidth: 2
+			},
+			points: {
+				show: true,
+				radius: 3,
+				lineWidth: 2
+			}
+		},
+		legend: {
+			show: false
+		},
+		xaxis: {
+			mode: "time",
+			timeformat: "%m/%d/%Y",
+			color: 'rgba(0, 0, 0, 0)',
+			font: {color: labelColor}
+		},
+		yaxis: {
+			font: {color: labelColor}
+		},
+		grid: {
+			borderWidth: 0,
+			color: labelColor,
+			hoverable: true
+		}
+	};
+
+	chart.width('100%');
+	var plot = $.plot(chart, data, options);
+
+	var tip, previousPoint = null;
+	chart.bind("plothover", function (event, pos, item) {
+		if (item) {
+			if (previousPoint !== item.dataIndex) {
+				previousPoint = item.dataIndex;
+
+				var x = item.datapoint[0];
+				var y = item.datapoint[1];
+				var img = '<img class="img-circle img-responsive" src="/static/img/'+item.series.label.toLowerCase()+'.png" style="display: block;  margin-left: auto; margin-right: auto;" width="30px" height="30px" alt=""></img>';
+				var tipContent = img + y.toFixed(2) + "% ";
+
+				if (tip !== undefined) {
+					$(tip).popover('destroy');
+				}
+				tip = $('<div></div>').appendTo('body').css({left: item.pageX, top: item.pageY - 5, position: 'absolute'});
+				tip.popover({html: true, content: tipContent, placement: 'top'}).popover('show');
+			}
+		}
+		else {
+			if (tip !== undefined) {
+				$(tip).popover('destroy');
+			}
+			previousPoint = null;
+		}
+	});
 });
 </script>
 {% endblock %}

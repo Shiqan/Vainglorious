@@ -1,4 +1,7 @@
 from __future__ import division
+
+import os
+
 from flask import redirect, render_template, request, url_for, flash
 from flask_app import lm, admin
 from flask_login import login_user, logout_user, current_user
@@ -86,92 +89,43 @@ def logout():
 @app.route('/')
 @app.route('/index/')
 def index():
-    app.logger.info("Request index 00")
+    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    feeds = process_data.read_from_file(os.path.join(__location__, 'data/data.json'))
 
-    games = Match.query.count()
-    players = Player.query.count()
-    potions = sum([i["*1000_Item_HalcyonPotion*"] for i, in db.session.query(Participant.itemUses).all() if "*1000_Item_HalcyonPotion*" in i])
-    infusions = sum([i["*1052_Item_WeaponInfusion*"] for i, in db.session.query(Participant.itemUses).all() if "*1052_Item_WeaponInfusion*" in i])
-    fountains = sum([i["*1045_Item_FountainOfRenewal*"] for i, in db.session.query(Participant.itemUses).all() if "*1045_Item_FountainOfRenewal*" in i])
-    mines = sum([i["*1054_Item_ScoutTrap*"] for i, in db.session.query(Participant.itemUses).all() if "*1054_Item_ScoutTrap*" in i])
-    krakens = sum([i[0] for i in db.session.query(Participant.krakenCaptures, ).group_by(Participant.roster_id).all()])
-    minions = db.session.query(func.sum(Participant.minionKills)).scalar()
-    kills = db.session.query(func.sum(Participant.kills)).scalar()
-    max_kills = db.session.query(func.max(Participant.kills)).scalar()
-    deaths = db.session.query(func.sum(Participant.deaths)).scalar()
-    max_deaths = db.session.query(func.max(Participant.deaths)).scalar()
-    died_by_minions = deaths - kills
-    duration = db.session.query(func.sum(Match.duration).label("duration")).scalar()
-    avg_duration = duration / games
+    facts = feeds[get_today()]['facts']
+    games = facts['games']
+    players = facts['players']
+    potions = facts['potions']
+    krakens = facts['krakens']
+    duration = facts['duration']
+    avg_duration = facts['avg_duration']
+    died_by_minions = facts['died_by_minions']
+    max_kills = facts['max_kills']
+    max_deaths = facts['max_deaths']
+    avg_cs = facts['avg_cs']
+    infusions = facts['infusions']
+    fountains = facts['fountains']
+    mines = facts['mines']
+    minions = facts['minions']
 
-    avg_cs = [i[0] for i in db.session.query(Participant.farm).filter(Participant.actor.in_([h for h, r in strings.hero_roles.iteritems() if "Lane" in r])).all()]
-    avg_cs = sum(avg_cs) / len(avg_cs)
+    hero_stats = feeds[get_today()]['data']
 
-    app.logger.info(avg_duration)
-    heroes = db.session.query(Participant.actor, func.count(Participant.actor))\
-        .group_by(Participant.actor).order_by(func.count(Participant.actor)).all()
-
-    app.logger.info("Request index 01")
-
-    heroes_win_rate = db.session.query(Participant.actor, func.sum(case([(Participant.winner == True, 1)], else_=0)).label("winrate"))\
-        .group_by(Participant.actor).order_by("winrate").all()
-
-    heroes_win_rate = [(hero[0], (herowr[1] / hero[1]) * 100) for hero in heroes for herowr in heroes_win_rate if hero[0] == herowr[0]]
-    heroes_win_rate = sorted(heroes_win_rate, key=operator.itemgetter(1), reverse=True)
-
-    app.logger.info("Request index 02")
-
-    # most_wins = db.session.query(Participant.player_id, Participant.wins).group_by(Participant.player_id)\
-    #     .order_by(Participant.wins.desc()).limit(25)
-    # most_wins = [(db.session.query(Player.name).filter_by(id=i[0]).one()[0], i[1]) for i in most_wins]
-
-    heroes_kda = db.session.query(Participant.actor, func.sum(Participant.kills).label("kills"),
-                                  func.sum(Participant.deaths).label("deaths"),
-                                  func.sum(Participant.assists).label("assists"))\
-        .group_by(Participant.actor).all()
-
-    hero_stats = []
-    for hero in heroes:
-        stats = {'hero': strings.heroes[hero[0]], 'games': hero[1], 'playrate': (hero[1] / games) * 100}
-        for hero2 in heroes_win_rate:
-            if hero[0] == hero2[0]:
-                stats['winrate'] = hero2[1]
-
-        for hero2 in heroes_kda:
-            if hero[0] == hero2[0]:
-                stats['kills'] = hero2.kills
-                stats['deaths'] = hero2.deaths
-                stats['assists'] = hero2.assists
-
-        hero_stats.append(stats)
-
-
-    app.logger.info("Request index 03")
+    top_heroes_win_rate = [i['hero'] for i in sorted(hero_stats, key=lambda x: x['winrate'], reverse=True)[:5]]
+    winrate_stats = {}
+    for date in feeds:
+        s = feeds[date]['data']
+        for hero in s:
+            if hero['hero'] in top_heroes_win_rate:
+                if hero['hero'] in winrate_stats:
+                    winrate_stats[hero['hero']][date] = hero['winrate']
+                else:
+                    winrate_stats[hero['hero']] = {date: hero['winrate']}
 
     return render_template('blank.html', games=games, players=players, potions=potions, krakens=krakens,
                            duration=duration, avg_duration=avg_duration, died_by_minions=died_by_minions,
                            max_kills=max_kills, max_deaths=max_deaths, avg_cs=avg_cs,
                            infusions=infusions, fountains=fountains, mines=mines, minions=minions,
-                           heroes=heroes, most_wins=0, heroes_win_rate=heroes_win_rate, hero_stats=hero_stats)
-
-
-@app.route('/query/')
-def query_matches():
-    api = VaingloryApi("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJkNzYzYTkyMC1kYzMyLTAxMzQtYTc1NC0wMjQyYWMxMTAwMDMiLCJpc3MiOiJnYW1lbG9ja2VyIiwib3JnIjoiZmVycm9uLXNhYW4tbGl2ZS1ubCIsImFwcCI6ImQ3NjFjZDUwLWRjMzItMDEzNC1hNzUzLTAyNDJhYzExMDAwMyIsInB1YiI6InNlbWMiLCJ0aXRsZSI6InZhaW5nbG9yeSIsInNjb3BlIjoiY29tbXVuaXR5IiwibGltaXQiOjEwfQ.o6z5i-2pfAjrcaw_NAchOzWm2ZcGvmNfwA7U7Hgd0Lg")
-    # s = api.sample()
-    # process_data.process_samples(s)
-
-    # split request to batches of 50
-    max_limit = 50
-    limit = 100
-    matches = []
-    for batch in range(0, limit, max_limit):
-        response = api.matches(offset=batch, limit=max_limit, sort="-createdAt")
-        matches.append(dict(response))
-        limit -= max_limit
-
-    process_data.process_batch_query(matches)
-    return render_template('200.html')
+                           most_wins=0, hero_stats=hero_stats, winrate_stats=winrate_stats)
 
 
 @app.route('/hero/<hero>/')
@@ -276,6 +230,116 @@ def view_hero(hero):
                            teammates=teammates, skins=skins, enemies=enemies,
                            single_teammates=single_teammates, single_enemies=single_enemies, cs=cs,
                            roles_played=roles_played)
+
+
+# ------------------
+# DATA
+# ------------------
+@app.route('/data/')
+def store_data():
+    app.logger.info("Request data 00")
+
+    games = Match.query.count()
+    players = Player.query.count()
+    potions = sum([i["*1000_Item_HalcyonPotion*"] for i, in db.session.query(Participant.itemUses).all() if "*1000_Item_HalcyonPotion*" in i])
+    infusions = sum([i["*1052_Item_WeaponInfusion*"] for i, in db.session.query(Participant.itemUses).all() if "*1052_Item_WeaponInfusion*" in i])
+    fountains = sum([i["*1045_Item_FountainOfRenewal*"] for i, in db.session.query(Participant.itemUses).all() if "*1045_Item_FountainOfRenewal*" in i])
+    mines = sum([i["*1054_Item_ScoutTrap*"] for i, in db.session.query(Participant.itemUses).all() if "*1054_Item_ScoutTrap*" in i])
+    krakens = sum([i[0] for i in db.session.query(Participant.krakenCaptures, ).group_by(Participant.roster_id).all()])
+    minions = float(db.session.query(func.sum(Participant.minionKills)).scalar())
+    kills = db.session.query(func.sum(Participant.kills)).scalar()
+    max_kills = db.session.query(func.max(Participant.kills)).scalar()
+    deaths = db.session.query(func.sum(Participant.deaths)).scalar()
+    max_deaths = db.session.query(func.max(Participant.deaths)).scalar()
+    died_by_minions = int(deaths - kills)
+    duration = int(db.session.query(func.sum(Match.duration).label("duration")).scalar())
+    avg_duration = int(duration / games)
+
+    avg_cs = [i[0] for i in db.session.query(Participant.farm).filter(Participant.actor.in_([h for h, r in strings.hero_roles.iteritems() if "Lane" in r])).all()]
+    avg_cs = sum(avg_cs) / len(avg_cs)
+
+    heroes = db.session.query(Participant.actor, func.count(Participant.actor))\
+        .group_by(Participant.actor).order_by(func.count(Participant.actor)).all()
+
+    app.logger.info("Request data 01")
+
+    heroes_win_rate = db.session.query(Participant.actor, func.sum(case([(Participant.winner == True, 1)], else_=0)).label("winrate"))\
+        .group_by(Participant.actor).order_by("winrate").all()
+
+    heroes_win_rate = [(hero[0], (herowr[1] / hero[1]) * 100) for hero in heroes for herowr in heroes_win_rate if hero[0] == herowr[0]]
+    heroes_win_rate = sorted(heroes_win_rate, key=operator.itemgetter(1), reverse=True)
+
+    app.logger.info("Request data 02")
+
+    heroes_kda = db.session.query(Participant.actor, func.sum(Participant.kills).label("kills"),
+                                  func.sum(Participant.deaths).label("deaths"),
+                                  func.sum(Participant.assists).label("assists"))\
+        .group_by(Participant.actor).all()
+
+    heroes_cs = db.session.query(Participant.actor, func.sum(Participant.nonJungleMinionKills).label("lane"),
+                                  func.sum(Participant.minionKills).label("jungle"),
+                                  func.sum(Participant.farm).label("farm")) \
+        .group_by(Participant.actor).all()
+
+    hero_stats = []
+    for hero in heroes:
+        stats = {'hero': strings.heroes[hero[0]], 'games': hero[1], 'playrate': float((hero[1] / games) * 100)}
+        for hero2 in heroes_win_rate:
+            if hero[0] == hero2[0]:
+                stats['winrate'] = float(hero2[1])
+
+        for hero2 in heroes_kda:
+            if hero[0] == hero2[0]:
+                stats['kills'] = float(hero2.kills)
+                stats['deaths'] = float(hero2.deaths)
+                stats['assists'] = float(hero2.assists)
+
+        for hero2 in heroes_cs:
+            if hero[0] == hero2[0]:
+                stats['lane'] = float(hero2.lane)
+                stats['jungle'] = float(hero2.jungle)
+                stats['farm'] = float(hero2.farm)
+
+        hero_stats.append(stats)
+
+
+    app.logger.info("Request data 03")
+
+    facts = {'games': games, 'players': players, 'potions': potions, 'krakens': krakens, 'duration': duration,
+             'avg_duration': avg_duration, 'died_by_minions': died_by_minions, 'max_kills': max_kills,
+             'max_deaths': max_deaths, 'avg_cs': avg_cs, 'infusions': infusions, 'fountains': fountains,
+             'mines': mines, 'minions': minions}
+
+
+    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    process_data.save_to_file(os.path.join(__location__, 'data/data.json'), hero_stats, facts)
+    return render_template('200.html')
+
+@app.route('/query/')
+def query_matches():
+    api = VaingloryApi("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJkNzYzYTkyMC1kYzMyLTAxMzQtYTc1NC0wMjQyYWMxMTAwMDMiLCJpc3MiOiJnYW1lbG9ja2VyIiwib3JnIjoiZmVycm9uLXNhYW4tbGl2ZS1ubCIsImFwcCI6ImQ3NjFjZDUwLWRjMzItMDEzNC1hNzUzLTAyNDJhYzExMDAwMyIsInB1YiI6InNlbWMiLCJ0aXRsZSI6InZhaW5nbG9yeSIsInNjb3BlIjoiY29tbXVuaXR5IiwibGltaXQiOjEwfQ.o6z5i-2pfAjrcaw_NAchOzWm2ZcGvmNfwA7U7Hgd0Lg")
+    # s = api.sample()
+    # process_data.process_samples(s)
+
+    # split request to batches of 50
+    max_limit = 50
+    limit = 450
+    matches = []
+    for batch in range(0, limit, max_limit):
+        response = api.matches(offset=batch, limit=max_limit, sort="-createdAt")
+        matches.append(dict(response))
+        limit -= max_limit
+
+    process_data.process_batch_query(matches)
+    return render_template('200.html')
+
+@app.route('/samples/')
+def query_samples():
+    api = VaingloryApi("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJkNzYzYTkyMC1kYzMyLTAxMzQtYTc1NC0wMjQyYWMxMTAwMDMiLCJpc3MiOiJnYW1lbG9ja2VyIiwib3JnIjoiZmVycm9uLXNhYW4tbGl2ZS1ubCIsImFwcCI6ImQ3NjFjZDUwLWRjMzItMDEzNC1hNzUzLTAyNDJhYzExMDAwMyIsInB1YiI6InNlbWMiLCJ0aXRsZSI6InZhaW5nbG9yeSIsInNjb3BlIjoiY29tbXVuaXR5IiwibGltaXQiOjEwfQ.o6z5i-2pfAjrcaw_NAchOzWm2ZcGvmNfwA7U7Hgd0Lg")
+    s = api.sample()
+    process_data.process_samples(s)
+
+    return render_template('200.html')
 
 
 # ------------------

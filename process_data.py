@@ -5,6 +5,8 @@ from models import Match, Roster, Participant, Player
 from sqlalchemy.exc import SQLAlchemyError
 import requests
 import urllib
+import json
+import commons
 
 def process_samples(samples):
     for sample in samples['data']:
@@ -162,3 +164,20 @@ def process_player(data):
         except SQLAlchemyError as e:
             db.session.rollback()
             app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
+
+
+def read_from_file(file):
+    with open(file, 'r') as f:
+        feeds = json.load(f)
+
+    return feeds
+
+
+def save_to_file(file, data, facts):
+    date = commons.get_today()
+    entry = {'data': data, 'facts': facts}
+    feeds = read_from_file(file)
+
+    with open(file, 'w') as f:
+        feeds[date] = entry
+        json.dump(feeds, f)
