@@ -43,6 +43,20 @@
     border-top:1px solid rgba(189, 193, 193, 0.2);
 }
 
+.tierlist-title {
+    text-align: center;
+}
+
+.buildpath-icon {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+
+.tile:hover {
+    background-color: #e5e6e6;
+}
+
 /** hero hover **/
 
 .hovereffect {

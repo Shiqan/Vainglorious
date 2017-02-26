@@ -91,6 +91,8 @@ def logout():
 def index():
     __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     feeds = process_data.read_from_file(os.path.join(__location__, 'data/data.json'))
+    tierlist = process_data.read_from_file(os.path.join(__location__, 'data/tierlist.json'))
+    tierlist = tierlist[get_today()]
 
     facts = feeds[get_today()]['facts']
     games = facts['games']
@@ -125,7 +127,8 @@ def index():
                            duration=duration, avg_duration=avg_duration, died_by_minions=died_by_minions,
                            max_kills=max_kills, max_deaths=max_deaths, avg_cs=avg_cs,
                            infusions=infusions, fountains=fountains, mines=mines, minions=minions,
-                           most_wins=0, hero_stats=hero_stats, winrate_stats=winrate_stats)
+                           most_wins=0, hero_stats=hero_stats, winrate_stats=winrate_stats,
+                           tierlist=tierlist)
 
 
 @app.route('/hero/<hero>/')
@@ -148,6 +151,7 @@ def view_hero(hero):
     single_enemies = Counter()
     skins = Counter()
     roles_played = Counter()
+    buildpaths = Counter()
     players = {}
 
     for m in matches:
@@ -209,6 +213,9 @@ def view_hero(hero):
         role = hero_determine_role(_items, m.assists, m.kills, m.nonJungleMinionKills, m.jungleKills)
         roles_played[role] += 1
 
+        buildpath = hero_determine_buildpath(_items)
+        buildpaths[buildpath] += 1
+
     threshold = 3
     players2 = {}
     for p, v in players.iteritems():
@@ -230,6 +237,11 @@ def view_hero(hero):
                            teammates=teammates, skins=skins, enemies=enemies,
                            single_teammates=single_teammates, single_enemies=single_enemies, cs=cs,
                            roles_played=roles_played)
+
+
+@app.route('/tierlist/')
+def tierlist():
+    return render_template('tierlist.html')
 
 
 # ------------------
@@ -313,6 +325,32 @@ def store_data():
 
     __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     process_data.save_to_file(os.path.join(__location__, 'data/data.json'), hero_stats, facts)
+
+    matches = db.session.query(Participant).all()
+    tierlist_lane = Counter()
+    tierlist_jungle = Counter()
+    tierlist_protector = Counter()
+
+    for m in matches:
+        _items = [strings.items[i] for i in m.items]
+        _items.sort()
+        if _items:
+            _items = ', '.join(_items)
+
+            buildpath = hero_determine_buildpath(_items)
+            role = hero_determine_role(_items, m.assists, m.kills, m.nonJungleMinionKills, m.jungleKills)
+
+            entry = (strings.heroes[m.actor], buildpath)
+
+            if role == "Lane":
+                tierlist_lane[entry] += 1
+            elif role == "Jungle":
+                tierlist_jungle[entry] += 1
+            else:
+                tierlist_protector[entry] += 1
+
+    process_data.save_to_file_tierlist(os.path.join(__location__, 'data/tierlist.json'), tierlist_lane.most_common(10), tierlist_jungle.most_common(10), tierlist_protector.most_common(10))
+
     return render_template('200.html')
 
 @app.route('/query/')

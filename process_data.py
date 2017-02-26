@@ -181,3 +181,15 @@ def save_to_file(file, data, facts):
     with open(file, 'w') as f:
         feeds[date] = entry
         json.dump(feeds, f)
+
+def save_to_file_tierlist(file, lane, jungle, protector):
+    date = commons.get_today()
+    result1 = [{'name': i[0][0], 'path': i[0][1], 'value': i[1]} for i in lane]
+    result2 = [{'name': i[0][0], 'path': i[0][1], 'value': i[1]} for i in jungle]
+    result3 = [{'name': i[0][0], 'path': i[0][1], 'value': i[1]} for i in protector]
+    entry = {'lane': result1, 'jungle': result2, 'protector': result3}
+    feeds = read_from_file(file)
+
+    with open(file, 'w') as f:
+        feeds[date] = entry
+        json.dump(feeds, f)
