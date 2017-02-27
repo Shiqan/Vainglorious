@@ -123,11 +123,16 @@ def index():
                 else:
                     winrate_stats[hero['hero']] = {date: hero['winrate']}
 
+    sorted_winrate_stats = []
+    for hero, stats in winrate_stats.iteritems():
+        stats = sorted(stats.iteritems(), key=lambda x: x[0])
+        sorted_winrate_stats.append((hero, stats))
+
     return render_template('blank.html', games=games, players=players, potions=potions, krakens=krakens,
                            duration=duration, avg_duration=avg_duration, died_by_minions=died_by_minions,
                            max_kills=max_kills, max_deaths=max_deaths, avg_cs=avg_cs,
                            infusions=infusions, fountains=fountains, mines=mines, minions=minions,
-                           most_wins=0, hero_stats=hero_stats, winrate_stats=winrate_stats,
+                           most_wins=0, hero_stats=hero_stats, winrate_stats=sorted_winrate_stats,
                            tierlist=tierlist)
 
 
@@ -242,6 +247,11 @@ def view_hero(hero):
 @app.route('/tierlist/')
 def tierlist():
     return render_template('tierlist.html')
+
+
+@app.route('/winrates/')
+def winrates():
+    return render_template('winrates.html')
 
 
 # ------------------
@@ -361,12 +371,19 @@ def query_matches():
 
     # split request to batches of 50
     max_limit = 50
-    limit = 450
+    limit = 4500
     matches = []
     for batch in range(0, limit, max_limit):
-        response = api.matches(offset=batch, limit=max_limit, sort="-createdAt")
-        matches.append(dict(response))
-        limit -= max_limit
+        try:
+            response = api.matches(offset=batch, limit=max_limit, sort="-createdAt")
+            matches.append(dict(response))
+            limit -= max_limit
+        except:
+            app.logger.error("Error occured...")
+
+        if limit % 450 == 0:
+            app.logger.info("time.sleep(60)")
+            time.sleep(60)
 
     process_data.process_batch_query(matches)
     return render_template('200.html')

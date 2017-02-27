@@ -1392,6 +1392,9 @@ a.text-success:hover {
   }
 }
 @media (max-width: 768px) {
+  #content {
+    padding-top: 0px;
+  }
   #header {
     position: relative;
   }
@@ -1420,17 +1423,7 @@ a.text-success:hover {
   .header-fixed .headerbar-left {
     position: fixed;
   }
-  .headerbar-right {
-    position: absolute;
-    left: 0;
-    right: 0;
-    min-height: 64px;
-    top: 64px;
-    float: none !important;
-    background: #ffffff;
-    -webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.33);
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.33);
-  }
+
   .headerbar-right .header-nav-options {
     margin-right: 12px;
     float: right;
@@ -1439,13 +1432,13 @@ a.text-success:hover {
     position: absolute;
     float: left;
   }
-  .headerbar-right .header-nav-toggle {
+  .headerbar-right .header-nav-options {
     position: absolute;
     z-index: 1012;
     top: -64px;
     right: 0;
   }
-  .header-fixed .headerbar-right .header-nav-toggle {
+  .header-fixed .headerbar-right .header-nav-options {
     position: fixed;
     top: 0;
   }

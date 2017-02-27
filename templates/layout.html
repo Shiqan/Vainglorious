@@ -151,40 +151,19 @@
 						</li>
 					</ul>
 				</div>
-				<!-- Collect the nav links, forms, and other content for toggling -->
+
 				<div class="headerbar-right">
-					<ul class="header-nav header-nav-profile">
-					    {% if current_user.is_authenticated %}
+					<ul class="header-nav header-nav-options">
 						<li class="dropdown">
-							<a href="#" class="dropdown-toggle ink-reaction" data-toggle="dropdown">
-								<img src="/static/img/avatar.png" alt="" />
-								<span class="profile-info">
-									{{ current_user.username }}
-									<small>Administrator</small>
-								</span>
+							<a class="btn btn-icon-toggle btn-default" data-toggle="dropdown">
+								<i class="fa fa fa-ellipsis-v"></i>
 							</a>
-							<ul class="dropdown-menu animation-dock">
-								<li class="dropdown-header">Config</li>
-								<li><a href="/addgame/">Add game</a></li>
-								<li><a href="/settings/">Settings</a></li>
-								<li><a href="/calender/">My appointments</a></li>
-								<li class="divider"></li>
-								<li><a href="/logout"><i class="fa fa-fw fa-power-off text-danger"></i> Logout</a></li>
+							<ul class="dropdown-menu animation-expand">
+								<li class="dropdown-header">Go to </li>
+								<li><a href="/winrates/">Winrates <span class="pull-right"><i class="fa fa-arrow-right"></i></span></a></li>
+								<li><a href="/tierlist/">Tierlist <span class="pull-right"><i class="fa fa-arrow-right"></i></span></a></li>
 							</ul>
 						</li>
-						{% else %}
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle ink-reaction" data-toggle="dropdown">
-									<img src="/static/img/avatar.png" alt="" />
-									<span class="profile-info">
-										Guest
-									</span>
-								</a>
-							<ul class="dropdown-menu animation-dock">
-								<li><a href="/login/">Login</a></li>
-							</ul>
-						</li>
-						{% endif %}
 					</ul>
 				</div>
 			</div>
