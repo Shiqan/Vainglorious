@@ -102,6 +102,12 @@
   text-align: left;
 }
 
+@media (max-width: 769px) {
+  .hovereffect h2 {
+    pading: 5% 0 10px 0 !important;
+  }
+}
+
 .hovereffect .overlay:before {
   position: absolute;
   top: 20px;

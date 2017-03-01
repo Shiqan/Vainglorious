@@ -1,26 +1,86 @@
 {% extends "layout.html" %}
 {% block title %} Tierlist {% endblock %}
 
-{% block css %}{% endblock %}
+{% block css %}
+<link type="text/css" rel="stylesheet" href="/static/css/dashboard.css" />
+{% endblock %}
 
 {% block content %}
 	<!-- BEGIN CONTENT-->
 	<div id="content">
-
-		<!-- BEGIN 200 MESSAGE -->
 		<section>
-
-			<div class="section-body contain-lg">
+			<div class="section-body">
 				<div class="row">
-					<div class="col-lg-12 text-center">
-						<h1><span class="text-xxxl text-light"><i class="fa fa-check-circle text-success"></i></span></h1>
-						<h2 class="text-light">In progress</h2>
+					<div class="col-xs-12">
+						<div class="card">
+							<div class="card-head">
+								<header class="text-primary">Tier list</header>
+								<div class="tools">
+									<a class="btn btn-icon-toggle btn-default" data-toggle="tooltip" title="Still need to work on better detection for the roles and buildpath"><i class="fa fa-question"></i></a>
+									<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="col-sm-4 col-xs-12">
+									<h3 class="tierlist-title"> Protector </h3>
+									<ul class="list">
+									{% for hero in tierlist['protector'] %}
+										{% if hero['path'] %}
+											<li class="tile">
+												<a class="tile-content ink-reaction" href="/hero/{{hero['name'] | lower }}">
+													<div class="tile-icon">
+														<img src="/static/img/{{ hero['name'] | lower }}.png" alt="" />
+													</div>
+													<div class="tile-text"> {{ hero['name'] }} <img class="buildpath-icon pull-right" src="/static/img/{{ hero['path'] | buildpath_to_img }}" /> </div>
+												</a>
+
+											</li>
+										{% endif %}
+									{% endfor %}
+									</ul>
+								</div>
+
+								<div class="col-sm-4 col-xs-12">
+									<h3 class="tierlist-title"> Jungle </h3>
+									<ul class="list">
+										{% for hero in tierlist['jungle'] %}
+											{% if hero['path'] %}
+												<li class="tile">
+													<a class="tile-content ink-reaction" href="/hero/{{hero['name'] | lower }}">
+														<div class="tile-icon">
+															<img src="/static/img/{{ hero['name'] | lower }}.png" alt="" />
+														</div>
+														<div class="tile-text"> {{ hero['name'] }} <img class="buildpath-icon pull-right" src="/static/img/{{ hero['path'] | buildpath_to_img }}" /></div>
+													</a>
+												</li>
+											{% endif %}
+										{% endfor %}
+									</ul>
+								</div>
+
+								<div class="col-sm-4 col-xs-12">
+									<h3 class="tierlist-title"> Lane </h3>
+									<ul class="list">
+										{% for hero in tierlist['lane'] %}
+											{% if hero['path'] %}
+												<li class="tile">
+													<a class="tile-content ink-reaction" href="/hero/{{hero['name'] | lower }}">
+														<div class="tile-icon">
+															<img src="/static/img/{{ hero['name'] | lower }}.png" alt="" />
+														</div>
+														<div class="tile-text"> {{ hero['name'] }} <img class="buildpath-icon pull-right" src="/static/img/{{ hero['path'] | buildpath_to_img }}" /></div>
+													</a>
+												</li>
+											{% endif %}
+										{% endfor %}
+									</ul>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</section>
-		<!-- END 200 MESSAGE -->
-
 	</div>
 	<!-- END CONTENT -->
 {% endblock %}

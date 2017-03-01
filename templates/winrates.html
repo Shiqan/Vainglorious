@@ -1,7 +1,19 @@
 {% extends "layout.html" %}
 {% block title %} Winrates {% endblock %}
 
-{% block css %}{% endblock %}
+{% block css %}
+ 	<link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/rickshaw/rickshaw.css?1422792967" />
+	<link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/morris/morris.core.css?1420463396" />
+    <style>
+        .mbox {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            margin: 10px 0px 0px 25px;
+            padding-left: 4px;
+        }
+    </style>
+{% endblock %}
 
 {% block content %}
 	<!-- BEGIN CONTENT-->
@@ -10,11 +22,72 @@
 		<!-- BEGIN 200 MESSAGE -->
 		<section>
 
-			<div class="section-body contain-lg">
+			<div class="section-body">
 				<div class="row">
-					<div class="col-lg-12 text-center">
-						<h1><span class="text-xxxl text-light"><i class="fa fa-check-circle text-success"></i></span></h1>
-						<h2 class="text-light">In progress</h2>
+					<div class="col-md-12">
+						<div class="card">
+							<div class="card-head">
+								<header class="text-primary">Filter</header>
+								<div class="tools">
+									<form class="navbar-search">
+										<div class="form-group">
+											<input id="filter" type="text" class="form-control" placeholder="Search hero">
+										</div>
+										<button type="button" class="btn btn-icon-toggle ink-reaction"><i class="fa fa-search"></i></button>
+									</form>
+									<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="col-xs-12">
+									<div class="controls">
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter="all">All</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".assassin">Assassin</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".mage">Mage</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".protector">Protector</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".sniper">Sniper</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".warrior">Warrior</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".lane">Lane</button>
+										<button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-filter=".jungle">Jungle</button>
+										<div class="btn-group pull-right">
+											<button type="button" class="btn ink-reaction btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+												Sort <i class="fa fa-caret-down text-default-light"></i>
+											</button>
+											<ul class="dropdown-menu animation-expand" role="menu">
+												<li class="dropdown-header">Name</li>
+												<li><button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-sort="name:descending">Descending</button></li>
+												<li><button type="button" class="btn ink-reaction btn-flat btn-default-bright filter" data-sort="name:asc">Ascending</button></li>
+											</ul>
+										</div>
+
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xs-12">
+						<div id="winrates">
+							{% for hero in winrates.keys() %}
+								{% set roles = hero | lower | get_hero_roles %}
+								<div class="card mix {% for r in roles.split(',') %}{{ r | lower }}{% endfor %} {{hero}}" data-name="{{ hero | lower }}">
+									<div class="card-head">
+										<header class="text-primary"><img class="img-circle" src="/static/img/{{ hero | lower }}.png" width="50px" height="50px" alt="" /> {{ hero }}</header>
+										<div class="tools">
+											<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
+										</div>
+									</div>
+									<div class="card-body">
+										<div id="morris-bar-graph_{{hero}}" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+										<div id="legend">
+											<div class="mbox" style="background-color: #9C27B0"></div> <span>Winrate with hero in team</span>
+											<div class="mbox" style="background-color: #2196F3"></div> <span>Winrate against hero</span>
+										</div>
+									</div>
+								</div>
+							{% endfor %}
+						</div>
 					</div>
 				</div>
 			</div>
@@ -25,3 +98,107 @@
 	<!-- END CONTENT -->
 {% endblock %}
 
+{% block js %}
+<script src="/static/js/libs/d3/d3.min.js"></script>
+<script src="/static/js/libs/d3/d3.v3.js"></script>
+<script src="/static/js/libs/raphael/raphael-min.js"></script>
+<script src="/static/js/libs/morris.js/morris.min.js"></script>
+<script src="/static/js/libs/rickshaw/rickshaw.min.js"></script>
+<script src="/static/js/libs/mixitup.min.js"></script>
+<script>
+ $(function() {
+ // Mixitup
+	var mixer = mixitup('#winrates', {
+		load: {
+		   sort: 'name:asc'
+		},
+		selectors: {
+			target: '.mix',
+			control: '.filter'
+		},
+		"animation": {
+			"duration": 250,
+			"nudge": true,
+			"reverseOut": false,
+			"effects": "fade translateZ(-100px)"
+		}
+	});
+
+	var inputText;
+	var $matching = $();
+
+	// Mixitup search function
+	var delay = (function(){
+		var timer = 0;
+		return function(callback, ms){
+	  		clearTimeout (timer);
+	  		timer = setTimeout(callback, ms);
+		};
+	})();
+
+	$("#filter").keyup(function(){
+    	// Delay function invoked to make sure user stopped typing
+    	delay(function(){
+      		inputText = $("#filter").val().toLowerCase();
+
+			// Check to see if input field is empty
+			if ((inputText.length) > 0) {
+        		$( '.mix').each(function() {
+          			$this = $("this");
+
+           			// add item to be filtered out if input text matches items inside the title
+           			if($(this).data("name").toLowerCase().match(inputText)) {
+            			$matching = $matching.add(this);
+          			} else {
+            			// removes any previously matched item
+            			$matching = $matching.not(this);
+          			}
+        		});
+
+        		$("#winrates").mixItUp('filter', $matching);
+      		} else {
+        		// resets the filter to show all item if input is empty
+        		$("#winrates").mixItUp('filter', 'all');
+      		}
+    	}, 200 );
+  	});
+
+ {% for root in winrates.keys() %}
+	if ($('#morris-bar-graph_{{root}}').length > 0) {
+		var morrisChart = Morris.Bar({
+			element: 'morris-bar-graph_{{root}}',
+			data: [
+				{% for hero, stats in winrates[root].iteritems() %}
+					{% if hero != root %}
+						{label: '<img class="img-circle img-responsive" src="/static/img/{{ hero | lower }}.png" style="display: block;  margin-left: auto; margin-right: auto;" width="30px" height="30px" alt=""></img>',
+						 v: '{{ stats["total_with"] }}',
+						 w: '{{ stats["total_against"] }}',
+						 x: '{{ hero }}',
+						 y:'{{ '%0.2f'| format(stats["ratio_with"]) }}',
+						 z: '{{ '%0.2f'| format(stats["ratio_against"]) }}' } {% if not loop.last %},{%endif%}
+					{% endif %}
+				{% endfor %}
+			],
+			xkey: 'x',
+			xLabelAngle: 60,
+			hoverCallback: function(index, options, content) {
+			  var data = options.data[index];
+			  return (data.label + content  + "Games with: "+ data.v + "<br>" + "Games against: "+ data.w   );
+			},
+			hideHover: true,
+			ykeys: ['y', 'z'],
+			labels: ['Winrate with', 'Winrate against'],
+			barColors: $('#morris-bar-graph_{{root}}').data('colors').split(',')
+		});
+	}
+	{% endfor %}
+
+
+	$('.card-head .tools .btn-collapse').on('click', function (e) {
+		var card = $(e.currentTarget).closest('.card');
+		materialadmin.AppCard.toggleCardCollapse(card);
+	});
+
+});
+</script>
+{% endblock %}

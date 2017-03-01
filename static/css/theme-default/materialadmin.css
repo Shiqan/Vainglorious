@@ -4589,6 +4589,7 @@ body [class*=" md-"],
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.33);
 }
 .dropdown-menu > li > a {
+  white-space: normal;
   padding: 5px 20px;
 }
 .dropdown-menu .alert {

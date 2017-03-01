@@ -65,13 +65,34 @@ def hero_to_role(id):
         return strings.hero_roles[strings.heroes_inv[id]]
 
 def hero_determine_role(build, assists, kills, cs_lane, cs_jungle):
-    if "Fountain of Renewal" in build and "Crucible" in build and assists > kills:
-        return "Protector"
+    lane = 0
+    jungle = 0
+    protector = 0
+
+    if build:
+        for item in build.split(', '):
+            if item in ["Fountain of Renewal", "Crucible", "War Treads", "Nullwave Gauntlet", "Contraption"]:
+                protector += 1
+
+    if assists > kills:
+        protector += 1
+    else:
+        jungle += 1
+        lane += 1
+
     if cs_lane > cs_jungle:
+        lane += 2
+    else:
+        jungle += 2
+
+
+    if lane > jungle and lane > protector:
         return "Lane"
-
-    return "Jungle"
-
+    if jungle > lane and jungle > protector:
+        return "Jungle"
+    if protector > lane and protector > jungle:
+        return "Protector"
+    return None
 
 def hero_determine_buildpath(build):
     wp = 0

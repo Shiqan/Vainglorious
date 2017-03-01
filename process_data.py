@@ -3,17 +3,18 @@ import datetime
 from flask_app import app, db
 from models import Match, Roster, Participant, Player
 from sqlalchemy.exc import SQLAlchemyError
-import requests
-import urllib
 import json
 import commons
+import requests, zipfile, StringIO
 
 def process_samples(samples):
     for sample in samples['data']:
         pprint.pprint(sample)
 
-        url = sample['attributes']['URL']
-        break
+
+        r = requests.get(sample['attributes']['URL'], stream=True)
+        z = zipfile.ZipFile(StringIO.StringIO(r.content))
+        z.extractall()
 
 
 def process_batch_query(matches):
@@ -180,6 +181,15 @@ def save_to_file(file, data, facts):
 
     with open(file, 'w') as f:
         feeds[date] = entry
+        json.dump(feeds, f)
+
+
+def save_to_file_winrates(file, data):
+    date = commons.get_today()
+    feeds = read_from_file(file)
+
+    with open(file, 'w') as f:
+        feeds[date] = data
         json.dump(feeds, f)
 
 def save_to_file_tierlist(file, lane, jungle, protector):

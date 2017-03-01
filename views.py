@@ -19,6 +19,9 @@ import operator
 import strings
 from collections import Counter
 
+
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
 @lm.user_loader
 def load_user(id):
     return User.query.get(int(id))
@@ -89,7 +92,6 @@ def logout():
 @app.route('/')
 @app.route('/index/')
 def index():
-    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     feeds = process_data.read_from_file(os.path.join(__location__, 'data/data.json'))
     tierlist = process_data.read_from_file(os.path.join(__location__, 'data/tierlist.json'))
     tierlist = tierlist[get_today()]
@@ -246,12 +248,17 @@ def view_hero(hero):
 
 @app.route('/tierlist/')
 def tierlist():
-    return render_template('tierlist.html')
+    tierlist = process_data.read_from_file(os.path.join(__location__, 'data/tierlist.json'))
+    tierlist = tierlist[get_today()]
+
+    return render_template('tierlist.html', tierlist=tierlist)
 
 
 @app.route('/winrates/')
 def winrates():
-    return render_template('winrates.html')
+    winrates = process_data.read_from_file(os.path.join(__location__, 'data/winrates_vs.json'))
+    winrates = winrates[get_today()]
+    return render_template('winrates.html', winrates=winrates)
 
 
 # ------------------
@@ -359,7 +366,60 @@ def store_data():
             else:
                 tierlist_protector[entry] += 1
 
-    process_data.save_to_file_tierlist(os.path.join(__location__, 'data/tierlist.json'), tierlist_lane.most_common(10), tierlist_jungle.most_common(10), tierlist_protector.most_common(10))
+    process_data.save_to_file_tierlist(os.path.join(__location__, 'data/tierlist.json'), tierlist_lane.most_common(30), tierlist_jungle.most_common(30), tierlist_protector.most_common(30))
+
+
+    winrates_vs_heroes = {}
+    for m in matches:
+        hero = strings.heroes[m.actor]
+        won = m.winner
+
+        if hero not in winrates_vs_heroes:
+            winrates_vs_heroes[hero] = {}
+
+        roster = m.roster
+        for teammate in roster.participants:
+            tm_hero = strings.heroes[teammate.actor]
+            won = teammate.winner
+
+            if tm_hero in winrates_vs_heroes[hero]:
+                winrates_vs_heroes[hero][tm_hero]['total_with'] += 1
+                winrates_vs_heroes[hero][tm_hero]['won_with'] += won
+            else:
+                winrates_vs_heroes[hero][tm_hero] = {'total_with': 1, 'won_with': won, 'total_against': 0, 'won_against': 0}
+
+
+        x = [i for i in m.roster.match.rosters if i.id != roster.id][0]
+        for enemy in x.participants:
+            enemy_hero = strings.heroes[enemy.actor]
+            won = enemy.winner
+
+            if enemy_hero in winrates_vs_heroes[hero]:
+                winrates_vs_heroes[hero][enemy_hero]['total_against'] += 1
+                winrates_vs_heroes[hero][enemy_hero]['won_against'] += won
+            else:
+                winrates_vs_heroes[hero][enemy_hero] = {'total_with': 0, 'won_with': 0, 'total_against': 1, 'won_against': won}
+
+    for hero in winrates_vs_heroes.keys():
+        for teammate in winrates_vs_heroes[hero].keys():
+            total = winrates_vs_heroes[hero][teammate]['total_with']
+            won = winrates_vs_heroes[hero][teammate]['won_with']
+            if total > 0:
+                ratio = (won / total) * 100
+            else:
+                ratio = 0
+            winrates_vs_heroes[hero][teammate]['ratio_with'] = ratio
+
+        for enemy in winrates_vs_heroes[hero].keys():
+            total = winrates_vs_heroes[hero][enemy]['total_against']
+            won = winrates_vs_heroes[hero][enemy]['won_against']
+            if total > 0:
+                ratio = (won / total) * 100
+            else:
+                ratio = 0
+            winrates_vs_heroes[hero][enemy]['ratio_against'] = ratio
+
+    process_data.save_to_file_winrates(os.path.join(__location__, 'data/winrates_vs.json'), winrates_vs_heroes)
 
     return render_template('200.html')
 

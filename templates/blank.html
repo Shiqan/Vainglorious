@@ -174,7 +174,7 @@
 							<div class="card-head">
 								<header class="text-primary">Winrate over time</header>
 								<div class="tools">
-									<a href="/winrates/" class="btn btn-icon-toggle btn-default" data-toggle="tooltip" title="See all"><i class="fa fa-reply"></i></a>
+									<a href="/winrates/" class="btn btn-icon-toggle btn-default" data-toggle="tooltip" title="See more winrates"><i class="fa fa-reply"></i></a>
 									<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
 								</div>
 							</div>
@@ -189,7 +189,7 @@
 							<div class="card-head">
 								<header class="text-primary">Tier list</header>
 								<div class="tools">
-									<a href="/tierlist/" class="btn btn-icon-toggle btn-default" data-toggle="tooltip" title="See all"><i class="fa fa-reply"></i></a>
+									<a href="/tierlist/" class="btn btn-icon-toggle btn-default" data-toggle="tooltip" title="See entire list"><i class="fa fa-reply"></i></a>
 									<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
 								</div>
 							</div>
@@ -302,7 +302,7 @@
 										{% for hero in hero_stats %}
 											{% set roles = hero.hero | lower | get_hero_roles %}
 											{% set name = hero.hero %}
-												<div class="col-md-3 mix {% for r in roles.split(',') %}{{ r | lower }}{% endfor %} {{ name }}"
+												<div class="col-md-3 col-sm-6 col-xs-12 mix {% for r in roles.split(',') %}{{ r | lower }}{% endfor %} {{ name }}"
 													 data-order="{{'%0.2f'| format(hero.winrate)}}"
 													 data-name="{{ name }}"
 													 data-games="{{ hero.games }}"
