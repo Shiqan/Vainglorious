@@ -1,14 +1,14 @@
 {
-    "name": "Vainglorious Secret",
+    "name": "",
     "icons": [
         {
-            "src": "/android-chrome-192x192.png",
+            "src": "/static/favicon/android-chrome-192x192.png?v=47re3A8O6N",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/android-chrome-512x512.png",
-            "sizes": "512x512",
+            "src": "/static/favicon/android-chrome-256x256.png?v=47re3A8O6N",
+            "sizes": "256x256",
             "type": "image/png"
         }
     ],

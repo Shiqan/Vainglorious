@@ -28,7 +28,8 @@ heroes = {
     "*SAW*": "SAW",
     "*Sayoc*": "Taka",
     "*Skye*": "Skye",
-    "*Vox*": "Vox"
+    "*Vox*": "Vox",
+    "Grumpjaw": "Grumpjaw"
 }
 
 heroes_inv = {v.lower(): k for k, v in heroes.iteritems()}
@@ -63,7 +64,8 @@ hero_roles = {
     "*SAW*": "Lane, Sniper",
     "*Sayoc*": "Jungle, Assassin",
     "*Skye*": "Lane, Sniper",
-    "*Vox*": "Lane, Sniper "
+    "*Vox*": "Lane, Sniper",
+    "Grumpjaw": "Jungle, Warrior"
 }
 
 items = {

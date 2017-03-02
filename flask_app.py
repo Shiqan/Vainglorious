@@ -6,7 +6,7 @@ from flask_admin import Admin
 
 import config
 
-appname = "Vainglorious Secret"
+appname = "Vainglorious Meta"
 app = Flask(__name__)
 db = SQLAlchemy(app)
 

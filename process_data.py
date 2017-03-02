@@ -1,3 +1,4 @@
+import os
 import pprint
 import datetime
 from flask_app import app, db
@@ -7,15 +8,49 @@ import json
 import commons
 import requests, zipfile, StringIO
 
-def process_samples(samples):
+def download_samples(samples):
     for sample in samples['data']:
-        pprint.pprint(sample)
-
-
+        # pprint.pprint(sample)
         r = requests.get(sample['attributes']['URL'], stream=True)
         z = zipfile.ZipFile(StringIO.StringIO(r.content))
         z.extractall()
 
+
+def process_samples():
+    app.logger.info("Process samples")
+    for root, dirs, files in os.walk('D:\\\\vainglory'):
+        dirs[:] = [d for d in dirs if d.startswith('sample') or d.startswith('matches')]
+        for f in files:
+            if f.lower().endswith((".json")):
+                json_data = open(os.path.join(root, f), 'r').read()
+                m = json.loads(json_data)
+
+                if m['data']['attributes']['gameMode'] in ['ranked', 'casual']:
+                    skill = []
+                    for roster in m['data']['relationships']['rosters']['data']:
+                        roster_data = [i for i in m['included'] if i['id'] == roster['id']]
+                        for participant in roster_data[0]['relationships']['participants']['data']:
+                            participant_data = [i for i in m['included'] if i['id'] == participant['id']]
+                            skill.append(participant_data[0]['attributes']['stats']['skillTier'])
+
+                    if (sum(skill) / len(skill)) > 25:
+                        process_match(m['data'])
+
+                        for roster in m['data']['relationships']['rosters']['data']:
+                            roster_data = [i for i in m['included'] if i['id'] == roster['id']]
+                            assert len(roster_data) == 1
+                            process_roster(roster_data[0], m['data']['id'])
+
+                            for participant in roster_data[0]['relationships']['participants']['data']:
+                                participant_data = [i for i in m['included'] if i['id'] == participant['id']]
+                                assert len(participant_data) == 1
+
+                                player_data = [i for i in m['included'] if
+                                               i['id'] == participant_data[0]['relationships']['player']['data']['id']]
+                                assert len(player_data) == 1
+                                process_player(player_data[0])
+
+                                process_participant(participant_data[0], roster['id'])
 
 def process_batch_query(matches):
     for batch in matches:
