@@ -7,7 +7,7 @@ class Config(object):
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
         username="shiqan",
-        password="plainpasswordftw",
+        password="plaintextpasswordftw",
         hostname="shiqan.mysql.pythonanywhere-services.com",
         databasename="shiqan$vainglory",
     )

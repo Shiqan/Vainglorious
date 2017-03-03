@@ -145,105 +145,134 @@ def index():
 def view_hero(hero):
     app.logger.info(hero)
 
-    actor = strings.heroes_inv[hero]
+    hero_details = process_data.read_from_file(os.path.join(__location__, 'data/hero_details.json'))
+    if get_today() not in hero_details:
+        return redirect(url_for('store_data'))
 
-    total_matches = Match.query.count()
-    matches = db.session.query(Participant).filter_by(actor=actor).all()
-    playrate = (len(matches) / total_matches) * 100
-    matches_won = 0
-    kda = {'assists': 0, 'deaths': 0, 'kills': 0}
-    cs = {'lane': 0, 'jungle': 0}
-    items = Counter()
-    builds = Counter()
-    teammates = Counter()
-    single_teammates = Counter()
-    enemies = Counter()
-    single_enemies = Counter()
-    skins = Counter()
-    roles_played = Counter()
-    buildpaths = Counter()
-    players = {}
+    hero_details = hero_details[get_today()][hero]
 
-    for m in matches:
-        matches_won += m.winner
-        kda['assists'] += m.assists
-        kda['deaths'] += m.deaths
-        kda['kills'] += m.kills
+    matches_played=hero_details['matches_played']
+    matches_won=hero_details['matches_won']
+    playrate=hero_details['playrate']
+    kda=hero_details['kda']
+    items=hero_details['items']
+    builds=hero_details['builds']
+    players=hero_details['players']
+    teammates=hero_details['teammates']
+    skins=hero_details['skins']
+    enemies=hero_details['enemies']
+    single_teammates=hero_details['single_teammates']
+    single_enemies=hero_details['single_enemies']
+    cs=hero_details['cs']
+    roles_played=hero_details['roles_played']
 
-        cs['lane'] += m.nonJungleMinionKills
-        cs['jungle'] += m.jungleKills
+    # hero_details = {}
+    # for hero, actor in strings.heroes_inv.iteritems():
+    #     total_matches = Match.query.count()
+    #     matches = db.session.query(Participant).filter_by(actor=actor).all()
+    #     playrate = (len(matches) / total_matches) * 100
+    #     matches_won = 0
+    #     kda = {'assists': 0, 'deaths': 0, 'kills': 0}
+    #     cs = {'lane': 0, 'jungle': 0}
+    #     items = Counter()
+    #     builds = Counter()
+    #     teammates = Counter()
+    #     single_teammates = Counter()
+    #     enemies = Counter()
+    #     single_enemies = Counter()
+    #     skins = Counter()
+    #     roles_played = Counter()
+    #     buildpaths = Counter()
+    #     players = {}
 
-        skins[m.skinKey] += 1
+    #     for m in matches:
+    #         matches_won += m.winner
+    #         kda['assists'] += m.assists
+    #         kda['deaths'] += m.deaths
+    #         kda['kills'] += m.kills
 
-        # best players
-        p = m.player.name
-        if p in players:
-            players[p]['total'] += 1
-            players[p]['win'] += m.winner
-        else:
-            players[p] = {'total': 1, 'win': m.winner }
+    #         cs['lane'] += m.nonJungleMinionKills
+    #         cs['jungle'] += m.jungleKills
 
-        # common builds
-        _items = [strings.items[i] for i in m.items]
-        _items.sort()
-        if _items:
-            for i in _items:
-                items[i] += 1
-            _items = ', '.join(_items)
-            builds[_items] += 1
+    #         skins[m.skinKey] += 1
 
-        _team = [strings.heroes[x.actor] for x in m.roster.participants]
-        _team.sort()
+    #         # best players
+    #         p = m.player.name
+    #         if p in players:
+    #             players[p]['total'] += 1
+    #             players[p]['win'] += m.winner
+    #         else:
+    #             players[p] = {'total': 1, 'win': m.winner }
 
-        # common teammates
-        for i in _team:
-            if hero != i.lower():
-                single_teammates[i] += 1
+    #         # common builds
+    #         _items = [strings.items[i] for i in m.items]
+    #         _items.sort()
+    #         if _items:
+    #             for i in _items:
+    #                 items[i] += 1
+    #             _items = ', '.join(_items)
+    #             builds[_items] += 1
 
-        _team = ', '.join(_team)
-        if _team:
-            teammates[_team] += 1
+    #         _team = [strings.heroes[x.actor] for x in m.roster.participants]
+    #         _team.sort()
 
-        # common enemies
-        r = m.roster
-        x = [i for i in m.roster.match.rosters if i.id != r.id][0]
+    #         # common teammates
+    #         for i in _team:
+    #             if hero != i.lower():
+    #                 single_teammates[i] += 1
 
-        _team = [strings.heroes[x.actor] for x in x.participants]
-        _team.sort()
+    #         _team = ', '.join(_team)
+    #         if _team:
+    #             teammates[_team] += 1
 
-        for i in _team:
-            if hero != i.lower():
-                single_enemies[i] += 1
+    #         # common enemies
+    #         r = m.roster
+    #         x = [i for i in m.roster.match.rosters if i.id != r.id][0]
 
-        _team = ', '.join(_team)
-        if _team:
-            enemies[_team] += 1
+    #         _team = [strings.heroes[x.actor] for x in x.participants]
+    #         _team.sort()
 
-        # roles played
-        role = hero_determine_role(_items, m.assists, m.kills, m.nonJungleMinionKills, m.jungleKills)
-        roles_played[role] += 1
+    #         for i in _team:
+    #             if hero != i.lower():
+    #                 single_enemies[i] += 1
 
-        buildpath = hero_determine_buildpath(_items)
-        buildpaths[buildpath] += 1
+    #         _team = ', '.join(_team)
+    #         if _team:
+    #             enemies[_team] += 1
 
-    threshold = 3
-    players2 = {}
-    for p, v in players.iteritems():
-        if v['total'] > threshold:
-            w = v['win'] / v['total'] * 100
-            players2[p] = {'total': v['total'], 'win': v['win'], 'ratio': w}
+    #         # roles played
+    #         role = hero_determine_role(_items, m.assists, m.kills, m.nonJungleMinionKills, m.jungleKills)
+    #         roles_played[role] += 1
 
-    items = items.most_common(5)
-    builds = builds.most_common(5)
-    teammates = teammates.most_common(5)
-    players2 = sorted(players2.iteritems(), key=lambda x: x[1]['ratio'], reverse=True)[:25]
-    skins = skins.most_common(5)
-    enemies = enemies.most_common(5)
-    single_enemies = single_enemies.most_common(10)
-    single_teammates = single_teammates.most_common(10)
+    #         buildpath = hero_determine_buildpath(_items)
+    #         buildpaths[buildpath] += 1
 
-    return render_template('hero.html', hero=hero, matches_played=len(matches), matches_won=matches_won, playrate=playrate,
-                           kda=kda, items=items, builds=builds, players=players2,
+    #     threshold = 3
+    #     players2 = {}
+    #     for p, v in players.iteritems():
+    #         if v['total'] > threshold:
+    #             w = v['win'] / v['total'] * 100
+    #             players2[p] = {'total': v['total'], 'win': v['win'], 'ratio': w}
+
+    #     items = items.most_common(5)
+    #     builds = builds.most_common(5)
+    #     teammates = teammates.most_common(5)
+    #     players2 = sorted(players2.iteritems(), key=lambda x: x[1]['ratio'], reverse=True)[:25]
+    #     skins = skins.most_common(5)
+    #     enemies = enemies.most_common(5)
+    #     single_enemies = single_enemies.most_common(10)
+    #     single_teammates = single_teammates.most_common(10)
+
+    #     hero_details[hero] = {'matches_played': len(matches), 'matches_won':matches_won, 'playrate': playrate,
+    #                       'kda':kda, 'items': items, 'builds': builds, 'players': players2,
+    #                       'teammates': teammates, 'skins': skins, 'enemies': enemies,
+    #                       'single_teammates': single_teammates, 'single_enemies': single_enemies, 'cs': cs,
+    #                       'roles_played': roles_played}
+
+    # process_data.save_to_file_winrates(os.path.join(__location__, 'data/hero_details.json'), hero_details)
+
+    return render_template('hero.html', hero=hero, matches_played=matches_played, matches_won=matches_won, playrate=playrate,
+                           kda=kda, items=items, builds=builds, players=players,
                            teammates=teammates, skins=skins, enemies=enemies,
                            single_teammates=single_teammates, single_enemies=single_enemies, cs=cs,
                            roles_played=roles_played)
