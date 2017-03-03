@@ -21,6 +21,8 @@ app.config.from_object('config.DevelopmentConfig')
 # app.config.from_envvar('YOURAPPLICATION_SETTINGS')
 app.secret_key = 'anotherplaintextpasswordftw'
 
+import models, views
+
 #
 # @app.teardown_request
 # def teardown_request(exception=None):
