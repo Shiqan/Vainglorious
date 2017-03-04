@@ -3,9 +3,7 @@ from __future__ import division
 import os
 
 from flask import redirect, render_template, request, url_for, flash
-from flask_app import lm, admin
-from flask_login import login_user, logout_user, current_user
-from flask_admin.contrib.sqla import ModelView
+from sqlalchemy.exc import SQLAlchemyError
 
 from sqlalchemy import func, case
 from functools import wraps
@@ -22,72 +20,9 @@ from collections import Counter
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
-@lm.user_loader
-def load_user(id):
-    return User.query.get(int(id))
-
-
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated:
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-# ------------------
-# ADMIN
-# -----------------
-
-class MyModelView(ModelView):
-    can_delete = False  # disable model deletion
-    page_size = 50  # the number of entries to display on the list view
-
-    def is_accessible(self):
-        return current_user.is_authenticated
-
-    def inaccessible_callback(self, name, **kwargs):
-            # redirect to login page if user doesn't have access
-            return redirect(url_for('login'))
-admin.add_view(MyModelView(Match, db.session))
-
 # ------------------
 # METHODS
 # ------------------
-
-@app.route('/login/', methods=['GET', 'POST'])
-def login():
-    if request.method == "POST":
-        username = request.form['username']
-        password = request.form['password']
-
-        remember_me = False
-        if 'remember' in request.form:
-            remember_me = True
-
-        registered_user = User.query.filter_by(username=username).first()
-
-        if registered_user is None:
-            flash('Username or Password is invalid' , 'error')
-            return redirect(url_for('login'))
-
-        if not registered_user.check_password(password):
-            flash('Username or Password is invalid' , 'error')
-            return redirect(url_for('login'))
-
-        login_user(registered_user, remember = remember_me)
-        flash('Logged in successfully')
-
-        return redirect(url_for('index'))
-    return render_template('login.html')
-
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
 
 @app.route('/')
 @app.route('/index/')
@@ -166,111 +101,6 @@ def view_hero(hero):
     cs=hero_details['cs']
     roles_played=hero_details['roles_played']
 
-    # hero_details = {}
-    # for hero, actor in strings.heroes_inv.iteritems():
-    #     total_matches = Match.query.count()
-    #     matches = db.session.query(Participant).filter_by(actor=actor).all()
-    #     playrate = (len(matches) / total_matches) * 100
-    #     matches_won = 0
-    #     kda = {'assists': 0, 'deaths': 0, 'kills': 0}
-    #     cs = {'lane': 0, 'jungle': 0}
-    #     items = Counter()
-    #     builds = Counter()
-    #     teammates = Counter()
-    #     single_teammates = Counter()
-    #     enemies = Counter()
-    #     single_enemies = Counter()
-    #     skins = Counter()
-    #     roles_played = Counter()
-    #     buildpaths = Counter()
-    #     players = {}
-
-    #     for m in matches:
-    #         matches_won += m.winner
-    #         kda['assists'] += m.assists
-    #         kda['deaths'] += m.deaths
-    #         kda['kills'] += m.kills
-
-    #         cs['lane'] += m.nonJungleMinionKills
-    #         cs['jungle'] += m.jungleKills
-
-    #         skins[m.skinKey] += 1
-
-    #         # best players
-    #         p = m.player.name
-    #         if p in players:
-    #             players[p]['total'] += 1
-    #             players[p]['win'] += m.winner
-    #         else:
-    #             players[p] = {'total': 1, 'win': m.winner }
-
-    #         # common builds
-    #         _items = [strings.items[i] for i in m.items]
-    #         _items.sort()
-    #         if _items:
-    #             for i in _items:
-    #                 items[i] += 1
-    #             _items = ', '.join(_items)
-    #             builds[_items] += 1
-
-    #         _team = [strings.heroes[x.actor] for x in m.roster.participants]
-    #         _team.sort()
-
-    #         # common teammates
-    #         for i in _team:
-    #             if hero != i.lower():
-    #                 single_teammates[i] += 1
-
-    #         _team = ', '.join(_team)
-    #         if _team:
-    #             teammates[_team] += 1
-
-    #         # common enemies
-    #         r = m.roster
-    #         x = [i for i in m.roster.match.rosters if i.id != r.id][0]
-
-    #         _team = [strings.heroes[x.actor] for x in x.participants]
-    #         _team.sort()
-
-    #         for i in _team:
-    #             if hero != i.lower():
-    #                 single_enemies[i] += 1
-
-    #         _team = ', '.join(_team)
-    #         if _team:
-    #             enemies[_team] += 1
-
-    #         # roles played
-    #         role = hero_determine_role(_items, m.assists, m.kills, m.nonJungleMinionKills, m.jungleKills)
-    #         roles_played[role] += 1
-
-    #         buildpath = hero_determine_buildpath(_items)
-    #         buildpaths[buildpath] += 1
-
-    #     threshold = 3
-    #     players2 = {}
-    #     for p, v in players.iteritems():
-    #         if v['total'] > threshold:
-    #             w = v['win'] / v['total'] * 100
-    #             players2[p] = {'total': v['total'], 'win': v['win'], 'ratio': w}
-
-    #     items = items.most_common(5)
-    #     builds = builds.most_common(5)
-    #     teammates = teammates.most_common(5)
-    #     players2 = sorted(players2.iteritems(), key=lambda x: x[1]['ratio'], reverse=True)[:25]
-    #     skins = skins.most_common(5)
-    #     enemies = enemies.most_common(5)
-    #     single_enemies = single_enemies.most_common(10)
-    #     single_teammates = single_teammates.most_common(10)
-
-    #     hero_details[hero] = {'matches_played': len(matches), 'matches_won':matches_won, 'playrate': playrate,
-    #                       'kda':kda, 'items': items, 'builds': builds, 'players': players2,
-    #                       'teammates': teammates, 'skins': skins, 'enemies': enemies,
-    #                       'single_teammates': single_teammates, 'single_enemies': single_enemies, 'cs': cs,
-    #                       'roles_played': roles_played}
-
-    # process_data.save_to_file_winrates(os.path.join(__location__, 'data/hero_details.json'), hero_details)
-
     return render_template('hero.html', hero=hero, matches_played=matches_played, matches_won=matches_won, playrate=playrate,
                            kda=kda, items=items, builds=builds, players=players,
                            teammates=teammates, skins=skins, enemies=enemies,
@@ -308,10 +138,10 @@ def store_data():
 
     games = Match.query.count()
     players = Player.query.count()
-    potions = sum([i["*1000_Item_HalcyonPotion*"] for i, in db.session.query(Participant.itemUses).all() if "*1000_Item_HalcyonPotion*" in i])
-    infusions = sum([i["*1052_Item_WeaponInfusion*"] for i, in db.session.query(Participant.itemUses).all() if "*1052_Item_WeaponInfusion*" in i])
-    fountains = sum([i["*1045_Item_FountainOfRenewal*"] for i, in db.session.query(Participant.itemUses).all() if "*1045_Item_FountainOfRenewal*" in i])
-    mines = sum([i["*1054_Item_ScoutTrap*"] for i, in db.session.query(Participant.itemUses).all() if "*1054_Item_ScoutTrap*" in i])
+    potions = sum([i["Halcyon Potion"] for i, in db.session.query(Participant.itemUses).all() if "Halcyon Potion" in i])
+    infusions = sum([i["Weapon Infusion"] for i, in db.session.query(Participant.itemUses).all() if "Weapon Infusion" in i])
+    fountains = sum([i["Fountain of Renewal"] for i, in db.session.query(Participant.itemUses).all() if "Fountain of Renewal" in i])
+    mines = sum([i["Scout Trap"] for i, in db.session.query(Participant.itemUses).all() if "Scout Trap" in i])
     krakens = sum([i[0] for i in db.session.query(Participant.krakenCaptures, ).group_by(Participant.roster_id).all()])
     minions = float(db.session.query(func.sum(Participant.minionKills)).scalar())
     kills = db.session.query(func.sum(Participant.kills)).scalar()
@@ -387,8 +217,7 @@ def store_data():
     tierlist_protector = Counter()
 
     for m in matches:
-        _items = [strings.items[i] for i in m.items]
-        _items.sort()
+        _items = m.items
         if _items:
             _items = ', '.join(_items)
 
@@ -410,7 +239,6 @@ def store_data():
     winrates_vs_heroes = {}
     for m in matches:
         hero = strings.heroes[m.actor]
-        won = m.winner
 
         if hero not in winrates_vs_heroes:
             winrates_vs_heroes[hero] = {}
@@ -459,6 +287,110 @@ def store_data():
 
     process_data.save_to_file_winrates(os.path.join(__location__, 'data/winrates_vs.json'), winrates_vs_heroes)
 
+    hero_details = {}
+    for hero, actor in strings.heroes_inv.iteritems():
+        matches = db.session.query(Participant).filter_by(actor=actor).all()
+        playrate = (len(matches) / games) * 100
+        matches_won = 0
+        kda = {'assists': 0, 'deaths': 0, 'kills': 0}
+        cs = {'lane': 0, 'jungle': 0}
+        items = Counter()
+        builds = Counter()
+        teammates = Counter()
+        single_teammates = Counter()
+        enemies = Counter()
+        single_enemies = Counter()
+        skins = Counter()
+        roles_played = Counter()
+        buildpaths = Counter()
+        players = {}
+
+        for m in matches:
+            matches_won += m.winner
+            kda['assists'] += m.assists
+            kda['deaths'] += m.deaths
+            kda['kills'] += m.kills
+
+            cs['lane'] += m.nonJungleMinionKills
+            cs['jungle'] += m.jungleKills
+
+            skins[m.skinKey] += 1
+
+            # best players
+            p = m.player.name
+            if p in players:
+                players[p]['total'] += 1
+                players[p]['win'] += m.winner
+            else:
+                players[p] = {'total': 1, 'win': m.winner }
+
+            # common builds
+            _items = m.items
+            if _items:
+                for i in _items:
+                    items[i] += 1
+                _items = ', '.join(_items)
+                builds[_items] += 1
+
+            _team = [strings.heroes[x.actor] for x in m.roster.participants]
+            _team.sort()
+
+            # common teammates
+            for i in _team:
+                if hero != i.lower():
+                    single_teammates[i] += 1
+
+            _team = ', '.join(_team)
+            if _team:
+                teammates[_team] += 1
+
+            # common enemies
+            r = m.roster
+            x = [i for i in m.roster.match.rosters if i.id != r.id][0]
+
+            _team = [strings.heroes[x.actor] for x in x.participants]
+            _team.sort()
+
+            for i in _team:
+                if hero != i.lower():
+                    single_enemies[i] += 1
+
+            _team = ', '.join(_team)
+            if _team:
+                enemies[_team] += 1
+
+            # roles played
+            role = hero_determine_role(_items, m.assists, m.kills, m.nonJungleMinionKills, m.jungleKills)
+            roles_played[role] += 1
+
+            if _items:
+                buildpath = hero_determine_buildpath(_items)
+                buildpaths[buildpath] += 1
+
+        threshold = 3
+        players2 = {}
+        for p, v in players.iteritems():
+            if v['total'] > threshold:
+                w = v['win'] / v['total'] * 100
+                players2[p] = {'total': v['total'], 'win': v['win'], 'ratio': w}
+
+        items = items.most_common(5)
+        builds = builds.most_common(5)
+        teammates = teammates.most_common(5)
+        players2 = sorted(players2.iteritems(), key=lambda x: x[1]['ratio'], reverse=True)[:25]
+        skins = skins.most_common(5)
+        enemies = enemies.most_common(5)
+        single_enemies = single_enemies.most_common(10)
+        single_teammates = single_teammates.most_common(10)
+
+        hero_details[hero] = {'matches_played': len(matches), 'matches_won':matches_won, 'playrate': playrate,
+                          'kda':kda, 'items': items, 'builds': builds, 'players': players2,
+                          'teammates': teammates, 'skins': skins, 'enemies': enemies,
+                          'single_teammates': single_teammates, 'single_enemies': single_enemies, 'cs': cs,
+                          'roles_played': roles_played}
+
+    process_data.save_to_file_winrates(os.path.join(__location__, 'data/hero_details.json'), hero_details)
+
     return redirect(url_for('index'))
 
 @app.route('/query/')
@@ -493,6 +425,34 @@ def query_samples():
     process_data.download_samples(s)
 
     process_data.process_samples()
+
+    return render_template('200.html')
+
+
+
+@app.route('/fix/')
+def quickfix():
+    matches = Participant.query.all()
+
+    for m in matches:
+        _items = [strings.items.get(i, i) for i in m.items]
+        _items.sort()
+        m.items = _items
+
+        _items = {strings.items.get(i, i): j for i, j in m.itemGrants.iteritems()}
+        m.itemGrants = _items
+
+        _items = {strings.items.get(i, i): j for i, j in m.itemSells.iteritems()}
+        m.itemSells = _items
+
+        _items = {strings.items.get(i, i): j for i, j in m.itemUses.iteritems()}
+        m.itemUses = _items
+
+        try:
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
 
     return render_template('200.html')
 

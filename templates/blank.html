@@ -302,7 +302,7 @@
 										{% for hero in hero_stats %}
 											{% set roles = hero.hero | lower | get_hero_roles %}
 											{% set name = hero.hero %}
-												<div class="col-md-3 col-sm-6 col-xs-12 mix {% for r in roles.split(',') %}{{ r | lower }}{% endfor %} {{ name }}"
+												<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 mix {% for r in roles.split(',') %}{{ r | lower }}{% endfor %} {{ name }}"
 													 data-order="{{'%0.2f'| format(hero.winrate)}}"
 													 data-name="{{ name }}"
 													 data-games="{{ hero.games }}"
