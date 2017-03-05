@@ -125,6 +125,29 @@
         -webkit-transition: all 0.3s 1s ease-out;
                 transition: all 0.3s 1s ease-out;
     }
+
+#content {
+	min-height: 100%;
+	margin-bottom: -40px;
+}
+.push, .footer-bottom {
+	height: 40px;
+}
+
+.footer-bottom {
+
+  right: 0;
+  bottom: 0;
+  left: 0;
+	background: #E3E3E3;
+	border-top: 1px solid #DDDDDD;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.footer-bottom a {
+	padding-left: 10px;
+}
+
 		</style>
 		<!-- END STYLESHEETS -->
 
@@ -180,6 +203,19 @@
 		</div>
 
 	    {% block content %}{% endblock %}
+
+		<div class="footer-bottom">
+			<div class="container">
+				<div class="pull-left">
+					<a href="https://github.com/Shiqan/Vainglorious" target="_blank"><i class="fa fa-github fa-2x"></i></a>
+				</div>
+				<div class="pull-right">
+					<p> <small> Powered by the awesome people at: </small>
+					<a href="http://madglory.com" target="_blank"><img src="https://media.glassdoor.com/sqll/700630/madglory-interactive-squarelogo-1461851186275.png" height="25px" width="25px"/> </a>
+					<a href="http://vainglorygame.com" target="_blank"><img src="/static/img/vglogo.png" height="25px" width="35px"/> </a></p>
+				</div>
+			</div>
+		</div>
 	</body>
 
 <!-- BEGIN JAVASCRIPT -->

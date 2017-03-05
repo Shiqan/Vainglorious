@@ -126,7 +126,11 @@ def winrates():
         return redirect(url_for('store_data'))
 
     winrates = winrates[get_today()]
-    return render_template('winrates.html', winrates=winrates)
+    return render_template('winrates.html', winrates=winrates)\
+
+@app.route('/about/')
+def about():
+    return render_template('about.html')
 
 
 # ------------------
@@ -217,7 +221,7 @@ def store_data():
     tierlist_protector = Counter()
 
     for m in matches:
-        _items = m.items
+        _items = sorted(m.items)
         if _items:
             _items = ', '.join(_items)
 
@@ -325,15 +329,14 @@ def store_data():
                 players[p] = {'total': 1, 'win': m.winner }
 
             # common builds
-            _items = m.items
+            _items = sorted(m.items)
             if _items:
                 for i in _items:
                     items[i] += 1
                 _items = ', '.join(_items)
                 builds[_items] += 1
 
-            _team = [strings.heroes[x.actor] for x in m.roster.participants]
-            _team.sort()
+            _team = sorted([strings.heroes[x.actor] for x in m.roster.participants])
 
             # common teammates
             for i in _team:
@@ -348,8 +351,7 @@ def store_data():
             r = m.roster
             x = [i for i in m.roster.match.rosters if i.id != r.id][0]
 
-            _team = [strings.heroes[x.actor] for x in x.participants]
-            _team.sort()
+            _team = sorted([strings.heroes[x.actor] for x in x.participants])
 
             for i in _team:
                 if hero != i.lower():
@@ -425,34 +427,6 @@ def query_samples():
     process_data.download_samples(s)
 
     process_data.process_samples()
-
-    return render_template('200.html')
-
-
-
-@app.route('/fix/')
-def quickfix():
-    matches = Participant.query.all()
-
-    for m in matches:
-        _items = [strings.items.get(i, i) for i in m.items]
-        _items.sort()
-        m.items = _items
-
-        _items = {strings.items.get(i, i): j for i, j in m.itemGrants.iteritems()}
-        m.itemGrants = _items
-
-        _items = {strings.items.get(i, i): j for i, j in m.itemSells.iteritems()}
-        m.itemSells = _items
-
-        _items = {strings.items.get(i, i): j for i, j in m.itemUses.iteritems()}
-        m.itemUses = _items
-
-        try:
-            db.session.commit()
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
 
     return render_template('200.html')
 

@@ -1,13 +1,14 @@
 from flask_app import app, appname
 import time
-from decimal import *
 import strings
-
+import random
 
 @app.context_processor
 def utility_processor():
-    return dict(appname=appname)
-
+    def get_random_quote():
+        q = random.choice(strings.quotes)
+        return "{0} - {1}".format(q[1], q[0])
+    return dict(appname=appname, random_quote=get_random_quote())
 
 # # --------- ITEM
 @app.template_filter('role_to_img')

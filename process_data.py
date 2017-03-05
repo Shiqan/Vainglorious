@@ -148,7 +148,7 @@ def process_participant(data, roster_id):
                         itemGrants=data['attributes']['stats']['itemGrants'],
                         itemSells=data['attributes']['stats']['itemSells'],
                         itemUses=data['attributes']['stats']['itemUses'],
-                        items=data['attributes']['stats']['items'].sort(),
+                        items=data['attributes']['stats']['items'],
                         skinKey=data['attributes']['stats']['skinKey'],
                         karmaLevel=data['attributes']['stats']['karmaLevel'],
                         level=data['attributes']['stats']['level'],
