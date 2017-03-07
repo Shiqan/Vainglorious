@@ -29,12 +29,12 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 def index():
     feeds = process_data.read_from_file(os.path.join(__location__, 'data/data.json'))
     tierlist = process_data.read_from_file(os.path.join(__location__, 'data/tierlist.json'))
-    if get_today() not in tierlist:
-        return redirect(url_for('store_data'))
 
-    tierlist = tierlist[get_today()]
+    latest = get_latest(tierlist.keys())
 
-    facts = feeds[get_today()]['facts']
+    tierlist = tierlist[latest]
+
+    facts = feeds[latest]['facts']
     games = facts['games']
     players = facts['players']
     potions = facts['potions']
@@ -49,8 +49,14 @@ def index():
     fountains = facts['fountains']
     mines = facts['mines']
     minions = facts['minions']
+    turrets = facts['turrets']
+    red_side = facts['red_side_winrate']
+    blue_side = facts['blue_side_winrate']
+    afks = facts['afks']
+    avg_afk = facts['afks_per_match']
+    avg_time_to_afk = facts['avg_time_to_afk']
 
-    hero_stats = feeds[get_today()]['data']
+    hero_stats = feeds[latest]['data']
 
     top_heroes_win_rate = [i['hero'] for i in sorted(hero_stats, key=lambda x: x['winrate'], reverse=True)[:5]]
     winrate_stats = {}
@@ -68,12 +74,13 @@ def index():
         stats = sorted(stats.iteritems(), key=lambda x: x[0])
         sorted_winrate_stats.append((hero, stats))
 
-    return render_template('blank.html', games=games, players=players, potions=potions, krakens=krakens,
+    return render_template('dashboard.html', games=games, players=players, potions=potions, krakens=krakens,
                            duration=duration, avg_duration=avg_duration, died_by_minions=died_by_minions,
                            max_kills=max_kills, max_deaths=max_deaths, avg_cs=avg_cs,
                            infusions=infusions, fountains=fountains, mines=mines, minions=minions,
                            most_wins=0, hero_stats=hero_stats, winrate_stats=sorted_winrate_stats,
-                           tierlist=tierlist)
+                           tierlist=tierlist, turrets=turrets, red_side=red_side, blue_side=blue_side, afks=afks,
+                           avg_afk=avg_afk)
 
 
 @app.route('/hero/<hero>/')
@@ -81,10 +88,9 @@ def view_hero(hero):
     app.logger.info(hero)
 
     hero_details = process_data.read_from_file(os.path.join(__location__, 'data/hero_details.json'))
-    if get_today() not in hero_details:
-        return redirect(url_for('store_data'))
+    latest = get_latest(hero_details.keys())
 
-    hero_details = hero_details[get_today()][hero]
+    hero_details = hero_details[latest][hero]
 
     matches_played=hero_details['matches_played']
     matches_won=hero_details['matches_won']
@@ -147,6 +153,7 @@ def store_data():
     fountains = sum([i["Fountain of Renewal"] for i, in db.session.query(Participant.itemUses).all() if "Fountain of Renewal" in i])
     mines = sum([i["Scout Trap"] for i, in db.session.query(Participant.itemUses).all() if "Scout Trap" in i])
     krakens = sum([i[0] for i in db.session.query(Participant.krakenCaptures, ).group_by(Participant.roster_id).all()])
+    turrets = sum([i[0] for i in db.session.query(Participant.turrentCaptures, ).group_by(Participant.roster_id).all()])
     minions = float(db.session.query(func.sum(Participant.minionKills)).scalar())
     kills = db.session.query(func.sum(Participant.kills)).scalar()
     max_kills = db.session.query(func.max(Participant.kills)).scalar()
@@ -155,6 +162,17 @@ def store_data():
     died_by_minions = int(deaths - kills)
     duration = int(db.session.query(func.sum(Match.duration).label("duration")).scalar())
     avg_duration = int(duration / games)
+    afks = db.session.query(func.count(Participant.wentAfk)).filter(Participant.wentAfk == 1).scalar()
+    afks_per_match = afks / games
+    time_to_afk = db.session.query(func.sum(Participant.firstAfkTime)).filter(Participant.firstAfkTime != -1).scalar()
+    avg_time_to_afk = int(time_to_afk / afks)
+
+    blue_side_total = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "left/blue").scalar()
+    blue_side = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "left/blue", Participant.winner == 1).scalar()
+    red_side_total = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "right/red").scalar()
+    red_side = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "right/red", Participant.winner == 1).scalar()
+    red_side_winrate = red_side / red_side_total
+    blue_side_winrate = blue_side / blue_side_total
 
     avg_cs = [i[0] for i in db.session.query(Participant.farm).filter(Participant.actor.in_([h for h, r in strings.hero_roles.iteritems() if "Lane" in r])).all()]
     avg_cs = sum(avg_cs) / len(avg_cs)
@@ -206,10 +224,11 @@ def store_data():
 
     app.logger.info("Request data 03")
 
-    facts = {'games': games, 'players': players, 'potions': potions, 'krakens': krakens, 'duration': duration,
+    facts = {'games': games, 'players': players, 'potions': potions, 'krakens': krakens, 'turrets': turrets, 'duration': duration,
              'avg_duration': avg_duration, 'died_by_minions': died_by_minions, 'max_kills': max_kills,
              'max_deaths': max_deaths, 'avg_cs': avg_cs, 'infusions': infusions, 'fountains': fountains,
-             'mines': mines, 'minions': minions}
+             'mines': mines, 'minions': minions, 'blue_side_winrate': blue_side_winrate, 'red_side_winrate': red_side_winrate,
+             'afks': afks, 'afks_per_match': afks_per_match, 'avg_time_to_afk': avg_time_to_afk}
 
 
     __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))

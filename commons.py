@@ -128,3 +128,6 @@ def convert_date(date_str):
 
 def get_today():
     return time.strftime("%m/%d/%Y")
+
+def get_latest(keys):
+    return sorted(keys, reverse=True)[0]
