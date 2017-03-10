@@ -24,7 +24,6 @@ def process_samples():
             if f.lower().endswith((".json")):
                 json_data = open(os.path.join(root, f), 'r').read()
                 m = json.loads(json_data)
-
                 if m['data']['attributes']['gameMode'] in ['ranked', 'casual']:
                     skill = []
                     for roster in m['data']['relationships']['rosters']['data']:

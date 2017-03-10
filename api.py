@@ -31,7 +31,9 @@ class VaingloryApi(object):
         return self.query("players", player_id)
 
     def sample(self):
-        return self.query("samples")
+        params = dict()
+        params['sort'] = "-createdAt"
+        return self.query("samples", params=params)
 
     def matches(self,
                 offset=None, limit=None, sort=None,

@@ -134,6 +134,12 @@ def winrates():
     winrates = winrates[get_today()]
     return render_template('winrates.html', winrates=winrates)\
 
+
+@app.route('/telemetry/')
+def telemetry():
+    return render_template('telemetry.html')
+
+
 @app.route('/about/')
 def about():
     return render_template('about.html')
