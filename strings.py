@@ -1,3 +1,5 @@
+import six
+
 heroes = {
     "*Adagio*": "Adagio",
     "*Alpha*": "Alpha",
@@ -32,7 +34,7 @@ heroes = {
     "*Grumpjaw*": "Grumpjaw"
 }
 
-heroes_inv = {v.lower(): k for k, v in heroes.iteritems()}
+heroes_inv = {v.lower(): k for k, v in six.iteritems(heroes)}
 
 hero_roles = {
     "*Adagio*": "Lane, Jungle, Protector",

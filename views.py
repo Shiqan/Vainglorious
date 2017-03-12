@@ -17,7 +17,7 @@ import pprint
 import operator
 import strings
 from collections import Counter
-
+import six
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -55,7 +55,11 @@ def index():
     blue_side = facts['blue_side_winrate']
     afks = facts['afks']
     avg_afk = facts['afks_per_match']
-    avg_time_to_afk = facts['avg_time_to_afk']
+    great_karma = facts['great_karma']
+    crystal_sentries = facts['crystal_sentries']
+    gold_miners = facts['gold_miners']
+    lowest_player_lvl = facts['lowest_player_lvl']
+    surrendered = facts['surrendered']
 
     hero_stats = feeds[latest]['data']
 
@@ -71,8 +75,8 @@ def index():
                     winrate_stats[hero['hero']] = {date: hero['winrate']}
 
     sorted_winrate_stats = []
-    for hero, stats in winrate_stats.iteritems():
-        stats = sorted(stats.iteritems(), key=lambda x: x[0])
+    for hero, stats in six.iteritems(winrate_stats):
+        stats = sorted(six.iteritems(stats), key=lambda x: x[0])
         sorted_winrate_stats.append((hero, stats))
 
     return render_template('dashboard.html', games=games, players=players, potions=potions, krakens=krakens,
@@ -81,7 +85,8 @@ def index():
                            infusions=infusions, fountains=fountains, mines=mines, minions=minions,
                            most_wins=0, hero_stats=hero_stats, winrate_stats=sorted_winrate_stats,
                            tierlist=tierlist, turrets=turrets, red_side=red_side, blue_side=blue_side, afks=afks,
-                           avg_afk=avg_afk)
+                           avg_afk=avg_afk, great_karma=great_karma, crystal_sentries=crystal_sentries,
+                           gold_miners=gold_miners, lowest_player_lvl=lowest_player_lvl, surrendered=surrendered)
 
 
 @app.route('/hero/<hero>/')
@@ -168,8 +173,6 @@ def store_data():
     avg_duration = int(duration / games)
     afks = db.session.query(func.count(Participant.wentAfk)).filter(Participant.wentAfk == 1).scalar()
     afks_per_match = afks / games
-    time_to_afk = db.session.query(func.sum(Participant.firstAfkTime)).filter(Participant.firstAfkTime != -1).scalar()
-    avg_time_to_afk = int(time_to_afk / afks)
 
     blue_side_total = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "left/blue").scalar()
     blue_side = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "left/blue", Participant.winner == 1).scalar()
@@ -178,7 +181,13 @@ def store_data():
     red_side_winrate = red_side / red_side_total
     blue_side_winrate = blue_side / blue_side_total
 
-    avg_cs = [i[0] for i in db.session.query(Participant.farm).filter(Participant.actor.in_([h for h, r in strings.hero_roles.iteritems() if "Lane" in r])).all()]
+    great_karma = len([i[0] for i in db.session.query(Participant.karmaLevel).filter(Participant.karmaLevel == 2).group_by(Participant.player_id).all()])
+    crystal_sentries = sum([i[0] for i in db.session.query(Participant.crystalMineCaptures,).group_by(Participant.roster_id).all()])
+    gold_miners = sum([i[0] for i in db.session.query(Participant.goldMindCaptures,).group_by(Participant.roster_id).all()])
+    lowest_player_lvl = db.session.query(func.min(Participant.level)).scalar()
+    surrendered = db.session.query(func.count(Match.endGameReason)).filter(Match.endGameReason == "surrender").scalar()
+
+    avg_cs = [i[0] for i in db.session.query(Participant.farm).filter(Participant.actor.in_([h for h, r in six.iteritems(strings.hero_roles) if "Lane" in r])).all()]
     avg_cs = sum(avg_cs) / len(avg_cs)
 
     heroes = db.session.query(Participant.actor, func.count(Participant.actor))\
@@ -232,7 +241,8 @@ def store_data():
              'avg_duration': avg_duration, 'died_by_minions': died_by_minions, 'max_kills': max_kills,
              'max_deaths': max_deaths, 'avg_cs': avg_cs, 'infusions': infusions, 'fountains': fountains,
              'mines': mines, 'minions': minions, 'blue_side_winrate': blue_side_winrate, 'red_side_winrate': red_side_winrate,
-             'afks': afks, 'afks_per_match': afks_per_match, 'avg_time_to_afk': avg_time_to_afk}
+             'afks': afks, 'afks_per_match': afks_per_match, 'great_karma': great_karma, 'crystal_sentries': crystal_sentries,
+             'gold_miners': gold_miners, 'lowest_player_lvl': lowest_player_lvl, 'surrendered': surrendered}
 
 
     __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -315,7 +325,7 @@ def store_data():
     process_data.save_to_file_winrates(os.path.join(__location__, 'data/winrates_vs.json'), winrates_vs_heroes)
 
     hero_details = {}
-    for hero, actor in strings.heroes_inv.iteritems():
+    for hero, actor in six.iteritems(strings.heroes_inv):
         matches = db.session.query(Participant).filter_by(actor=actor).all()
         playrate = (len(matches) / games) * 100
         matches_won = 0
@@ -394,7 +404,7 @@ def store_data():
 
         threshold = 3
         players2 = {}
-        for p, v in players.iteritems():
+        for p, v in six.iteritems(players):
             if v['total'] > threshold:
                 w = v['win'] / v['total'] * 100
                 players2[p] = {'total': v['total'], 'win': v['win'], 'ratio': w}
@@ -402,7 +412,7 @@ def store_data():
         items = items.most_common(5)
         builds = builds.most_common(5)
         teammates = teammates.most_common(5)
-        players2 = sorted(players2.iteritems(), key=lambda x: x[1]['ratio'], reverse=True)[:25]
+        players2 = sorted(six.iteritems(players2), key=lambda x: x[1]['ratio'], reverse=True)[:25]
         skins = skins.most_common(5)
         enemies = enemies.most_common(5)
         single_enemies = single_enemies.most_common(10)
