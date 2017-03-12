@@ -7,7 +7,9 @@
 <link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/DataTables/extensions/dataTables.tableTools.css?1423553990" />
 <link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/rickshaw/rickshaw.css?1422792967" />
 <link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/morris/morris.core.css?1420463396" />
+<link type="text/css" rel="stylesheet" href="/static/css/theme-default/libs/slick.css" />
 <link type="text/css" rel="stylesheet" href="/static/css/dashboard.css" />
+
 {% endblock %}
 
 {% block content %}
@@ -19,22 +21,22 @@
 			<div class="section-body">
 
 				<!-- BEGIN GAME FACTS -->
-				<div class="row" style='height: 100px;'>
-					<!-- TODO show all page? -->
-					<!-- implement https://github.com/nolimits4web/Swiper/blob/master/demos/05-slides-per-view.html? -->
+				<div class="row">
+					<div class="css-carousel2 col-xs-12">
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-success no-margin">
+										<img class="pull-right text-success hero-icon" src="https://s-media-cache-ak0.pinimg.com/564x/9a/b8/a5/9ab8a5d52931e8528f617cb18f7fd483.jpg" width="75px" height="75px"/>
+										<strong id="games" class="text-xl"> {{ games }}</strong><br/>
+										<span class="opacity-50">Vain Crystals destroyed</span>
+									</div>
+								</div>
+							</div>
+						</div>
 
-					<div class="col-md-3 col-sm-6 hidden-xs">
-						<div class="css-carousel col-sm-12">
-						    <div class="card css-img">
-							    <div class="card-body no-padding">
-							    	<div class="alert alert-callout alert-success no-margin">
-								    	<img class="pull-right text-success hero-icon" src="https://s-media-cache-ak0.pinimg.com/564x/9a/b8/a5/9ab8a5d52931e8528f617cb18f7fd483.jpg" width="75px" height="75px"/>
-									    <strong id="games" class="text-xl"> {{ games }}</strong><br/>
-									    <span class="opacity-50">Vain Crystals destroyed</span>
-							    	</div>
-							    </div>
-					    	</div>
-				        	<div class="card css-img">
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-danger no-margin">
 										<img class="pull-right hero-icon" src="/static/img/great_karma.png" width="75px" height="75px"/>
@@ -43,7 +45,10 @@
 									</div>
 								</div>
 							</div>
-				            <div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-success no-margin">
 										<strong class="text-xl">{{ crystal_sentries }}</strong><br/>
@@ -51,7 +56,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-warning no-margin">
 										<strong class="text-xl">{{ gold_miners }}</strong><br/>
@@ -59,7 +67,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-success no-margin">
 										<strong class="text-xl">{{ lowest_player_lvl }}</strong><br/>
@@ -67,7 +78,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-warning no-margin">
 										<strong class="text-xl">{{ surrendered }}</strong><br/>
@@ -75,11 +89,11 @@
 									</div>
 								</div>
 							</div>
-				    	</div>
-                    </div>
-					<div class="col-md-3 col-sm-6 hidden-xs">
-						<div class="css-carousel col-sm-12">
-							<div class="card css-img">
+						</div>
+
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-warning no-margin">
 										<strong id="players" class="text-xl">{{ players }}</strong><br/>
@@ -87,7 +101,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-info no-margin">
 										<strong class="text-xl">{{ '%0.2f'| format(blue_side) }}%</strong><br/>
@@ -95,7 +112,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-danger no-margin">
 										<strong class="text-xl">{{ '%0.2f'| format(red_side) }}%</strong><br/>
@@ -103,6 +123,9 @@
 									</div>
 								</div>
 							</div>
+						</div>
+
+						<div class="col-md-3 col-sm-6">
 							<div class="card css-img">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-danger no-margin">
@@ -112,7 +135,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-info no-margin">
 										<strong class="text-xl">{{ afks }}</strong><br/>
@@ -120,7 +146,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-danger no-margin">
 										<strong class="text-xl">{{ '%0.2f'| format(avg_afk) }}%</strong><br/>
@@ -129,11 +158,9 @@
 								</div>
 							</div>
 						</div>
-					</div>
 
-					<div class="col-md-3 col-sm-6 hidden-xs">
-						<div class="css-carousel col-sm-12">
-							<div class="card css-img">
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-danger no-margin">
 										<img class="pull-right text-success hero-icon" src="http://i.imgur.com/2EPwPt7.jpg" width="75px" height="75px"/>
@@ -142,8 +169,10 @@
 									</div>
 								</div>
 							</div>
+						</div>
 
-							<div class="card css-img">
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-success no-margin">
 										<img class="pull-right text-success hero-icon" src="/static/img/items/halcyon-potion.png" width="75px" height="75px"/>
@@ -152,8 +181,10 @@
 									</div>
 								</div>
 							</div>
+						</div>
 
-							<div class="card css-img">
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-info no-margin">
 										<img class="pull-right text-success hero-icon" src="/static/img/items/fountain-of-renewal.png" width="75px" height="75px"/>
@@ -162,7 +193,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-warning no-margin">
 										<img class="pull-right text-success hero-icon" src="/static/img/minion.png" width="75px" height="75px"/>
@@ -171,7 +205,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-danger no-margin">
 										<img class="pull-right text-success hero-icon" src="/static/img/items/scout-trap.png" width="75px" height="75px"/>
@@ -180,7 +217,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-success no-margin">
 										<img class="pull-right text-success hero-icon" src="/static/img/items/weapon-infusion.png" width="75px" height="75px"/>
@@ -190,11 +230,9 @@
 								</div>
 							</div>
 						</div>
-					</div>
 
-					<div class="col-md-3 col-sm-6 hidden-xs">
-						<div class="css-carousel col-sm-12">
-							<div class="card css-img">
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-info no-margin">
 										<h1 class="pull-right text-info"><i class="md md-timer"></i></h1>
@@ -203,7 +241,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-warning no-margin">
 										<h1 class="pull-right text-warning"><i class="md md-timer"></i></h1>
@@ -212,7 +253,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-danger no-margin">
 										<h1 class="pull-right text-danger"><i class="md md-error"></i></h1>
@@ -221,7 +265,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-success no-margin">
 										<h1 class="pull-right text-success"><i class="md md-trending-up"></i></h1>
@@ -230,7 +277,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-warning no-margin">
 										<h1 class="pull-right text-warning"><i class="md md-trending-down"></i></h1>
@@ -239,7 +289,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="card css-img">
+						</div>
+
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-info no-margin">
 										<h1 class="pull-right text-info"><i class="md md-star"></i></h1>
@@ -477,21 +530,22 @@
 
 {% block js %}
 <!-- BEGIN JAVASCRIPT -->
-<script src="/static/js/libs/toastr/toastr.js"></script>
-<script src="/static/js/libs/countup/countUp.js"></script>
-<script src="/static/js/libs/d3/d3.min.js"></script>
-<script src="/static/js/libs/d3/d3.v3.js"></script>
-<script src="/static/js/libs/raphael/raphael-min.js"></script>
-<script src="/static/js/libs/morris.js/morris.min.js"></script>
-<script src="/static/js/libs/rickshaw/rickshaw.min.js"></script>
+<script src="/static/js/libs/toastr.js"></script>
+<script src="/static/js/libs/countUp.js"></script>
+<script src="/static/js/libs/d3.min.js"></script>
+<script src="/static/js/libs/d3.v3.js"></script>
+<script src="/static/js/libs/raphael-min.js"></script>
+<script src="/static/js/libs/morris.min.js"></script>
+<script src="/static/js/libs/rickshaw.min.js"></script>
 <script src="/static/js/libs/mixitup.min.js"></script>
 <script src="/static/js/libs/DataTables/jquery.dataTables.min.js"></script>
-<script src="/static/js/libs/DataTables/extensions/ColVis/js/dataTables.colVis.min.js"></script>
-<script src="/static/js/libs/DataTables/extensions/TableTools/js/dataTables.tableTools.min.js"></script>
-<script src="/static/js/libs/moment/moment.min.js"></script>
+<script src="/static/js/libs/DataTables/extensions/dataTables.colVis.min.js"></script>
+<script src="/static/js/libs/DataTables/extensions/dataTables.tableTools.min.js"></script>
+<script src="/static/js/libs/moment.min.js"></script>
 <script src="/static/js/libs/flot/jquery.flot.min.js"></script>
 <script src="/static/js/libs/flot/jquery.flot.time.min.js"></script>
 <script src="/static/js/libs/flot/jquery.flot.resize.min.js"></script>
+<script src="/static/js/libs/slick.min.js"></script>
 <script>
 $(function() {
 	// CountUp
@@ -673,6 +727,40 @@ $(function() {
 			}
 			previousPoint = null;
 		}
+	});
+
+	// Slick carousel
+	$('.css-carousel2').slick({
+		 slidesToShow: 4,
+		  slidesToScroll: 1,
+		  autoplay: true,
+		  arrows: false,
+		  responsive: [
+    {
+      breakpoint: 1024,
+      settings: {
+        slidesToShow: 3,
+        slidesToScroll: 3
+      }
+    },
+    {
+      breakpoint: 600,
+      settings: {
+        slidesToShow: 2,
+        slidesToScroll: 2
+      }
+    },
+    {
+      breakpoint: 480,
+      settings: {
+        slidesToShow: 1,
+        slidesToScroll: 1
+      }
+    }
+    // You can unslick at a given breakpoint now by adding:
+    // settings: "unslick"
+    // instead of a settings object
+  ]
 	});
 });
 </script>
