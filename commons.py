@@ -29,7 +29,16 @@ def buildpath_to_img(path):
     if path == "WP":
         return "items/sorrowblade.png"
     if path == "UT":
-        return "items/fountain-of-renewal.png"
+        return "items/fountain-of-renewal.png"\
+
+@app.template_filter('buildpath_to_str')
+def buildpath_to_img(path):
+    if path == "CP":
+        return "Crystal"
+    if path == "WP":
+        return "Weapon"
+    if path == "UT":
+        return "Utility"
 
 
 @app.template_filter('convert_time')

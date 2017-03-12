@@ -140,7 +140,7 @@
 	padding-top: 10px;
 	padding-bottom: 10px;
 }
-.footer-bottom a {
+.footer-bottom a, .footer-bottom p{
 	padding-left: 10px;
 }
 
@@ -169,6 +169,7 @@
 								</a>
 							</div>
 						</li>
+						{% if beta %} <li> <span class="text-danger"> BETA </span></li> {% endif %}
 					</ul>
 				</div>
 
@@ -203,14 +204,16 @@
 
 		<div class="footer-bottom">
 			<div class="container">
-				<div class="pull-left">
-					<small><a href="/about/"> About </a></small>
-					<a href="https://github.com/Shiqan/Vainglorious" target="_blank" data-toggle="tooltip" title="See source code"><i class="fa fa-github fa-2x"></i></a>
-				</div>
-				<div class="pull-right">
-					<p> <small> Powered by the awesome people at: </small>
-					<a href="http://madglory.com" target="_blank" data-toggle="tooltip" title="Madglory"><img src="https://media.glassdoor.com/sqll/700630/madglory-interactive-squarelogo-1461851186275.png" height="25px" width="25px"/> </a>
-					<a href="http://vainglorygame.com" target="_blank" data-toggle="tooltip" title="SEMC"><img src="/static/img/vglogo.png" height="25px" width="35px"/> </a></p>
+				<div class="row">
+					<div class="col-sm-6 col-xs-12">
+						<small><a href="/about/"> About </a></small>
+						<a href="https://github.com/Shiqan/Vainglorious" target="_blank" data-toggle="tooltip" title="See source code"><i class="fa fa-github fa-2x"></i></a>
+					</div>
+					<div class="col-sm-6 col-xs-12">
+						<p> <small> Powered by the awesome people at: </small>
+						<a href="http://madglory.com" target="_blank" data-toggle="tooltip" title="Madglory"><img src="https://media.glassdoor.com/sqll/700630/madglory-interactive-squarelogo-1461851186275.png" height="25px" width="25px"/> </a>
+						<a href="http://vainglorygame.com" target="_blank" data-toggle="tooltip" title="SEMC"><img src="/static/img/vglogo.png" height="25px" width="35px"/> </a></p>
+					</div>
 				</div>
 			</div>
 		</div>

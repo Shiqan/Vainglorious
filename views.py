@@ -112,12 +112,13 @@ def view_hero(hero):
     single_enemies=hero_details['single_enemies']
     cs=hero_details['cs']
     roles_played=hero_details['roles_played']
+    buildpaths=hero_details['buildpaths']
 
     return render_template('hero.html', hero=hero, matches_played=matches_played, matches_won=matches_won, playrate=playrate,
                            kda=kda, items=items, builds=builds, players=players,
                            teammates=teammates, skins=skins, enemies=enemies,
                            single_teammates=single_teammates, single_enemies=single_enemies, cs=cs,
-                           roles_played=roles_played)
+                           roles_played=roles_played, buildpaths=buildpaths)
 
 
 @app.route('/tierlist/')
@@ -135,12 +136,12 @@ def winrates():
     winrates = process_data.read_from_file(os.path.join(__location__, 'data/winrates_vs.json'))
     latest = get_latest(winrates.keys())
     winrates = winrates[latest]
-    return render_template('winrates.html', winrates=winrates)\
+    return render_template('winrates.html', winrates=winrates)
 
 
 @app.route('/map/')
 def telemetry():
-    return render_template('telemetry.html')
+    return render_template('telemetry.html', beta=True)
 
 
 @app.route('/about/')
@@ -422,7 +423,7 @@ def store_data():
                           'kda':kda, 'items': items, 'builds': builds, 'players': players2,
                           'teammates': teammates, 'skins': skins, 'enemies': enemies,
                           'single_teammates': single_teammates, 'single_enemies': single_enemies, 'cs': cs,
-                          'roles_played': roles_played}
+                          'roles_played': roles_played, 'buildpaths': buildpaths}
 
     process_data.save_to_file_winrates(os.path.join(__location__, 'data/hero_details.json'), hero_details)
 

@@ -187,6 +187,9 @@
 								<div id="roles" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
 							</div>
 							<div class="card">
+								<div id="buildpath" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+							</div>
+							<div class="card">
 								<div id="skins" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
 							</div>
 							<div class="card">
@@ -205,7 +208,7 @@
 <script src="/static/js/libs/d3.min.js"></script>
 <script src="/static/js/libs/d3.v3.js"></script>
 <script src="/static/js/libs/raphael-min.js"></script>
-<script src="/static/js/libs/js/morris.min.js"></script>
+<script src="/static/js/libs/morris.min.js"></script>
 <script src="/static/js/libs/rickshaw.min.js"></script>
 <script src="/static/js/libs/toastr.js"></script>
 <script src="/static/js/libs/countUp.js"></script>
@@ -285,6 +288,21 @@ $(function() {
 				    {% endfor %}
 			],
 			colors: $('#roles').data('colors').split(','),
+			formatter: function (x, data) {
+				return data.formatted;
+			}
+		});
+	}
+
+	if ($('#buildpath').length > 0) {
+		Morris.Donut({
+			element: 'buildpath',
+			data: [
+				 {% for i, n in buildpaths.iteritems() %}
+				        {value: {{ n }}, label: '{{ i|buildpath_to_str }}', formatted: '{{ n }} games'} {% if not loop.last %},{%endif%}
+				    {% endfor %}
+			],
+			colors: $('#buildpath').data('colors').split(','),
 			formatter: function (x, data) {
 				return data.formatted;
 			}
