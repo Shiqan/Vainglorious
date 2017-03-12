@@ -19,22 +19,64 @@
 			<div class="section-body">
 
 				<!-- BEGIN GAME FACTS -->
-				<div class="row">
+				<div class="row" style='height: 100px;'>
 					<!-- TODO show all page? -->
 					<!-- implement https://github.com/nolimits4web/Swiper/blob/master/demos/05-slides-per-view.html? -->
 
 					<div class="col-md-3 col-sm-6 hidden-xs">
-						<div class="card">
-							<div class="card-body no-padding">
-								<div class="alert alert-callout alert-info no-margin">
-									<img class="pull-right text-success hero-icon" src="https://s-media-cache-ak0.pinimg.com/564x/9a/b8/a5/9ab8a5d52931e8528f617cb18f7fd483.jpg" width="75px" height="75px"/>
-									<strong id="games" class="text-xl"> {{ games }}</strong><br/>
-									<span class="opacity-50">Vain crystals destroyed</span>
+						<div class="css-carousel col-sm-12">
+						    <div class="card css-img">
+							    <div class="card-body no-padding">
+							    	<div class="alert alert-callout alert-success no-margin">
+								    	<img class="pull-right text-success hero-icon" src="https://s-media-cache-ak0.pinimg.com/564x/9a/b8/a5/9ab8a5d52931e8528f617cb18f7fd483.jpg" width="75px" height="75px"/>
+									    <strong id="games" class="text-xl"> {{ games }}</strong><br/>
+									    <span class="opacity-50">Vain Crystals destroyed</span>
+							    	</div>
+							    </div>
+					    	</div>
+				        	<div class="card css-img">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-danger no-margin">
+										<img class="pull-right hero-icon" src="/static/img/great_karma.png" width="75px" height="75px"/>
+										<strong class="text-xl">{{ great_karma }}</strong><br/>
+										<span class="opacity-50">Players with great Karma </span>
+									</div>
 								</div>
 							</div>
-						</div>
-					</div>
-
+				            <div class="card css-img">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-success no-margin">
+										<strong class="text-xl">{{ crystal_sentries }}</strong><br/>
+										<span class="opacity-50">Crystal Sentry defeated</span>
+									</div>
+								</div>
+							</div>
+							<div class="card css-img">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-warning no-margin">
+										<strong class="text-xl">{{ gold_miners }}</strong><br/>
+										<span class="opacity-50">Gold Miner kills</span>
+									</div>
+								</div>
+							</div>
+							<div class="card css-img">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-success no-margin">
+										<strong class="text-xl">{{ lowest_player_lvl }}</strong><br/>
+										<span class="opacity-50">Lowest level Vainglorious player </span>
+									</div>
+								</div>
+							</div>
+							<div class="card css-img">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-warning no-margin">
+										<strong class="text-xl">{{ surrendered }}</strong><br/>
+										<span class="opacity-50">Number of surrenders</span>
+									</div>
+								</div>
+							</div>
+				    	</div>
+                    </div>
 					<div class="col-md-3 col-sm-6">
 						<div class="css-carousel col-sm-12">
 							<div class="card css-img">
@@ -63,7 +105,7 @@
 							</div>
 							<div class="card css-img">
 								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-success no-margin">
+									<div class="alert alert-callout alert-danger no-margin">
 										<img class="pull-right text-success hero-icon" src="/static/img/turret.png" width="75px" height="75px"/>
 										<strong class="text-xl">{{ turrets | format_number }}</strong><br/>
 										<span class="opacity-50"> Turrets destroyed </span>
