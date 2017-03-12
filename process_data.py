@@ -51,6 +51,26 @@ def process_samples():
 
                                 process_participant(participant_data[0], roster['id'])
 
+
+def process_telemetry():
+    app.logger.info("Process telemetry")
+    root = 'D:\\\\vainglory\\telemetry'
+    onlyfiles = [f for f in os.listdir(root) if os.path.isfile(os.path.join(root, f))]
+
+    for file in onlyfiles:
+        json_data = []
+        with open(os.path.join(root, file), 'r') as f:
+            for line in f:
+                json_data.append(line)
+
+        m = ', '.join(json_data)
+        json.load(m)
+        break
+
+    print(onlyfiles)
+
+
+
 def process_batch_query(matches):
     app.logger.info("Process {0} batches".format(len(matches)))
     for batch in matches:
@@ -177,7 +197,6 @@ def process_player(data):
                    wins=data['attributes']['stats']['wins'],
                    xp=data['attributes']['stats']['xp'])
 
-
         db.session.add(p)
 
         try:
@@ -227,6 +246,7 @@ def save_to_file_winrates(file, data):
     with open(file, 'w') as f:
         feeds[date] = data
         json.dump(feeds, f)
+
 
 def save_to_file_tierlist(file, lane, jungle, protector):
     date = commons.get_today()

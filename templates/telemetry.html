@@ -1,94 +1,18 @@
 {% extends "layout.html" %}
-{% block title %} Dashboard {% endblock %}
+{% block title %} Telemetry {% endblock %}
 
 {% block css %}
 <style>
-	canvas
-{
+canvas {
+	width: 100%;
 	border:1px solid #eff0f2;
 }
 
-/* Everything but the jumbotron gets side spacing for mobile first views */
-.header,
-.marketing,
-.footer {
-  padding-right: 15px;
-  padding-left: 15px;
-}
-
-/* Custom page header */
-.header {
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e5e5e5;
-}
-/* Make the masthead heading the same height as the navigation */
-.header h3 {
-  margin-top: 0;
-  margin-bottom: 0;
-  line-height: 40px;
-}
-
-/* Custom page footer */
-.footer {
-  padding-top: 19px;
-  color: #777;
-  border-top: 1px solid #e5e5e5;
-}
-
-/* Customize container */
-@media (min-width: 960px) {
-  .container {
-    max-width: 960px;
-  }
-}
-.container-narrow > hr {
-  margin: 30px 0;
-}
-
-/* Main marketing message and sign up button */
-.jumbotron {
-  text-align: center;
-  border-bottom: 1px solid #e5e5e5;
-}
-.jumbotron .btn {
-  padding: 14px 24px;
-  font-size: 21px;
-}
-
-/* Supporting marketing content */
-.marketing {
-  margin: 40px 0;
-}
-.marketing p + h4 {
-  margin-top: 28px;
-}
-
-/* Responsive: Portrait tablets and up */
-@media screen and (min-width: 960px) {
-  /* Remove the padding we set earlier */
-  .header,
-  .marketing,
-  .footer {
-    padding-right: 0;
-    padding-left: 0;
-  }
-  /* Space out the masthead */
-  .header {
-    margin-bottom: 30px;
-  }
-  /* Remove the bottom border on the jumbotron for visual effect */
-  .jumbotron {
-    border-bottom: 0;
-  }
-}
-
-#timeline
-{
+#timeline {
 	margin:10px;
 }
 
-.circle
-{
+.circle {
   background: #f00;
   width: 10px;
   height: 10px;
@@ -96,16 +20,15 @@
   display:inline-block;
 }
 
-#event_container
-{
+#event_container {
   position: fixed;
   width: 200px;
   height:auto;
-  font-size: 16px;
-  padding:10px;
-  background-color: #1e2126;
+   padding: 12px 24px;
+  color: #ffffff;
+  background-color: #20252b;
   border:1px solid #eff0f2;
-  z-index: 10000
+  z-index: 10000;
 }
 </style>
 {% endblock %}
@@ -118,27 +41,11 @@
 
 			<div class="section-body">
 
-				<h3>Vainglory Telemetry Timeline</h3>
-
-				<div class="row">
-					<div class="col-md-2">
-					  <div class="circle" style="background-color:blue"></div> Left Team Kills
-					</div>
-
-					<div class="col-md-2">
-					  <div class="circle" style="background-color:red"></div> Right Team Kills
-					</div>
-
-					<div class="col-md-2">
-						<div class="circle" style="background-color:white"></div> Minion Kills
-					</div>
-			  	</div>
-
 				<div class="row">
 					<div class="col-xs-12">
 						<div class="card">
 							<div class="card-head">
-								<header class="text-primary">Test map</header>
+								<header class="text-primary">Testing telemetry map</header>
 								<div class="tools">
 									<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
 								</div>
@@ -170,43 +77,33 @@
 {% block js %}
 <!-- BEGIN JAVASCRIPT -->
 <script src="/static/telemetry/data.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
 
 <script>
-var container = "telemtry_map"
+var container = "telemtry_map";
 var canvas = document.getElementById(container);
 var context = canvas.getContext('2d');
 
-// scaling ranges from 0 to 1
-// The closer to the 1, the larger the canvas will be
-var scaling = .73
-
-// full scaling
-//var scaling = 1
-
-var canvas_width = 1234
-var canvas_height = 480
-
-var scaled_width = canvas_width * scaling
-var scaled_height = canvas_height * scaling
+var canvas_width = canvas.offsetWidth;
+var canvas_height = canvas.offsetHeight;
 
 var canvas_offsetLeft = canvas.offsetLeft;
 var canvas_offsetTop = canvas.offsetTop;
 
 // the radius of the circles that will represent kills
-var radius = 6
-var minion_radius = 4
+var radius = 6;
+var minion_radius = 4;
+var mine_radius = 4;
 
 // keep track of the items that were painted
 // this allows our overall list to be smaller incase we need
 // to loop through it frequently
-var drawn_items = []
+var drawn_items = [];
 
 // keep track of the left and right team members/heros
-var team = {'left': [], 'right': []}
+var team = {'left': [], 'right': []};
 
-start_time = new Date(data[0].time).getTime() / 1000
-end_time = new Date(data.slice(-1)[0].time).getTime() / 1000
+start_time = new Date(data[0].time).getTime() / 1000;
+end_time = new Date(data.slice(-1)[0].time).getTime() / 1000;
 
 // canvas events
 canvas.addEventListener('click', detectClick, false);
@@ -217,31 +114,32 @@ function draw(callback) {
     imageObj.onload = function() {
 
     	// Add the image to the canvas
-    	context.drawImage(imageObj, 0, 0, scaled_width, scaled_height);
+    	context.drawImage(imageObj, 0, 0, canvas_width, canvas_height);
 
-    	callback()
+    	callback();
     };
     imageObj.src = '/static/img/vainglory-map.png';
 }
 
 function drawDataObject(item) {
 	//Find hero/hero kills
-	if (item.type == "KillActor" || item.type == "NPCkillNPC")
-	{
-		x = transformX(item.payload.Position[0])
-		y = transformY(item.payload.Position[2])
+	if (item.type == "KillActor" || item.type == "NPCkillNPC" ) {
+		x = transformX(item.payload.Position[0]);
+		y = transformY(item.payload.Position[2]);
 
-		if (item.payload.TargetIsHero) {
+		if (item.payload.TargetIsHero && item.type == "KillActor") {
 
-			if (item.payload.KilledTeam == "Left")
-				killed_team_color = "red"
-			else
-				killed_team_color = "blue"
+			if (item.payload.KilledTeam == "Left") {
+				killed_team_color = "red";
+			} else {
+				killed_team_color = "blue";
+			}
 
-			if (item.payload.Team == "Left")
-				killer_team_color = "red"
-			else
-				killer_team_color = "blue"
+			if (item.payload.Team == "Left") {
+				killer_team_color = "red";
+			} else {
+				killer_team_color = "blue";
+			}
 
 			context.beginPath();
 	    	context.arc(x, y, radius, 0, 2 * Math.PI, false);
@@ -251,8 +149,14 @@ function drawDataObject(item) {
 
 	    	// add to our drawn items array:
 	    	drawn_items.push(item)
-		} 		else
-		{
+	   	} else if (item.payload.TargetIsHero && item.payload.Source == "Ability__Item__ScoutTrap_Explode") {
+			context.beginPath();
+	    	context.arc(x, y, radius, 0, 2 * Math.PI, false);
+	    	context.fillStyle = "green";
+	    	context.fill();
+	    	context.stroke();
+
+	   	} else {
 			context.beginPath();
 	    	context.arc(x, y, minion_radius, 0, 2 * Math.PI, false);
 	    	context.fillStyle = "white";
@@ -267,27 +171,21 @@ function drawDataObject(item) {
 
 function buildTeamObject() {
 	// ignored kill actors:
-	var ignore = ["RangedMinion", "LeadMinion", "Kraken_Captured"]
+	var ignore = ["RangedMinion", "LeadMinion", "Kraken_Captured"];
 
 	for (i = 0; i < data.length; i++) {
 
-		var hero = data[i].payload.Actor.replace(/\*/g, "")
+		var hero = data[i].payload.Actor.replace(/\*/g, "");
 
-		if (ignore.indexOf(hero) <= -1)
-		{
+		if (ignore.indexOf(hero) <= -1) {
 			// check what team the hero is on
-			if (data[i].payload.Team == "Left")
-			{
-				if (team.left.indexOf(hero) <= -1)
-				{
-					team.left.push(hero)
+			if (data[i].payload.Team == "Left") {
+				if (team.left.indexOf(hero) <= -1) {
+					team.left.push(hero);
 				}
-		   	}
-		   	else
-		   	{
-		    	if (team.right.indexOf(hero) <= -1)
-				{
-					team.right.push(hero)
+		   	} else {
+		    	if (team.right.indexOf(hero) <= -1) {
+					team.right.push(hero);
 				}
 		   	}
 		}
@@ -296,12 +194,12 @@ function buildTeamObject() {
 
 // Transform the telemetry X coordinate to fit the correct map scaling
 function transformX(x) {
-	return (x - -93) * (scaled_width / 185)
+	return (x - -93) * (canvas_width / 185);
 }
 
 // Transform the telemetry Y coordinate to fit the correct map scaling
 function transformY(y) {
-	return (y - -25) * (scaled_height / 75);
+	return (y - -25) * (canvas_height / 75);
 }
 
 function detectInsideItem(e) {
@@ -312,112 +210,110 @@ function detectInsideItem(e) {
 
     for (i = 0; i < drawn_items.length; i++) {
 
-    	cx = transformX(drawn_items[i].payload.Position[0])
-		cy = transformY(drawn_items[i].payload.Position[2])
+    	cx = transformX(drawn_items[i].payload.Position[0]);
+		cy = transformY(drawn_items[i].payload.Position[2]);
 
 		// determine what radius to use
-		if (drawn_items[i].payload.TargetIsHero)
-			calc_radius = radius
-		else
-			calc_radius = minion_radius
+		if (drawn_items[i].payload.TargetIsHero) {
+			calc_radius = radius;
+		} else {
+			calc_radius = minion_radius;
+		}
 
 		// distance formula
-		var distance = Math.sqrt(Math.pow((mx - cx), 2) + Math.pow((my - cy), 2))
-		if (distance <= radius)
-		{
-			return true
+		var distance = Math.sqrt(Math.pow((mx - cx), 2) + Math.pow((my - cy), 2));
+		if (distance <= radius) {
+			return true;
 		}
 	}
 
-	return false
+	return false;
 }
 
 // detect if user clicked on a kill event in the canvas
 function detectClick(e) {
 
-	if (detectInsideItem(e))
-	{
-		drawOverlay(drawn_items[i], true, e.clientX, e.clientY)
-	}
-	else
-	{
-		drawOverlay(false, false, false, false)
+	if (detectInsideItem(e)) {
+		drawOverlay(drawn_items[i], true, e.clientX, e.clientY);
+	} else {
+		drawOverlay(false, false, false, false);
 	}
 }
 
 function detectHover(e) {
-	if (detectInsideItem(e))	{
+	if (detectInsideItem(e)) {
 		canvas.style.cursor = "pointer";
-	}
-	else {
+	} else {
 		canvas.style.cursor = "default";
 	}
 }
 
 // show/hide the overlay
 function drawOverlay(selectedItem, display, x, y) {
-	var overlay = $("#event_container")
+	var overlay = $("#event_container");
 
-	if (display)
-	{
-		overlay.removeClass('hide')
+	if (display) {
+		overlay.removeClass('hide');
 		overlay.css({'left': x, 'top': y});
 
-		var content_string = selectedItem.payload.Actor + " killed " + selectedItem.payload.Killed
-		var cleaned_content_string = content_string.replace(/\*/g, "")
-		overlay.html(cleaned_content_string)
-	}
-	else
-	{
-		overlay.addClass('hide')
+		var content_string = selectedItem.payload.Actor + " killed " + selectedItem.payload.Killed;
+		var cleaned_content_string = content_string.replace(/\*/g, "");
+		overlay.html(cleaned_content_string);
+	} else 	{
+		overlay.addClass('hide');
 	}
 }
 
 function findHeroItems(hero) {
 	// reset the drawn items
-	drawn_items = []
+	drawn_items = [];
 	draw(function () {
 		for (i = 0; i < data.length; i++) {
 
-			var item_actor_hero = data[i].payload.Actor.replace(/\*/g, "")
-
-			//var item_killed_hero = data[i].payload.Killed.replace(/\*/g, "")
-			var item_killed_hero = ''
+			var item_actor_hero = data[i].payload.Actor.replace(/\*/g, "");
+			var item_killed_hero = '';
 			if (typeof data[i].payload.Killed != "undefined") {
-			   item_killed_hero = data[i].payload.Killed.replace(/\*/g, "")
+			   item_killed_hero = data[i].payload.Killed.replace(/\*/g, "");
 			}
 
-			if (hero == item_killed_hero || hero == item_actor_hero)
-			{
-				drawDataObject(data[i])
+			if (hero == item_killed_hero || hero == item_actor_hero) {
+				drawDataObject(data[i]);
 			}
 		}
-	})
+	});
 }
 
-// Initialize the page load. Draw the image then draw the telemetry items
-setTimeout(function() {
+function drawMap() {
+	console.log("DrawMap");
+
 	// reset the drawn items:
-	drawn_items = []
+	drawn_items = [];
 
 	// resize the canvas:
-	context.canvas.width  = scaled_width;
-	context.canvas.height = scaled_height;
+	canvas_width = canvas.offsetWidth;
+	canvas_height = canvas.offsetHeight;
+
+	context.canvas.width  = canvas_width;
+	context.canvas.height = canvas_height;
 
 	draw(function () {
 
 		// loop through every item
 		for (i = 0; i < data.length; i++) {
-		    drawDataObject(data[i])
+		    drawDataObject(data[i]);
 		}
-	})
-}, 10)
+	});
+}
+// Initialize the page load. Draw the image then draw the telemetry items
+setTimeout(drawMap(), 10);
+
 
 // Add a jquery ui slider and interact with it
 $(document).ready(function () {
 
-	buildTeamObject()
+	buildTeamObject();
 
+	/*
 	$( "#timeline" ).slider({
 		range: "max",
 		min: start_time,
@@ -426,7 +322,7 @@ $(document).ready(function () {
 		slide: function( event, ui ) {
 
 			// reset the drawn items:
-			drawn_items = []
+			drawn_items = [];
 
 			// calculate the time difference
 			var diffMs = (ui.value - start_time);
@@ -435,7 +331,7 @@ $(document).ready(function () {
 			draw(function () {
 				// loop through the data set to see if it the items exist in the time frame
 				$.each(data, function (key, item) {
-					item_time = new Date(item.time).getTime() / 1000
+					item_time = new Date(item.time).getTime() / 1000;
 
 					if (item_time <= ui.value) {
 						drawDataObject(item);
@@ -444,16 +340,24 @@ $(document).ready(function () {
 			})
 		}
 	});
+	*/
 
 	// Show the hero's kills/deaths
 	$(".toggleItems").click(function() {
-		$(".toggleItems").removeClass('active')
-		$(this).addClass('active')
+		$(".toggleItems").removeClass('active');
+		$(this).addClass('active');
 		var hero = $(this).attr("hero");
-		findHeroItems(hero)
-	})
-	drawn_items = []
+		findHeroItems(hero);
+	});
+	drawn_items = [];
+
+
 });
+
+$( window ).resize(function() {
+  window.addEventListener('resize', drawMap());
+});
+
 </script>
 {% endblock %}
 

@@ -133,7 +133,7 @@ def winrates():
     return render_template('winrates.html', winrates=winrates)\
 
 
-@app.route('/telemetry/')
+@app.route('/map/')
 def telemetry():
     return render_template('telemetry.html')
 
@@ -453,6 +453,11 @@ def query_samples():
 
     return render_template('200.html')
 
+
+@app.route('/telemetry/')
+def query_telemetry():
+    process_data.process_telemetry()
+    return render_template('200.html')
 
 # ------------------
 # ERROR HANDLERS
