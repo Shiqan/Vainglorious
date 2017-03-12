@@ -39,9 +39,9 @@ class VaingloryApi(object):
         if sort:
             params["sort"] = sort
         if createdAtStart:
-            params["filter[createdAt-start]"] = createdAtStart
+            params["filter[createdAt-Start]"] = createdAtStart
         if createdAtEnd:
-            params["filter[createdAt-end]"] = createdAtEnd
+            params["filter[createdAt-End]"] = createdAtEnd
 
         return self.query("samples", params=params)
 

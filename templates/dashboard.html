@@ -340,7 +340,7 @@
 										<li class="tile">
 											<a class="tile-content ink-reaction" href="/hero/{{hero['name'] | lower }}">
 												<div class="tile-icon">
-													<img src="/static/img/{{ hero['name'] | lower }}.png" alt="">
+													<img src="/static/img/heroes/{{ hero['name'] | lower }}.png" alt="">
 												</div>
 												<div class="tile-text"> {{ hero['name'] }} <img class="buildpath-icon pull-right" src="/static/img/{{ hero['path'] | buildpath_to_img }}" /> </div>
 											</a>
@@ -357,7 +357,7 @@
 											<li class="tile">
 												<a class="tile-content ink-reaction" href="/hero/{{hero['name'] | lower }}">
 													<div class="tile-icon">
-														<img src="/static/img/{{ hero['name'] | lower }}.png" alt="">
+														<img src="/static/img/heroes/{{ hero['name'] | lower }}.png" alt="">
 													</div>
 													<div class="tile-text"> {{ hero['name'] }} <img class="buildpath-icon pull-right" src="/static/img/{{ hero['path'] | buildpath_to_img }}" /></div>
 												</a>
@@ -373,7 +373,7 @@
 											<li class="tile">
 												<a class="tile-content ink-reaction" href="/hero/{{hero['name'] | lower }}">
 													<div class="tile-icon">
-														<img src="/static/img/{{ hero['name'] | lower }}.png" alt="">
+														<img src="/static/img/heroes/{{ hero['name'] | lower }}.png" alt="">
 													</div>
 													<div class="tile-text"> {{ hero['name'] }} <img class="buildpath-icon pull-right" src="/static/img/{{ hero['path'] | buildpath_to_img }}" /></div>
 												</a>
@@ -451,7 +451,7 @@
 													 data-playrate="{{ hero.playrate }}"
 													 data-url="/hero/{{ name | lower }}/">
 														<div class="hovereffect">
-															<img class="img-responsive" src="/static/img/{{ name | lower }}_splash.png"  alt="">
+															<img class="img-responsive" src="/static/img/heroes/{{ name | lower }}_splash.png"  alt="">
 															<div class="overlay">
 																<h2 class="hero-name"> {{ name }} </h2>
 
@@ -711,7 +711,7 @@ $(function() {
 
 				var x = item.datapoint[0];
 				var y = item.datapoint[1];
-				var img = '<img class="img-circle img-responsive" src="/static/img/'+item.series.label.toLowerCase()+'.png" style="display: block;  margin-left: auto; margin-right: auto;" width="30px" height="30px" alt=""></img>';
+				var img = '<img class="img-circle img-responsive" src="/static/img/heroes/'+item.series.label.toLowerCase()+'.png" style="display: block;  margin-left: auto; margin-right: auto;" width="30px" height="30px" alt=""></img>';
 				var tipContent = img + y.toFixed(2) + "% ";
 
 				if (tip !== undefined) {

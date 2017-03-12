@@ -32,11 +32,11 @@
 			<!-- BEGIN HERO HEADER -->
 			<section class="full-bleed">
 				<div class="section-body style-default-dark force-padding text-shadow">
-					<div class="img-backdrop" style="background-image: url('/static/img/{{ hero|lower }}_splash.png')"></div>
+					<div class="img-backdrop" style="background-image: url('/static/img/heroes/{{ hero|lower }}_splash.png')"></div>
 					<div class="overlay overlay-shade-top stick-top-left height-3"></div>
 					<div class="row">
 						<div class="col-md-3 col-xs-5">
-							<img class="img-circle border-white border-xl img-responsive auto-width" src="/static/img/{{ hero|lower }}.png" alt="" />
+							<img class="img-circle border-white border-xl img-responsive auto-width" src="/static/img/heroes/{{ hero|lower }}.png" alt="" />
 							<h3> {{ hero|title }} <br/><small>{{ hero|get_hero_roles }}</small></h3>
 						</div>
 						<div class="col-md-9 col-xs-7">
@@ -106,7 +106,7 @@
 												{% for actor in team.split(', ') %}
 													<div class="col-xs-4">
 														<a class="ink-reaction" href="/hero/{{ actor|lower }}" data-toggle="tooltip" title="{{ actor }}">
-															<img class="item-icon" src="/static/img/{{ actor|lower }}.png" alt="" />
+															<img class="item-icon" src="/static/img/heroes/{{ actor|lower }}.png" alt="" />
 														</a>
 													</div>
 												{% endfor %}
@@ -132,7 +132,7 @@
 												{% for actor in team.split(', ') %}
 													<div class="col-xs-4">
 														<a class="ink-reaction" href="/hero/{{ actor|lower }}" data-toggle="tooltip" title="{{ actor }}">
-															<img class="item-icon" src="/static/img/{{ actor|lower }}.png" alt="" />
+															<img class="item-icon" src="/static/img/heroes/{{ actor|lower }}.png" alt="" />
 														</a>
 													</div>
 												{% endfor %}

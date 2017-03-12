@@ -78,7 +78,7 @@
 								{% set roles = hero | lower | get_hero_roles %}
 								<div class="card mix {% for r in roles.split(',') %}{{ r | lower }}{% endfor %} {{hero}}" data-name="{{ hero | lower }}">
 									<div class="card-head">
-										<header class="text-primary"><img class="img-circle" src="/static/img/{{ hero | lower }}.png" width="50px" height="50px" alt="" /> {{ hero }}</header>
+										<header class="text-primary"><img class="img-circle" src="/static/img/heroes/{{ hero | lower }}.png" width="50px" height="50px" alt="" /> {{ hero }}</header>
 										<div class="tools">
 											<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
 										</div>
@@ -175,7 +175,7 @@
 			data: [
 				{% for hero, stats in winrates[root].iteritems() %}
 					{% if hero != root %}
-						{label: '<img class="img-circle img-responsive" src="/static/img/{{ hero | lower }}.png" style="display: block;  margin-left: auto; margin-right: auto;" width="30px" height="30px" alt=""></img>',
+						{label: '<img class="img-circle img-responsive" src="/static/img/heroes/{{ hero | lower }}.png" style="display: block;  margin-left: auto; margin-right: auto;" width="30px" height="30px" alt=""></img>',
 						 v: '{{ stats["total_with"] }}',
 						 w: '{{ stats["total_against"] }}',
 						 x: '{{ hero }}',

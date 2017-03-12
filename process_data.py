@@ -10,7 +10,7 @@ import requests, zipfile, StringIO
 
 def download_samples(samples):
     for sample in samples['data']:
-        # pprint.pprint(sample)
+        pprint.pprint(sample)
         r = requests.get(sample['attributes']['URL'], stream=True)
         z = zipfile.ZipFile(StringIO.StringIO(r.content))
         z.extractall()
