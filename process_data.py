@@ -52,7 +52,9 @@ def process_samples():
                                 process_participant(participant_data[0], roster['id'])
 
 def process_batch_query(matches):
+    app.logger.info("Process {0} batches".format(len(matches)))
     for batch in matches:
+        app.logger.info("Process {0} matches".format(len(batch['data'])))
         for m in batch['data']:
 
             if m['attributes']['gameMode'] in ['ranked', 'casual']:

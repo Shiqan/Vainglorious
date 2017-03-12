@@ -1,5 +1,6 @@
 from flask_app import app, appname
 import time
+from datetime import date, timedelta
 import strings
 import random
 
@@ -126,8 +127,14 @@ def convert_date(date_str):
     return time.strptime(date_str, "%m/%d/%Y")
 
 
-def get_today():
-    return time.strftime("%m/%d/%Y")
+def get_today(format="%m/%d/%Y"):
+    return time.strftime(format)
+
+
+def get_yesterday(format="%m/%d/%Y"):
+    yesterday = date.today() - timedelta(1)
+    return yesterday.strftime(format)
+
 
 def get_latest(keys):
     return sorted(keys, reverse=True)[0]

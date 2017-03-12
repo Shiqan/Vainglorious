@@ -21,8 +21,9 @@
 				<!-- BEGIN GAME FACTS -->
 				<div class="row">
 					<!-- TODO show all page? -->
+					<!-- implement https://github.com/nolimits4web/Swiper/blob/master/demos/05-slides-per-view.html? -->
 
-					<div class="col-md-3 col-sm-6">
+					<div class="col-md-3 col-sm-6 hidden-xs">
 						<div class="card">
 							<div class="card-body no-padding">
 								<div class="alert alert-callout alert-info no-margin">
@@ -62,7 +63,7 @@
 							</div>
 							<div class="card css-img">
 								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-warning no-margin">
+									<div class="alert alert-callout alert-success no-margin">
 										<img class="pull-right text-success hero-icon" src="/static/img/turret.png" width="75px" height="75px"/>
 										<strong class="text-xl">{{ turrets | format_number }}</strong><br/>
 										<span class="opacity-50"> Turrets destroyed </span>
@@ -71,7 +72,7 @@
 							</div>
 							<div class="card css-img">
 								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-warning no-margin">
+									<div class="alert alert-callout alert-info no-margin">
 										<strong class="text-xl">{{ afks }}</strong><br/>
 										<span class="opacity-50"> Players went afk </span>
 									</div>
@@ -79,7 +80,7 @@
 							</div>
 							<div class="card css-img">
 								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-warning no-margin">
+									<div class="alert alert-callout alert-danger no-margin">
 										<strong class="text-xl">{{ '%0.2f'| format(avg_afk) }}%</strong><br/>
 										<span class="opacity-50"> Of the games have an afk</span>
 									</div>
@@ -425,39 +426,6 @@
 					    </div>
 					</div>
 					<!-- END GAME TABLE -->
-
-				<div class="row">
-					<div class="col-md-6 col-xs-12">
-						<div class="card card-collapsed">
-							<div class="card-head">
-								<header class="text-primary">Vision</header>
-								<div class="tools">
-									<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
-								</div>
-							</div>
-							<div class="card-body" style="display: none; text-align: center;">
-								<h1> Waiting for telemetry data </h1>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-6 col-xs-12">
-						<div class="card card-collapsed">
-							<div class="card-head">
-								<header class="text-primary">Team fights</header>
-								<div class="tools">
-									<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
-								</div>
-							</div>
-							<div class="card-body" style="display: none; text-align: center;">
-								<h1> Waiting for telemetry data </h1>
-							</div>
-						</div>
-					</div>
-				</div>
-
-
-
 			</div>
 		</section>
 	</div>
@@ -586,12 +554,6 @@ $(function() {
 	$('#datatable1 tbody').on('click', 'tr', function() {
 		window.location.href = $(this).data( "url" );
 	});
-
-	$('.card-head .tools .btn-collapse').on('click', function (e) {
-		var card = $(e.currentTarget).closest('.card');
-		materialadmin.AppCard.toggleCardCollapse(card);
-	});
-
 
 	// Winrate chart
 	var chart = $("#winrate-chart");

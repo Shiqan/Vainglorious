@@ -9,7 +9,7 @@ class VaingloryApi(object):
         self.url = "https://api.{datacenter}.gamelockerapp.com/shards/{region}/".format(datacenter=self.datacenter, region=self.region)
 
     def request(self, endpoint, params=None):
-        app.logger.info("Request {0} with params: {1}".format(endpoint, params))
+        app.logger.info("Request {0} with params: {1}".format(endpoint, str(params)))
         headers = {
             "Authorization": "Bearer {}".format(self.key),
             "X-TITLE-ID": "semc-vainglory",
@@ -30,15 +30,25 @@ class VaingloryApi(object):
     def player(self, player_id):
         return self.query("players", player_id)
 
-    def sample(self):
+    def sample(self, offset=None, limit=None, sort=None, createdAtStart=None, createdAtEnd=None):
         params = dict()
-        params['sort'] = "-createdAt"
+        if offset:
+            params["page[offset]"] = offset
+        if limit:
+            params["page[limit]"] = limit
+        if sort:
+            params["sort"] = sort
+        if createdAtStart:
+            params["filter[createdAt-start]"] = createdAtStart
+        if createdAtEnd:
+            params["filter[createdAt-end]"] = createdAtEnd
+
         return self.query("samples", params=params)
 
     def matches(self,
                 offset=None, limit=None, sort=None,
                 createdAtStart=None, createdAtEnd=None,
-                player=None, team=None):
+                player=None, playerId=None, team=None, gameMode=None):
 
         params = dict()
         if offset:
@@ -53,8 +63,12 @@ class VaingloryApi(object):
             params["filter[createdAt-end]"] = createdAtEnd
         if player:
             params["filter[playerNames]"] = player
+        if playerId:
+            params["filter[playerIds]"] = playerId
         if team:
             params["filter[teamNames]"] = team
+        if gameMode:
+            params["filter[gameMode]"] = gameMode
 
         return self.query("matches", params=params)
 

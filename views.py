@@ -2,6 +2,7 @@ from __future__ import division
 
 import os
 
+import sys
 from flask import redirect, render_template, request, url_for, flash
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -117,10 +118,9 @@ def view_hero(hero):
 @app.route('/tierlist/')
 def tierlist():
     tierlist = process_data.read_from_file(os.path.join(__location__, 'data/tierlist.json'))
-    if get_today() not in tierlist:
-        return redirect(url_for('store_data'))
+    latest = get_latest(tierlist.keys())
 
-    tierlist = tierlist[get_today()]
+    tierlist = tierlist[latest]
 
     return render_template('tierlist.html', tierlist=tierlist)
 
@@ -128,10 +128,8 @@ def tierlist():
 @app.route('/winrates/')
 def winrates():
     winrates = process_data.read_from_file(os.path.join(__location__, 'data/winrates_vs.json'))
-    if get_today() not in winrates:
-        return redirect(url_for('store_data'))
-
-    winrates = winrates[get_today()]
+    latest = get_latest(winrates.keys())
+    winrates = winrates[latest]
     return render_template('winrates.html', winrates=winrates)\
 
 
@@ -428,15 +426,15 @@ def query_matches():
 
     # split request to batches of 50
     max_limit = 50
-    limit = 4500
+    limit = 450
     matches = []
     for batch in range(0, limit, max_limit):
         try:
-            response = api.matches(offset=batch, limit=max_limit, sort="-createdAt")
+            response = api.matches(offset=batch, limit=max_limit, createdAtStart="{0}T00:00:00Z".format(get_yesterday("%Y-%m-%d")), createdAtEnd="{0}T00:00:00Z".format(get_today("%Y-%m-%d")), sort="-createdAt", gameMode="casual, ranked")
             matches.append(dict(response))
             limit -= max_limit
         except:
-            app.logger.error("Error occured...")
+            app.logger.error("Unexpected error:", sys.exc_info()[0])
 
         if limit % 450 == 0:
             app.logger.info("time.sleep(60)")
@@ -448,9 +446,9 @@ def query_matches():
 @app.route('/samples/')
 def query_samples():
     api = VaingloryApi("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJkNzYzYTkyMC1kYzMyLTAxMzQtYTc1NC0wMjQyYWMxMTAwMDMiLCJpc3MiOiJnYW1lbG9ja2VyIiwib3JnIjoiZmVycm9uLXNhYW4tbGl2ZS1ubCIsImFwcCI6ImQ3NjFjZDUwLWRjMzItMDEzNC1hNzUzLTAyNDJhYzExMDAwMyIsInB1YiI6InNlbWMiLCJ0aXRsZSI6InZhaW5nbG9yeSIsInNjb3BlIjoiY29tbXVuaXR5IiwibGltaXQiOjEwfQ.o6z5i-2pfAjrcaw_NAchOzWm2ZcGvmNfwA7U7Hgd0Lg")
-    s = api.sample()
-    process_data.download_samples(s)
+    s = api.sample(sort="-createdAt")
 
+    process_data.download_samples(s)
     process_data.process_samples()
 
     return render_template('200.html')
