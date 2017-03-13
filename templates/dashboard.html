@@ -34,11 +34,42 @@
 								</div>
 							</div>
 						</div>
-
+                        <div class="col-md-3 col-sm-6">
+							<div class="card">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-warning no-margin">
+										<h1 class="pull-right text-warning"><i class="md md-timer"></i></h1>
+										<strong class="text-xl">{{ avg_duration | convert_game_time }}</strong><br/>
+										<span class="opacity-50">Avg duration</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-info no-margin">
+										<strong id="players" class="text-xl">{{ players }}</strong><br/>
+										<span class="opacity-50">Number of players </span>
+									</div>
+								</div>
+							</div>
+						</div>
 						<div class="col-md-3 col-sm-6">
 							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-danger no-margin">
+										<img class="pull-right text-success hero-icon" src="http://i.imgur.com/2EPwPt7.jpg" width="75px" height="75px"/>
+										<strong id="krakens" class="text-xl">{{ krakens | format_number }}</strong><br/>
+										<span class="opacity-50">Krakens unleashed</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-warning no-margin">
 										<img class="pull-right hero-icon" src="/static/img/great_karma.png" width="75px" height="75px"/>
 										<strong class="text-xl">{{ great_karma }}</strong><br/>
 										<span class="opacity-50">Players with great Karma </span>
@@ -51,8 +82,9 @@
 							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-success no-margin">
+										<img class="pull-right hero-icon" src="/static/img/crystal_sentry.jpg" width="75px" height="75px"/>
 										<strong class="text-xl">{{ crystal_sentries }}</strong><br/>
-										<span class="opacity-50">Crystal Sentry defeated</span>
+										<span class="opacity-50">Crystal Sentries defeated</span>
 									</div>
 								</div>
 							</div>
@@ -61,7 +93,8 @@
 						<div class="col-md-3 col-sm-6">
 							<div class="card">
 								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-warning no-margin">
+									<div class="alert alert-callout alert-danger no-margin">
+										<img class="pull-right hero-icon" src="/static/img/gold_mine.png" width="75px" height="75px"/>
 										<strong class="text-xl">{{ gold_miners }}</strong><br/>
 										<span class="opacity-50">Gold Miner kills</span>
 									</div>
@@ -73,6 +106,7 @@
 							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-success no-margin">
+									    <img class="pull-right hero-icon" src="/static/img/vainglorious_bronze.png" width="75px" height="75px"/>
 										<strong class="text-xl">{{ lowest_player_lvl }}</strong><br/>
 										<span class="opacity-50">Lowest level Vainglorious player </span>
 									</div>
@@ -83,7 +117,8 @@
 						<div class="col-md-3 col-sm-6">
 							<div class="card">
 								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-warning no-margin">
+									<div class="alert alert-callout alert-danger no-margin">
+										<img class="pull-right hero-icon" src="/static/img/surrendered.jpg" width="75px" height="75px"/>
 										<strong class="text-xl">{{ surrendered }}</strong><br/>
 										<span class="opacity-50">Number of surrenders</span>
 									</div>
@@ -92,16 +127,7 @@
 						</div>
 
 
-						<div class="col-md-3 col-sm-6">
-							<div class="card">
-								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-warning no-margin">
-										<strong id="players" class="text-xl">{{ players }}</strong><br/>
-										<span class="opacity-50">Number of players </span>
-									</div>
-								</div>
-							</div>
-						</div>
+
 
 						<div class="col-md-3 col-sm-6">
 							<div class="card">
@@ -128,7 +154,7 @@
 						<div class="col-md-3 col-sm-6">
 							<div class="card css-img">
 								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-danger no-margin">
+									<div class="alert alert-callout alert-warning no-margin">
 										<img class="pull-right text-success hero-icon" src="/static/img/turret.png" width="75px" height="75px"/>
 										<strong class="text-xl">{{ turrets | format_number }}</strong><br/>
 										<span class="opacity-50"> Turrets destroyed </span>
@@ -141,6 +167,7 @@
 							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-info no-margin">
+										<img class="pull-right hero-icon" src="/static/img/lpq.png" width="75px" height="75px"/>
 										<strong class="text-xl">{{ afks }}</strong><br/>
 										<span class="opacity-50"> Players went afk </span>
 									</div>
@@ -152,6 +179,7 @@
 							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-danger no-margin">
+										<img class="pull-right hero-icon" src="/static/img/lpq.png" width="75px" height="75px"/>
 										<strong class="text-xl">{{ '%0.2f'| format(avg_afk) }}%</strong><br/>
 										<span class="opacity-50"> Of the games have an afk</span>
 									</div>
@@ -159,17 +187,7 @@
 							</div>
 						</div>
 
-						<div class="col-md-3 col-sm-6">
-							<div class="card">
-								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-danger no-margin">
-										<img class="pull-right text-success hero-icon" src="http://i.imgur.com/2EPwPt7.jpg" width="75px" height="75px"/>
-										<strong id="krakens" class="text-xl">{{ krakens | format_number }}</strong><br/>
-										<span class="opacity-50">Krakens unleashed</span>
-									</div>
-								</div>
-							</div>
-						</div>
+
 
 						<div class="col-md-3 col-sm-6">
 							<div class="card">
@@ -238,18 +256,6 @@
 										<h1 class="pull-right text-info"><i class="md md-timer"></i></h1>
 										<strong id="duration" class="text-xl">{{ duration | convert_time }}</strong><br/>
 										<span class="opacity-50">Hours well spent</span>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="col-md-3 col-sm-6">
-							<div class="card">
-								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-warning no-margin">
-										<h1 class="pull-right text-warning"><i class="md md-timer"></i></h1>
-										<strong class="text-xl">{{ avg_duration | convert_game_time }}</strong><br/>
-										<span class="opacity-50">Avg duration</span>
 									</div>
 								</div>
 							</div>
