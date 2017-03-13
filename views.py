@@ -436,10 +436,10 @@ def query_matches():
     # process_data.process_samples(s)
 
     # split request to batches of 50
-    max_limit = 50
-    limit = 450
+    max_limit = 5
+    limit = 2000
     matches = []
-    for batch in range(0, limit, max_limit):
+    for batch in range(1000, limit, max_limit):
         try:
             response = api.matches(offset=batch, limit=max_limit, createdAtStart="{0}T00:00:00Z".format(get_yesterday("%Y-%m-%d")), createdAtEnd="{0}T00:00:00Z".format(get_today("%Y-%m-%d")), sort="-createdAt", gameMode="casual, ranked")
             matches.append(dict(response))
@@ -447,7 +447,7 @@ def query_matches():
         except:
             app.logger.error("Unexpected error:", sys.exc_info()[0])
 
-        if limit % 450 == 0:
+        if limit % 50 == 0:
             app.logger.info("time.sleep(60)")
             time.sleep(60)
 
@@ -457,7 +457,7 @@ def query_matches():
 @app.route('/samples/')
 def query_samples():
     api = VaingloryApi("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJkNzYzYTkyMC1kYzMyLTAxMzQtYTc1NC0wMjQyYWMxMTAwMDMiLCJpc3MiOiJnYW1lbG9ja2VyIiwib3JnIjoiZmVycm9uLXNhYW4tbGl2ZS1ubCIsImFwcCI6ImQ3NjFjZDUwLWRjMzItMDEzNC1hNzUzLTAyNDJhYzExMDAwMyIsInB1YiI6InNlbWMiLCJ0aXRsZSI6InZhaW5nbG9yeSIsInNjb3BlIjoiY29tbXVuaXR5IiwibGltaXQiOjEwfQ.o6z5i-2pfAjrcaw_NAchOzWm2ZcGvmNfwA7U7Hgd0Lg")
-    s = api.sample(sort="-createdAt")
+    s = api.sample(sort="-createdAt", createdAtStart="{0}T00:00:00Z".format(get_yesterday("%Y-%m-%d")), createdAtEnd="{0}T00:00:00Z".format(get_today("%Y-%m-%d")))
 
     process_data.download_samples(s)
     process_data.process_samples()
