@@ -114,11 +114,14 @@ def view_hero(hero):
     roles_played=hero_details['roles_played']
     buildpaths=hero_details['buildpaths']
 
+    winrates = process_data.read_from_file(os.path.join(__location__, 'data/winrates_vs.json'))
+    winrates = winrates[latest][hero]
+
     return render_template('hero.html', hero=hero, matches_played=matches_played, matches_won=matches_won, playrate=playrate,
                            kda=kda, items=items, builds=builds, players=players,
                            teammates=teammates, skins=skins, enemies=enemies,
                            single_teammates=single_teammates, single_enemies=single_enemies, cs=cs,
-                           roles_played=roles_played, buildpaths=buildpaths)
+                           roles_played=roles_played, buildpaths=buildpaths, winrates=winrates)
 
 
 @app.route('/tierlist/')
@@ -276,7 +279,7 @@ def store_data():
 
     winrates_vs_heroes = {}
     for m in matches:
-        hero = strings.heroes[m.actor]
+        hero = strings.heroes[m.actor].lower()
 
         if hero not in winrates_vs_heroes:
             winrates_vs_heroes[hero] = {}

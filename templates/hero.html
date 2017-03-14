@@ -149,6 +149,26 @@
 					</div>
 
 					<div class="row">
+						<div class="col-xs-12">
+							<div class="card">
+								<div class="card-head">
+									<header class="text-primary"><img class="img-circle" src="/static/img/heroes/{{ hero | lower }}.png" width="50px" height="50px" alt="" /> Winrates of {{ hero | title }}</header>
+									<div class="tools">
+										<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
+									</div>
+								</div>
+								<div class="card-body">
+									<div id="morris-bar-graph_{{hero}}" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+									<div id="legend">
+										<div class="mbox" style="background-color: #9C27B0"></div> <span>Winrate with hero in team</span>
+										<div class="mbox" style="background-color: #2196F3"></div> <span>Winrate against hero</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
 						<!-- BEGIN BEST PLAYERS -->
 						<div class="col-lg-8 col-xs-12">
 							<h2>Best {{ hero|title }} players </h2>
@@ -306,6 +326,35 @@ $(function() {
 			formatter: function (x, data) {
 				return data.formatted;
 			}
+		});
+	}
+
+	if ($('#morris-bar-graph_{{hero}}').length > 0) {
+		var morrisChart = Morris.Bar({
+			element: 'morris-bar-graph_{{hero}}',
+			data: [
+				{% for hero, stats in winrates.iteritems() %}
+					{% if hero != root %}
+						{label: '<img class="img-circle img-responsive" src="/static/img/heroes/{{ hero | lower }}.png" style="display: block;  margin-left: auto; margin-right: auto;" width="30px" height="30px" alt=""></img>',
+						 v: '{{ stats["total_with"] }}',
+						 w: '{{ stats["total_against"] }}',
+						 x: '{{ hero }}',
+						 y:'{{ '%0.2f'| format(stats["ratio_with"]) }}',
+						 z: '{{ '%0.2f'| format(stats["ratio_against"]) }}' } {% if not loop.last %},{%endif%}
+					{% endif %}
+				{% endfor %}
+			],
+			xkey: 'x',
+			xLabelAngle: 60,
+			hoverCallback: function(index, options, content) {
+			  var data = options.data[index];
+			  return (data.label + content  + "Games with: "+ data.v + "<br>" + "Games against: "+ data.w   );
+			},
+			hideHover: true,
+			ymax: 100,
+			ykeys: ['y', 'z'],
+			labels: ['Winrate with', 'Winrate against'],
+			barColors: $('#morris-bar-graph_{{hero}}').data('colors').split(',')
 		});
 	}
 });
