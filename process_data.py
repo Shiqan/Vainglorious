@@ -1,12 +1,24 @@
+import datetime
+import json
+import operator
 import os
 import pprint
-import datetime
+from collections import Counter
+
+import StringIO
+import requests
+import six
+import zipfile
+from sqlalchemy import func, case
+from sqlalchemy.exc import SQLAlchemyError
+
+import commons
+import strings
 from flask_app import app, db
 from models import Match, Roster, Participant, Player
-from sqlalchemy.exc import SQLAlchemyError
-import json
-import commons
-import requests, zipfile, StringIO
+
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
 
 def download_samples(samples):
     for sample in samples['data']:
@@ -260,3 +272,288 @@ def save_to_file_tierlist(file, lane, jungle, protector):
     with open(file, 'w') as f:
         feeds[date] = entry
         json.dump(feeds, f)
+
+
+def update_json_files():
+    update_data()
+    update_tierlist()
+    update_winrates()
+    update_hero_details()
+
+
+def update_data():
+    app.logger.info("Generate data.json")
+    games = Match.query.count()
+    players = Player.query.count()
+    potions = sum([i["Halcyon Potion"] for i, in db.session.query(Participant.itemUses).all() if "Halcyon Potion" in i])
+    infusions = sum([i["Weapon Infusion"] for i, in db.session.query(Participant.itemUses).all() if "Weapon Infusion" in i])
+    fountains = sum([i["Fountain of Renewal"] for i, in db.session.query(Participant.itemUses).all() if "Fountain of Renewal" in i])
+    mines = sum([i["Scout Trap"] for i, in db.session.query(Participant.itemUses).all() if "Scout Trap" in i])
+    krakens = sum([i[0] for i in db.session.query(Participant.krakenCaptures, ).group_by(Participant.roster_id).all()])
+    turrets = sum([i[0] for i in db.session.query(Participant.turrentCaptures, ).group_by(Participant.roster_id).all()])
+    minions = float(db.session.query(func.sum(Participant.minionKills)).scalar())
+    kills = db.session.query(func.sum(Participant.kills)).scalar()
+    max_kills = db.session.query(func.max(Participant.kills)).scalar()
+    deaths = db.session.query(func.sum(Participant.deaths)).scalar()
+    max_deaths = db.session.query(func.max(Participant.deaths)).scalar()
+    died_by_minions = int(deaths - kills)
+    duration = int(db.session.query(func.sum(Match.duration).label("duration")).scalar())
+    avg_duration = int(duration / games)
+    afks = db.session.query(func.count(Participant.wentAfk)).filter(Participant.wentAfk == 1).scalar()
+    afks_per_match = afks / games
+
+    blue_side_total = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "left/blue").scalar()
+    blue_side = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "left/blue", Participant.winner == 1).scalar()
+    red_side_total = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "right/red").scalar()
+    red_side = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "right/red", Participant.winner == 1).scalar()
+    red_side_winrate = red_side / red_side_total
+    blue_side_winrate = blue_side / blue_side_total
+
+    great_karma = len([i[0] for i in db.session.query(Participant.karmaLevel).filter(Participant.karmaLevel == 2).group_by(Participant.player_id).all()])
+    crystal_sentries = sum([i[0] for i in db.session.query(Participant.crystalMineCaptures,).group_by(Participant.roster_id).all()])
+    gold_miners = sum([i[0] for i in db.session.query(Participant.goldMindCaptures,).group_by(Participant.roster_id).all()])
+    lowest_player_lvl = db.session.query(func.min(Participant.level)).scalar()
+    surrendered = db.session.query(func.count(Match.endGameReason)).filter(Match.endGameReason == "surrender").scalar()
+
+    avg_cs = [i[0] for i in db.session.query(Participant.farm).filter(Participant.actor.in_([h for h, r in six.iteritems(strings.hero_roles) if "Lane" in r])).all()]
+    avg_cs = sum(avg_cs) / len(avg_cs)
+
+    heroes = db.session.query(Participant.actor, func.count(Participant.actor))\
+        .group_by(Participant.actor).order_by(func.count(Participant.actor)).all()
+
+    heroes_win_rate = db.session.query(Participant.actor, func.sum(case([(Participant.winner == True, 1)], else_=0)).label("winrate"))\
+        .group_by(Participant.actor).order_by("winrate").all()
+
+    heroes_win_rate = [(hero[0], (herowr[1] / hero[1]) * 100) for hero in heroes for herowr in heroes_win_rate if hero[0] == herowr[0]]
+    heroes_win_rate = sorted(heroes_win_rate, key=operator.itemgetter(1), reverse=True)
+
+    heroes_kda = db.session.query(Participant.actor, func.sum(Participant.kills).label("kills"),
+                                  func.sum(Participant.deaths).label("deaths"),
+                                  func.sum(Participant.assists).label("assists"))\
+        .group_by(Participant.actor).all()
+
+    heroes_cs = db.session.query(Participant.actor, func.sum(Participant.nonJungleMinionKills).label("lane"),
+                                  func.sum(Participant.minionKills).label("jungle"),
+                                  func.sum(Participant.farm).label("farm")) \
+        .group_by(Participant.actor).all()
+
+    hero_stats = []
+    for hero in heroes:
+        stats = {'hero': strings.heroes[hero[0]], 'games': hero[1], 'playrate': float((hero[1] / games) * 100)}
+        for hero2 in heroes_win_rate:
+            if hero[0] == hero2[0]:
+                stats['winrate'] = float(hero2[1])
+
+        for hero2 in heroes_kda:
+            if hero[0] == hero2[0]:
+                stats['kills'] = float(hero2.kills)
+                stats['deaths'] = float(hero2.deaths)
+                stats['assists'] = float(hero2.assists)
+
+        for hero2 in heroes_cs:
+            if hero[0] == hero2[0]:
+                stats['lane'] = float(hero2.lane)
+                stats['jungle'] = float(hero2.jungle)
+                stats['farm'] = float(hero2.farm)
+
+        hero_stats.append(stats)
+
+    facts = {'games': games, 'players': players, 'potions': potions, 'krakens': krakens, 'turrets': turrets, 'duration': duration,
+             'avg_duration': avg_duration, 'died_by_minions': died_by_minions, 'max_kills': max_kills,
+             'max_deaths': max_deaths, 'avg_cs': avg_cs, 'infusions': infusions, 'fountains': fountains,
+             'mines': mines, 'minions': minions, 'blue_side_winrate': blue_side_winrate, 'red_side_winrate': red_side_winrate,
+             'afks': afks, 'afks_per_match': afks_per_match, 'great_karma': great_karma, 'crystal_sentries': crystal_sentries,
+             'gold_miners': gold_miners, 'lowest_player_lvl': lowest_player_lvl, 'surrendered': surrendered}
+
+    save_to_file(os.path.join(__location__, 'data/data.json'), hero_stats, facts)
+
+
+def update_tierlist():
+    app.logger.info("Update tierlist.json")
+    matches = db.session.query(Participant).all()
+    tierlist_lane = Counter()
+    tierlist_jungle = Counter()
+    tierlist_protector = Counter()
+
+    for m in matches:
+        _items = sorted(m.items)
+        if _items:
+            _items = ', '.join(_items)
+
+            buildpath = commons.hero_determine_buildpath(_items)
+            role = commons.hero_determine_role(_items, m.assists, m.kills, m.nonJungleMinionKills, m.jungleKills)
+
+            entry = (strings.heroes[m.actor], buildpath)
+
+            if role == "Lane":
+                tierlist_lane[entry] += 1
+            elif role == "Jungle":
+                tierlist_jungle[entry] += 1
+            else:
+                tierlist_protector[entry] += 1
+
+    save_to_file_tierlist(os.path.join(__location__, 'data/tierlist.json'), tierlist_lane.most_common(30),
+                                       tierlist_jungle.most_common(30), tierlist_protector.most_common(30))
+
+
+def update_winrates():
+    app.logger.info("Update winrates.json")
+    matches = db.session.query(Participant).all()
+    winrates_vs_heroes = {}
+    for m in matches:
+        hero = strings.heroes[m.actor].lower()
+
+        if hero not in winrates_vs_heroes:
+            winrates_vs_heroes[hero] = {}
+
+        roster = m.roster
+        for teammate in roster.participants:
+            tm_hero = strings.heroes[teammate.actor]
+            won = teammate.winner
+
+            if tm_hero in winrates_vs_heroes[hero]:
+                winrates_vs_heroes[hero][tm_hero]['total_with'] += 1
+                winrates_vs_heroes[hero][tm_hero]['won_with'] += won
+            else:
+                winrates_vs_heroes[hero][tm_hero] = {'total_with': 1, 'won_with': won, 'total_against': 0,
+                                                     'won_against': 0}
+
+        x = [i for i in m.roster.match.rosters if i.id != roster.id][0]
+        for enemy in x.participants:
+            enemy_hero = strings.heroes[enemy.actor]
+            won = enemy.winner
+
+            if enemy_hero in winrates_vs_heroes[hero]:
+                winrates_vs_heroes[hero][enemy_hero]['total_against'] += 1
+                winrates_vs_heroes[hero][enemy_hero]['won_against'] += won
+            else:
+                winrates_vs_heroes[hero][enemy_hero] = {'total_with': 0, 'won_with': 0, 'total_against': 1,
+                                                        'won_against': won}
+
+    for hero in winrates_vs_heroes.keys():
+        for teammate in winrates_vs_heroes[hero].keys():
+            total = winrates_vs_heroes[hero][teammate]['total_with']
+            won = winrates_vs_heroes[hero][teammate]['won_with']
+            if total > 0:
+                ratio = (won / total) * 100
+            else:
+                ratio = 0
+            winrates_vs_heroes[hero][teammate]['ratio_with'] = ratio
+
+        for enemy in winrates_vs_heroes[hero].keys():
+            total = winrates_vs_heroes[hero][enemy]['total_against']
+            won = winrates_vs_heroes[hero][enemy]['won_against']
+            if total > 0:
+                ratio = (won / total) * 100
+            else:
+                ratio = 0
+            winrates_vs_heroes[hero][enemy]['ratio_against'] = ratio
+
+    save_to_file_winrates(os.path.join(__location__, 'data/winrates_vs.json'), winrates_vs_heroes)
+
+
+def update_hero_details():
+    app.logger.info("Update hero_details.json")
+    hero_details = {}
+    games = Match.query.count()
+
+    for hero, actor in six.iteritems(strings.heroes_inv):
+        matches = db.session.query(Participant).filter_by(actor=actor).all()
+        playrate = (len(matches) / games) * 100
+        matches_won = 0
+        kda = {'assists': 0, 'deaths': 0, 'kills': 0}
+        cs = {'lane': 0, 'jungle': 0}
+        items = Counter()
+        builds = Counter()
+        teammates = Counter()
+        single_teammates = Counter()
+        enemies = Counter()
+        single_enemies = Counter()
+        skins = Counter()
+        roles_played = Counter()
+        buildpaths = Counter()
+        players = {}
+
+        for m in matches:
+            matches_won += m.winner
+            kda['assists'] += m.assists
+            kda['deaths'] += m.deaths
+            kda['kills'] += m.kills
+
+            cs['lane'] += m.nonJungleMinionKills
+            cs['jungle'] += m.jungleKills
+
+            skins[m.skinKey] += 1
+
+            # best players
+            p = m.player.name
+            if p in players:
+                players[p]['total'] += 1
+                players[p]['win'] += m.winner
+            else:
+                players[p] = {'total': 1, 'win': m.winner}
+
+            # common builds
+            _items = sorted(m.items)
+            if _items:
+                for i in _items:
+                    items[i] += 1
+                _items = ', '.join(_items)
+                builds[_items] += 1
+
+            _team = sorted([strings.heroes[x.actor] for x in m.roster.participants])
+
+            # common teammates
+            for i in _team:
+                if hero != i.lower():
+                    single_teammates[i] += 1
+
+            _team = ', '.join(_team)
+            if _team:
+                teammates[_team] += 1
+
+            # common enemies
+            r = m.roster
+            x = [i for i in m.roster.match.rosters if i.id != r.id][0]
+
+            _team = sorted([strings.heroes[x.actor] for x in x.participants])
+
+            for i in _team:
+                if hero != i.lower():
+                    single_enemies[i] += 1
+
+            _team = ', '.join(_team)
+            if _team:
+                enemies[_team] += 1
+
+            # roles played
+            role = commons.hero_determine_role(_items, m.assists, m.kills, m.nonJungleMinionKills, m.jungleKills)
+            roles_played[role] += 1
+
+            if _items:
+                buildpath = commons.hero_determine_buildpath(_items)
+                buildpaths[buildpath] += 1
+
+        threshold = 3
+        players2 = {}
+        for p, v in six.iteritems(players):
+            if v['total'] > threshold:
+                w = v['win'] / v['total'] * 100
+                players2[p] = {'total': v['total'], 'win': v['win'], 'ratio': w}
+
+        items = items.most_common(5)
+        builds = builds.most_common(5)
+        teammates = teammates.most_common(5)
+        players2 = sorted(six.iteritems(players2), key=lambda x: x[1]['ratio'], reverse=True)[:25]
+        skins = skins.most_common(5)
+        enemies = enemies.most_common(5)
+        single_enemies = single_enemies.most_common(10)
+        single_teammates = single_teammates.most_common(10)
+
+        hero_details[hero] = {'matches_played': len(matches), 'matches_won': matches_won, 'playrate': playrate,
+                              'kda': kda, 'items': items, 'builds': builds, 'players': players2,
+                              'teammates': teammates, 'skins': skins, 'enemies': enemies,
+                              'single_teammates': single_teammates, 'single_enemies': single_enemies, 'cs': cs,
+                              'roles_played': roles_played, 'buildpaths': buildpaths}
+
+    save_to_file_winrates(os.path.join(__location__, 'data/hero_details.json'), hero_details)
