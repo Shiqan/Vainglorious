@@ -1,3 +1,5 @@
+from __future__ import division
+
 import datetime
 import json
 import operator
