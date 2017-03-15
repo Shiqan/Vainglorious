@@ -442,7 +442,7 @@ def query_matches():
     max_limit = 5
     limit = 2000
     matches = []
-    for batch in range(1000, limit, max_limit):
+    for batch in range(0, limit, max_limit):
         try:
             response = api.matches(offset=batch, limit=max_limit, createdAtStart="{0}T00:00:00Z".format(get_yesterday("%Y-%m-%d")), createdAtEnd="{0}T00:00:00Z".format(get_today("%Y-%m-%d")), sort="-createdAt", gameMode="casual, ranked")
             matches.append(dict(response))

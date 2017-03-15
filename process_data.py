@@ -87,6 +87,7 @@ def process_batch_query(matches):
 
                 if (sum(skill)/len(skill)) > 25:
                     process_match(m)
+                    pprint.pprint(m['relationships']['assets']['data'])
 
                     for roster in m['relationships']['rosters']['data']:
                         roster_data = [i for i in batch['included'] if i['id'] == roster['id']]

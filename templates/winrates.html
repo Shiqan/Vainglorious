@@ -78,7 +78,7 @@
 								{% set roles = hero | lower | get_hero_roles %}
 								<div class="card mix {% for r in roles.split(',') %}{{ r | lower }}{% endfor %} {{hero}}" data-name="{{ hero | lower }}">
 									<div class="card-head">
-										<header class="text-primary"><img class="img-circle" src="/static/img/heroes/{{ hero | lower }}.png" width="50px" height="50px" alt="" /> {{ hero }}</header>
+										<header class="text-primary"><img class="img-circle" src="/static/img/heroes/{{ hero | lower }}.png" width="50px" height="50px" alt="" /> {{ hero | title }}</header>
 										<div class="tools">
 											<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
 										</div>

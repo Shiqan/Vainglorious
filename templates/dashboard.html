@@ -28,7 +28,7 @@
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-success no-margin">
 										<img class="pull-right text-success hero-icon" src="https://s-media-cache-ak0.pinimg.com/564x/9a/b8/a5/9ab8a5d52931e8528f617cb18f7fd483.jpg" width="75px" height="75px"/>
-										<strong id="games" class="text-xl"> {{ games }}</strong><br/>
+										<strong class="text-xl"> {{ games }}</strong><br/>
 										<span class="opacity-50">Vain Crystals destroyed</span>
 									</div>
 								</div>
@@ -49,7 +49,7 @@
 							<div class="card">
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-info no-margin">
-										<strong id="players" class="text-xl">{{ players }}</strong><br/>
+										<strong class="text-xl">{{ players }}</strong><br/>
 										<span class="opacity-50">Number of players </span>
 									</div>
 								</div>
@@ -60,19 +60,8 @@
 								<div class="card-body no-padding">
 									<div class="alert alert-callout alert-danger no-margin">
 										<img class="pull-right text-success hero-icon" src="http://i.imgur.com/2EPwPt7.jpg" width="75px" height="75px"/>
-										<strong id="krakens" class="text-xl">{{ krakens | format_number }}</strong><br/>
+										<strong class="text-xl">{{ krakens | format_number }}</strong><br/>
 										<span class="opacity-50">Krakens unleashed</span>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-md-3 col-sm-6">
-							<div class="card">
-								<div class="card-body no-padding">
-									<div class="alert alert-callout alert-warning no-margin">
-										<img class="pull-right hero-icon" src="/static/img/great_karma.png" width="75px" height="75px"/>
-										<strong class="text-xl">{{ great_karma }}</strong><br/>
-										<span class="opacity-50">Players with great Karma </span>
 									</div>
 								</div>
 							</div>
@@ -126,7 +115,17 @@
 							</div>
 						</div>
 
-
+						<div class="col-md-3 col-sm-6">
+							<div class="card">
+								<div class="card-body no-padding">
+									<div class="alert alert-callout alert-warning no-margin">
+										<img class="pull-right hero-icon" src="/static/img/great_karma.png" width="75px" height="75px"/>
+										<strong class="text-xl">{{ great_karma }}</strong><br/>
+										<span class="opacity-50">Players with great Karma </span>
+									</div>
+								</div>
+							</div>
+						</div>
 
 
 						<div class="col-md-3 col-sm-6">
@@ -186,8 +185,6 @@
 								</div>
 							</div>
 						</div>
-
-
 
 						<div class="col-md-3 col-sm-6">
 							<div class="card">
@@ -554,24 +551,6 @@
 <script src="/static/js/libs/slick.min.js"></script>
 <script>
 $(function() {
-	// CountUp
-	var options = {
-	  useEasing : true,
-	  useGrouping : true,
-	  separator : ',',
-	  decimal : '.',
-	  prefix : '',
-	  suffix : ''
-	};
-	var demo = new CountUp("games", 0, {{ games }}, 0, 2.5, options);
-	var demo1 = new CountUp("players", 0, {{ players }}, 0, 2.5, options);
-	var demo2 = new CountUp("krakens", 0, {{ krakens }}, 0, 2.5, options);
-	var demo3 = new CountUp("duration", 0, {{ '%0.2f'| format(duration | convert_time) }}, 0, 2.5, options);
-	demo.start();
-	demo1.start();
-	demo2.start();
-	demo3.start();
-
 	// Mixitup
 	var mixer = mixitup('#winrates', {
 		load: {
