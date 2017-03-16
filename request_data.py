@@ -6,7 +6,6 @@ import time
 import process_data
 from api import VaingloryApi
 from commons import get_yesterday, get_today
-from flask_app import app
 
 api_key = os.environ.get('API_KEY', None)
 print(api_key)
@@ -23,7 +22,7 @@ def samples():
 
 def query_matches():
     max_limit = 5
-    limit = 2000
+    limit = 1
     matches = []
     for batch in range(0, limit, max_limit):
         try:
@@ -34,15 +33,16 @@ def query_matches():
             matches.append(dict(response))
             limit -= max_limit
         except:
-            app.logger.info("Unexpected error:", sys.exc_info()[0])
+            print("Unexpected error:", sys.exc_info()[0])
 
         if limit % 50 == 0:
-            app.logger.info("time.sleep(60)")
+            print("time.sleep(60)")
             time.sleep(60)
 
     process_data.process_batch_query(matches)
 
 
 if __name__ == "__main__":
-    samples()
+    # samples()
+    query_matches()
     process_data.update_json_files()

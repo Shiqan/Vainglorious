@@ -39,6 +39,9 @@ def process_samples():
                 json_data = open(os.path.join(root, f), 'r').read()
                 m = json.loads(json_data)
                 if m['data']['attributes']['gameMode'] in ['ranked', 'casual']:
+                    pprint.pprint(
+                        [i for i in m['included'] if i['id'] == m['relationships']['assets']['data'][0]['id']][0]['attributes']['URL'])
+
                     skill = []
                     for roster in m['data']['relationships']['rosters']['data']:
                         roster_data = [i for i in m['included'] if i['id'] == roster['id']]
@@ -64,6 +67,15 @@ def process_samples():
                                 process_player(player_data[0])
 
                                 process_participant(participant_data[0], roster['id'])
+
+
+def download_telemetry(telemetry):
+    r = requests.get(telemetry['attributes']['URL'])
+    root = 'D:\\\\vainglory\\telemetry'
+    f = open(os.path.join(root, 'xxx.json'), 'w+')
+    json.dump(r.json(), f)
+    f.close()
+
 
 
 def process_telemetry():
@@ -92,6 +104,10 @@ def process_batch_query(matches):
         for m in batch['data']:
 
             if m['attributes']['gameMode'] in ['ranked', 'casual']:
+                pprint.pprint(m['relationships']['assets']['data'])
+                pprint.pprint([i for i in batch['included'] if i['id'] == m['relationships']['assets']['data'][0]['id']][0]['attributes']['URL'])
+                download_telemetry([i for i in batch['included'] if i['id'] == m['relationships']['assets']['data'][0]['id']][0])
+
                 skill = []
                 for roster in m['relationships']['rosters']['data']:
                     roster_data = [i for i in batch['included'] if i['id'] == roster['id']]
@@ -101,7 +117,6 @@ def process_batch_query(matches):
 
                 if (sum(skill)/len(skill)) > 25:
                     process_match(m)
-                    pprint.pprint(m['relationships']['assets']['data'])
 
                     for roster in m['relationships']['rosters']['data']:
                         roster_data = [i for i in batch['included'] if i['id'] == roster['id']]

@@ -90,3 +90,37 @@ quotes = [
     ("Phinn", "As long as I'm here i might as well kill you"),
     ("Phinn", "I'm mostly guilty by association")
 ]
+
+abilities = {
+    "*Adagio*": {"": "Gift of Fire", "": "Agent of Wrath", "": "Verse of Judgement"},
+    "*Alpha*": {"": "Prime Directive", "": "Core Charge", "": "Termniation Protocol"},
+    "*Ardan*": {"": "Vanguard", "": "Blood for Blood", "": "Gauntlet"},
+    "*Baron*": {"": "Porcupine Mortar", "": "Jump Jets", "": "Ion Cannon"},
+    "*Blackfeather*": {"": "Feints of Hearth", "": "On Point", "": "Rose Offensive"},
+    "*Catherine*": {"HERO_ABILITY_CATHERINE_ASSASSINS_CHARGE_NAME": "Merciless Pursuit", "HERO_ABILITY_CATHERINE_ARCANE_SHIELD_NAME": "Stormguard", "HERO_ABILITY_CATHERINE_DEADLY_GRACE_NAME": "Blast Tremor"},
+    "*Celeste*": {"HERO_ABILITY_CELESTE_A_NAME": "", "HERO_ABILITY_CELESTE_B_NAME": "", "HERO_ABILITY_CELESTE_C_NAME": ""},
+    "*Flicker*": {"HERO_ABILITY_HERO036_A_NAME": "", "HERO_ABILITY_HERO036_B_NAME": "", "HERO_ABILITY_HERO036_C_NAME": ""},
+    "*forttress*": {"": "", "": "", "": ""},
+    "*Glaive*": {"HERO_ABILITY_GLAIVE_AFTERBURN_NAME": "", "HERO_ABILITY_GLAIVE_TWISTED_STROKE_NAME": "", "": ""},
+     "*Gwen*": {"HERO_ABILITY_GWEN_A_NAME": "", "HERO_ABILITY_GWEN_B_NAME": "", "HERO_ABILITY_GWEN_C_NAME": ""},
+    "*Hero009*": {"": "", "": "", "": ""},
+    "*Hero010*": {"HERO_ABILITY_SKAARF_A_SPITFIRE": "", "HERO_ABILITY_SKAARF_B_GOOP": "", "HERO_ABILITY_SKAARF_C_DRAGON_BREATH": ""},
+    "*Hero016*": {"HERO_ABILITY_RONA_A_NAME": "", "HERO_ABILITY_RONA_B_NAME": "", "HERO_ABILITY_RONA_C_NAME": ""},
+    "*Idris*": {"HERO_ABILITY_IDRIS_A_NAME": "", "HERO_ABILITY_IDRIS_B_NAME": "", "HERO_ABILITY_IDRIS_C_NAME": ""},
+    "*Joule*": {"": "", "": "", "": ""},
+    "*Kestrel*": {"": "", "": "", "": ""},
+    "*Koshka*": {"HERO_ABILITY_KOSHKA_POUNCE_NAME": "", "HERO_ABILITY_KOSHKA_TWIRL_NAME": "", "HERO_ABILITY_KOSHKA_FRENZY_NAME": ""},
+    "*Lance*": {"": "", "": "", "": ""},
+    "*Lyra*": {"": "", "": "", "": ""},
+    "*Ozo*": {"": "", "": "", "": ""},
+    "*Petal*": {"": "", "": "", "": ""},
+    "*Phinn*": {"HERO_ABILITY_PHINN_A_NAME": "", "HERO_ABILITY_PHINN_B_NAME": "", "HERO_ABILITY_PHINN_C_NAME": ""},
+    "*Reim*": {"": "", "": "", "": ""},
+    "*Ringo*": {"HERO_ABILITY_RINGO_WING_CUT_NAME": "", "HERO_ABILITY_RINGO_TWIRLING_SILVER_NAME": "", "HERO_ABILITY_RINGO_HELLFIRE_SAKE_NAME": ""},
+    "*Samuel*": {"": "", "": "", "": ""},
+    "*SAW*": {"HERO_ABILITY_SAW_ROADIE_RUN_NAME": "", "HERO_ABILITY_SAW_SUPPRESSING_FIRE_NAME": "", "HERO_ABILITY_SAW_EXPLOSIVE_TIPPED_SHELLS_NAME": ""},
+    "*Sayoc*": {"": "", "": "", "": ""},
+    "*Skye*": {"": "", "": "", "": ""},
+    "*Vox*": {"": "", "": "", "": ""},
+    "*Grumpjaw*": {"HERO_ABILITY_GRUMPJAW_A_NAME": "", "HERO_ABILITY_GRUMPJAW_B_NAME": "", "": ""}
+}
