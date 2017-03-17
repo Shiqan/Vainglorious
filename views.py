@@ -15,6 +15,7 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 # ------------------
 
 @app.route('/')
+
 @app.route('/index/')
 def index():
     feeds = process_data.read_from_file(os.path.join(__location__, 'data/data.json'))
@@ -110,7 +111,7 @@ def view_hero(hero):
                            kda=kda, items=items, builds=builds, players=players,
                            teammates=teammates, skins=skins, enemies=enemies,
                            single_teammates=single_teammates, single_enemies=single_enemies, cs=cs,
-                           roles_played=roles_played, buildpaths=buildpaths, winrates=winrates)
+                           roles_played=roles_played, buildpaths=buildpaths, winrates=winrates, fact=fact)
 
 
 @app.route('/tierlist/')
@@ -140,6 +141,10 @@ def telemetry():
 def about():
     return render_template('about.html')
 
+
+@app.route('/fact/')
+def fact():
+    return render_template('fact.html')
 
 # ------------------
 # ERROR HANDLERS
