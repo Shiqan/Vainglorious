@@ -48,6 +48,8 @@ def process_samples():
                             skill.append(participant_data[0]['attributes']['stats']['skillTier'])
 
                     if (sum(skill) / len(skill)) > 25:
+                        download_telemetry(
+                            [i for i in m['included'] if i['id'] == m['data']['relationships']['assets']['data'][0]['id']][0], m['data']['id'])
                         process_match(m['data'])
 
                         for roster in m['data']['relationships']['rosters']['data']:
