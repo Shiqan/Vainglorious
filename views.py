@@ -1,9 +1,7 @@
-from __future__ import division
-
 import os
 
 from flask import render_template, request
-
+import pprint
 from commons import *
 import process_data
 import six
@@ -67,7 +65,7 @@ def index():
     sorted_winrate_stats = []
     for hero, stats in six.iteritems(winrate_stats):
         stats = sorted(six.iteritems(stats), key=lambda x: x[0])
-        sorted_winrate_stats.append((hero, stats))
+        sorted_winrate_stats.append((hero, stats[-7:]))
 
     return render_template('dashboard.html', games=games, players=players, potions=potions, krakens=krakens,
                            duration=duration, avg_duration=avg_duration, died_by_minions=died_by_minions,
@@ -104,6 +102,14 @@ def view_hero(hero):
     roles_played=hero_details['roles_played']
     buildpaths=hero_details['buildpaths']
 
+    total_actual_damage_dealt=hero_details['total_actual_damage_dealt']
+    max_actual_damage_dealt=hero_details['max_actual_damage_dealt']
+    turret_damage=hero_details['turret_damage']
+    kraken_damage=hero_details['kraken_damage']
+    ability_lvl=hero_details['ability_lvl']
+    ability_used=hero_details['ability_used']
+    ability_order=hero_details['ability_order']
+
     winrates = process_data.read_from_file(os.path.join(__location__, 'data/winrates_vs.json'))
     winrates = winrates[latest][hero]
 
@@ -111,7 +117,12 @@ def view_hero(hero):
                            kda=kda, items=items, builds=builds, players=players,
                            teammates=teammates, skins=skins, enemies=enemies,
                            single_teammates=single_teammates, single_enemies=single_enemies, cs=cs,
-                           roles_played=roles_played, buildpaths=buildpaths, winrates=winrates, fact=fact)
+                           roles_played=roles_played, buildpaths=buildpaths, winrates=winrates, fact=fact,
+                           total_actual_damage_dealt=total_actual_damage_dealt,
+                           max_actual_damage_dealt=max_actual_damage_dealt,
+                           turret_damage=turret_damage, kraken_damage=kraken_damage, ability_lvl=ability_lvl,
+                           ability_used=ability_used, ability_order=ability_order
+                           )
 
 
 @app.route('/tierlist/')

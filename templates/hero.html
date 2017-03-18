@@ -82,32 +82,24 @@
 				<div class="section-body no-margin">
 					<div class="row">
 						<div class="css-carousel2 col-xs-12">
-							<div class="col-md-3 col-sm-6">
-								<div class="card">
-									<div class="card-body no-padding">
-										<div class="alert alert-callout alert-success no-margin">
-											<strong class="text-xl"> Card </strong><br/>
-											<span class="opacity-50"> Card description </span>
+							{% for ability, n in ability_used.iteritems() %}
+								<div class="col-md-3 col-sm-6">
+									<div class="card">
+										<div class="card-body no-padding">
+											<div class="alert alert-callout alert-success no-margin">
+												<strong class="text-xl"> {{ n }} </strong><br/>
+												<span class="opacity-50"> {{ id_to_ability(hero, ability) }} </span>
+											</div>
 										</div>
 									</div>
 								</div>
-							</div>
+							{% endfor %}
 							<div class="col-md-3 col-sm-6">
 								<div class="card">
 									<div class="card-body no-padding">
 										<div class="alert alert-callout alert-warning no-margin">
-											<strong class="text-xl"> Card </strong><br/>
-											<span class="opacity-50"> Card description </span>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-3 col-sm-6">
-								<div class="card">
-									<div class="card-body no-padding">
-										<div class="alert alert-callout alert-info no-margin">
-											<strong class="text-xl"> Card </strong><br/>
-											<span class="opacity-50"> Card description </span>
+											<strong class="text-xl"> {{ turret_damage | format_number }} </strong><br/>
+											<span class="opacity-50"> Damage done to turrets </span>
 										</div>
 									</div>
 								</div>
@@ -116,8 +108,8 @@
 								<div class="card">
 									<div class="card-body no-padding">
 										<div class="alert alert-callout alert-danger no-margin">
-											<strong class="text-xl"> Card </strong><br/>
-											<span class="opacity-50"> Card description </span>
+											<strong class="text-xl"> {{ total_actual_damage_dealt | format_number }} </strong><br/>
+											<span class="opacity-50"> Total actual damage dealt</span>
 										</div>
 									</div>
 								</div>
@@ -125,9 +117,19 @@
 							<div class="col-md-3 col-sm-6">
 								<div class="card">
 									<div class="card-body no-padding">
-										<div class="alert alert-callout alert-success no-margin">
-											<strong class="text-xl"> Card </strong><br/>
-											<span class="opacity-50"> Card description </span>
+										<div class="alert alert-callout alert-info no-margin">
+											<strong class="text-xl"> {{ max_actual_damage_dealt | format_number }} </strong><br/>
+											<span class="opacity-50"> Most damage dealt with one attack</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-3 col-sm-6">
+								<div class="card">
+									<div class="card-body no-padding">
+										<div class="alert alert-callout alert-warning no-margin">
+											<strong class="text-xl"> {{ kraken_damage | format_number }} </strong><br/>
+											<span class="opacity-50"> Damage done to krakens </span>
 										</div>
 									</div>
 								</div>
@@ -231,6 +233,22 @@
 					</div>
 
 					<div class="row">
+						<div class="col-xs-12">
+							<div class="card">
+								<div class="card-head">
+									<header class="text-primary"> Abilities </header>
+									<div class="tools">
+										<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
+									</div>
+								</div>
+								<div class="card-body">
+									{{ ability_lvl }}
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
 						<!-- BEGIN BEST PLAYERS -->
 						<div class="col-lg-8 col-xs-12">
 							<h2>Best {{ hero|title }} players </h2>
@@ -257,6 +275,7 @@
 												<button type="button" class="btn btn-icon-toggle" data-toggle="tooltip" data-placement="top" data-original-title="vainsocial" data-url="https://alpha.vainsocial.com/players/eu/{{p}}"><i class="fa share-square"></i></button>
 												<button type="button" class="btn btn-icon-toggle" data-toggle="tooltip" data-placement="top" data-original-title="vain.gg" data-url="http://vain.gg/eu/{{p}}"><i class="fa fa-share-square-o"></i></button>
 												<button type="button" class="btn btn-icon-toggle" data-toggle="tooltip" data-placement="top" data-original-title="vgminer" data-url="http://www.vgminer.com/DataMine/PlayerData?playerName={{p}}&region=EU"><i class="fa fa-share"></i></button>
+												<button type="button" class="btn btn-icon-toggle" data-toggle="tooltip" data-placement="top" data-original-title="vainaura" data-url="https://vainaura.com/stats/index.php?userName={{p}}&region=eu"><i class="fa external-link"></i></button>
 											</td>
 										</tr>
 									{% endfor %}

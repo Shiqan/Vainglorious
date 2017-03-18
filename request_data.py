@@ -8,7 +8,6 @@ from api import VaingloryApi
 from commons import get_yesterday, get_today
 
 api_key = os.environ.get('API_KEY', None)
-print(api_key)
 api = VaingloryApi(api_key)
 
 
@@ -22,9 +21,9 @@ def samples():
 
 def query_matches():
     max_limit = 5
-    limit = 1
+    limit = 350
     matches = []
-    for batch in range(0, limit, max_limit):
+    for batch in range(100, limit, max_limit):
         try:
             response = api.matches(offset=batch, limit=max_limit,
                                    createdAtStart="{0}T00:00:00Z".format(get_yesterday("%Y-%m-%d")),
@@ -44,5 +43,6 @@ def query_matches():
 
 if __name__ == "__main__":
     # samples()
-    query_matches()
-    process_data.update_json_files()
+    # query_matches()
+    # process_data.update_json_files()
+    process_data.update_hero_details()

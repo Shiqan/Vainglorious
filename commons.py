@@ -63,6 +63,14 @@ def id_to_hero(id):
     return strings.heroes[id]
 
 
+@app.context_processor
+def id_to_ability():
+    def _id_to_ability(hero, ability):
+        return strings.abilities[strings.heroes_inv[hero]].get(ability, ability)
+    return dict(id_to_ability=_id_to_ability)
+
+
+
 @app.template_filter('format_number')
 def format_currency(value):
     return "{:,}".format(value)

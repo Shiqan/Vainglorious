@@ -1,23 +1,24 @@
 from __future__ import division
 
+import StringIO
 import datetime
 import json
 import operator
 import os
 import pprint
+import uuid
+import zipfile
 from collections import Counter
 
-import StringIO
 import requests
 import six
-import zipfile
 from sqlalchemy import func, case
 from sqlalchemy.exc import SQLAlchemyError
 
 import commons
 import strings
 from flask_app import app, db
-from models import Match, Roster, Participant, Player
+from models import Match, Roster, Participant, Player, Participant_Telemetry
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -39,9 +40,6 @@ def process_samples():
                 json_data = open(os.path.join(root, f), 'r').read()
                 m = json.loads(json_data)
                 if m['data']['attributes']['gameMode'] in ['ranked', 'casual']:
-                    pprint.pprint(
-                        [i for i in m['included'] if i['id'] == m['relationships']['assets']['data'][0]['id']][0]['attributes']['URL'])
-
                     skill = []
                     for roster in m['data']['relationships']['rosters']['data']:
                         roster_data = [i for i in m['included'] if i['id'] == roster['id']]
@@ -69,31 +67,140 @@ def process_samples():
                                 process_participant(participant_data[0], roster['id'])
 
 
-def download_telemetry(telemetry):
+def download_telemetry(telemetry, id):
     r = requests.get(telemetry['attributes']['URL'])
     root = 'D:\\\\vainglory\\telemetry'
-    f = open(os.path.join(root, 'xxx.json'), 'w+')
+    f = open(os.path.join(root, '{0}.json'.format(id)), 'w+')
     json.dump(r.json(), f)
     f.close()
 
 
-
-def process_telemetry():
-    app.logger.info("Process telemetry")
+def process_telemetry(match_id, actors=list()):
+    app.logger.info("Process telemetry {0} with {1}".format(match_id, actors))
     root = 'D:\\\\vainglory\\telemetry'
-    onlyfiles = [f for f in os.listdir(root) if os.path.isfile(os.path.join(root, f))]
+    json_data = open(os.path.join(root, match_id)+".json", 'r').read()
+    m = json.loads(json_data)
 
-    for file in onlyfiles:
-        json_data = []
-        with open(os.path.join(root, file), 'r') as f:
-            for line in f:
-                json_data.append(line)
+    stats = dict()
 
-        m = ', '.join(json_data)
-        json.load(m)
-        break
+    for i in actors:
+        side = i[2].split('/')[0].lower().title()
 
-    print(onlyfiles)
+        stats["{0}_{1}".format(i[1], side)] = {'ability_usage': {}, 'ability_order': [],
+                                               'total_damage_dealt': 0, 'total_actual_damage_dealt': 0,
+                                               'max_damage_dealt': 0, 'max_actual_damage_dealt': 0,
+                                               'kraken_damage': 0, 'turret_damage': 0,
+                                               'default_attacks': 0,
+                                               'item_damage': {},
+                                               'damage_to_heroes': {},
+                                               'actual_damage_to_heroes': {},
+                                               'damage_curve': [],
+                                               'item_bought': [],
+                                               'xp_curve': [],
+                                               'level_up': []
+                                               }
+
+    for row in m:
+        time = row['time']
+        if 'LearnAbility' == row['type']:
+            ability = row['payload']['Ability']
+            lvl = row['payload']['Level']
+            actor = row['payload']['Actor']
+            side = row['payload']['Team']
+
+            stats["{0}_{1}".format(actor, side)]['ability_order'].append((ability, lvl))
+            continue
+
+        if 'UseAbility' == row['type']:
+            ability = row['payload']['Ability']
+            actor = row['payload']['Actor']
+            side = row['payload']['Team']
+
+            if ability in stats["{0}_{1}".format(actor, side)]['ability_usage']:
+                stats["{0}_{1}".format(actor, side)]['ability_usage'][ability] += 1
+            else:
+                stats["{0}_{1}".format(actor, side)]['ability_usage'][ability] = 1
+            continue
+
+        if 'BuyItem' == row['type']:
+            actor = row['payload']['Actor']
+            side = row['payload']['Team']
+            item = row['payload']['Item']
+            stats["{0}_{1}".format(actor, side)]['item_bought'].append((time, item))
+            continue
+
+        if 'LevelUp' == row['type']:
+            actor = row['payload']['Actor']
+            side = row['payload']['Team']
+            level = row['payload']['Level']
+            stats["{0}_{1}".format(actor, side)]['level_up'].append((time, level))
+            continue
+
+        if 'EarnXP' == row['type']:
+            actor = row['payload']['Actor']
+            side = row['payload']['Team']
+            xp = row['payload']['Amount']
+            stats["{0}_{1}".format(actor, side)]['xp_curve'].append((time, xp))
+            continue
+
+        if 'DealDamage' == row['type']:
+            target = row['payload']['Target']
+            actor = row['payload']['Actor']
+            side = row['payload']['Team']
+            damage = row['payload']['Damage']
+            delt = row['payload']['Delt']
+            source = row['payload']['Source']
+
+            if target == "*Kraken_Jungle*" or target == "*Kraken_Captured*":
+                stats["{0}_{1}".format(actor, side)]['kraken_damage'] += delt
+
+            elif target == "*Turret*":
+                stats["{0}_{1}".format(actor, side)]['turret_damage'] += delt
+
+            elif target == "*PetalMinion*":
+                pass
+
+
+            elif row['payload']['IsHero']:
+
+                if target in stats["{0}_{1}".format(actor, side)]['damage_to_heroes']:
+                    stats["{0}_{1}".format(actor, side)]['damage_to_heroes'][target] += damage
+                else:
+                    stats["{0}_{1}".format(actor, side)]['damage_to_heroes'][target] = damage
+
+                if target in stats["{0}_{1}".format(actor, side)]['actual_damage_to_heroes']:
+                    stats["{0}_{1}".format(actor, side)]['actual_damage_to_heroes'][target] += delt
+                else:
+                    stats["{0}_{1}".format(actor, side)]['actual_damage_to_heroes'][target] = delt
+
+            else:
+                print(row['payload'])
+
+
+            stats["{0}_{1}".format(actor, side)]['total_damage_dealt'] += damage
+            stats["{0}_{1}".format(actor, side)]['total_actual_damage_dealt'] += delt
+
+            stats["{0}_{1}".format(actor, side)]['damage_curve'].append((time, damage))
+
+            if stats["{0}_{1}".format(actor, side)]['max_damage_dealt'] < damage:
+                stats["{0}_{1}".format(actor, side)]['max_damage_dealt'] = damage
+
+            if stats["{0}_{1}".format(actor, side)]['max_actual_damage_dealt'] < delt:
+                stats["{0}_{1}".format(actor, side)]['max_actual_damage_dealt'] = delt
+
+
+            if source.startswith("Buff_Item_"):
+                item = source.replace("Buff_Item_", "")
+
+                if target in stats["{0}_{1}".format(actor, side)]['item_damage']:
+                    stats["{0}_{1}".format(actor, side)]['item_damage'][item] += damage
+                else:
+                    stats["{0}_{1}".format(actor, side)]['item_damage'][item] = damage
+
+    for i in actors:
+        side = i[2].split('/')[0].lower().title()
+        process_participant_telemetry(stats["{0}_{1}".format(i[1], side)], i[0])
+
 
 
 
@@ -102,11 +209,8 @@ def process_batch_query(matches):
     for batch in matches:
         app.logger.info("Process {0} matches".format(len(batch['data'])))
         for m in batch['data']:
-
+            actors = []
             if m['attributes']['gameMode'] in ['ranked', 'casual']:
-                pprint.pprint(m['relationships']['assets']['data'])
-                pprint.pprint([i for i in batch['included'] if i['id'] == m['relationships']['assets']['data'][0]['id']][0]['attributes']['URL'])
-                download_telemetry([i for i in batch['included'] if i['id'] == m['relationships']['assets']['data'][0]['id']][0])
 
                 skill = []
                 for roster in m['relationships']['rosters']['data']:
@@ -116,6 +220,7 @@ def process_batch_query(matches):
                         skill.append(participant_data[0]['attributes']['stats']['skillTier'])
 
                 if (sum(skill)/len(skill)) > 25:
+                    download_telemetry([i for i in batch['included'] if i['id'] == m['relationships']['assets']['data'][0]['id']][0], m['id'])
                     process_match(m)
 
                     for roster in m['relationships']['rosters']['data']:
@@ -132,6 +237,12 @@ def process_batch_query(matches):
                             process_player(player_data[0])
 
                             process_participant(participant_data[0], roster['id'])
+
+                            participant_id = participant_data[0]['id']
+                            participant_actor = participant_data[0]['attributes']['actor']
+                            actors.append((participant_id, participant_actor, roster_data[0]['attributes']['stats']['side']))
+
+                    process_telemetry(m['id'], actors)
 
 
 def process_match(data):
@@ -213,6 +324,35 @@ def process_participant(data, roster_id):
             db.session.rollback()
             app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
 
+
+def process_participant_telemetry(data, participant_id):
+    test = db.session.query(Participant_Telemetry).filter_by(participant_id = participant_id).first()
+    if not test:
+        p = Participant_Telemetry(id=uuid.uuid4(), participant_id=participant_id,
+                                  total_damage_dealt=data['total_damage_dealt'],
+                                  total_actual_damage_dealt=data['total_actual_damage_dealt'],
+                                  max_damage_dealt=data['max_damage_dealt'],
+                                  max_actual_damage_dealt=data['max_actual_damage_dealt'],
+                                  kraken_damage=data['kraken_damage'],
+                                  turret_damage=data['turret_damage'],
+                                  default_attacks=data['default_attacks'],
+                                  damage_to_heroes=data['damage_to_heroes'],
+                                  actual_damage_to_heroes=data['actual_damage_to_heroes'],
+                                  ability_order=data['ability_order'],
+                                  ability_usage=data['ability_usage'],
+                                  item_damage=data['item_damage'],
+                                  damage_curve=data['damage_curve'],
+                                  xp_curve=data['xp_curve'],
+                                  item_bought=data['item_bought'],
+                                  level_up=data['level_up'])
+
+        db.session.add(p)
+
+        try:
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
 
 def process_player(data):
     test = db.session.query(Player).get(data['id'])
@@ -490,6 +630,18 @@ def update_hero_details():
         roles_played = Counter()
         buildpaths = Counter()
         players = {}
+        ability_order = Counter()
+        ability_lvl = Counter()
+        ability_used = Counter()
+
+        total_damage_dealt = 0
+        total_actual_damage_dealt = 0
+
+        max_damage_dealt = 0
+        max_actual_damage_dealt = 0
+
+        kraken_damage = 0
+        turret_damage = 0
 
         for m in matches:
             matches_won += m.winner
@@ -551,6 +703,33 @@ def update_hero_details():
                 buildpath = commons.hero_determine_buildpath(_items)
                 buildpaths[buildpath] += 1
 
+            # telemetry data
+            if m.telemetry:
+                total_damage_dealt += m.telemetry.total_damage_dealt
+                total_actual_damage_dealt += m.telemetry.total_actual_damage_dealt
+
+                if max_damage_dealt < m.telemetry.max_damage_dealt:
+                    max_damage_dealt = m.telemetry.max_damage_dealt
+
+                if max_actual_damage_dealt < m.telemetry.max_actual_damage_dealt:
+                    max_actual_damage_dealt = m.telemetry.max_actual_damage_dealt
+
+                kraken_damage += m.telemetry.kraken_damage
+                turret_damage += m.telemetry.turret_damage
+
+                ability_lvls = {}
+                _ability_order = []
+                for i in m.telemetry.ability_order:
+                    ability_lvls[i[0]] = i[1]
+                    _ability_order.append(i[0])
+
+                ability_order[', '.join(_ability_order)] += 1
+                ability_lvl[str(ability_lvls)] += 1
+
+                for ability, n in six.iteritems(m.telemetry.ability_usage):
+                    ability_used[ability] += n
+
+
         threshold = 3
         players2 = {}
         for p, v in six.iteritems(players):
@@ -567,10 +746,18 @@ def update_hero_details():
         single_enemies = single_enemies.most_common(10)
         single_teammates = single_teammates.most_common(10)
 
+        ability_lvl = ability_lvl.most_common(10)
+        ability_order = ability_order.most_common(10)
+
+
         hero_details[hero] = {'matches_played': len(matches), 'matches_won': matches_won, 'playrate': playrate,
                               'kda': kda, 'items': items, 'builds': builds, 'players': players2,
                               'teammates': teammates, 'skins': skins, 'enemies': enemies,
                               'single_teammates': single_teammates, 'single_enemies': single_enemies, 'cs': cs,
-                              'roles_played': roles_played, 'buildpaths': buildpaths}
+                              'roles_played': roles_played, 'buildpaths': buildpaths,
+                              'total_damage_dealt': total_damage_dealt, 'total_actual_damage_dealt': total_actual_damage_dealt,
+                              'max_damage_dealt': max_damage_dealt, 'max_actual_damage_dealt': max_actual_damage_dealt,
+                              'turret_damage': turret_damage, 'kraken_damage': kraken_damage, 'ability_lvl': ability_lvl,
+                              'ability_used': ability_used, 'ability_order': ability_order}
 
     save_to_file_winrates(os.path.join(__location__, 'data/hero_details.json'), hero_details)

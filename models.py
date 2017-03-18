@@ -78,10 +78,24 @@ class Match(db.Model):
     queue = db.Column(db.String(128))
 
     rosters = db.relationship("Roster", backref="match")
+    telemetry = db.relationship("Match_Telemetry", backref="match")
 
     def __init__(self, **kwargs):
         super(Match, self).__init__(**kwargs)
         # do custom initialization here
+
+
+class Match_Telemetry(db.Model):
+    __tablename__ = "match_telemetry"
+
+    id = db.Column(db.String(128), primary_key=True)
+    match_id = db.Column(db.String(128), db.ForeignKey("match.id"))
+
+    first_blood = db.Column(db.String(128))
+
+
+    def __init__(self, **kwargs):
+        super(Match_Telemetry, self).__init__(**kwargs)
 
 
 class Roster(db.Model):
@@ -138,7 +152,7 @@ class Participant(db.Model):
     level = db.Column(db.Integer)
     skillTier = db.Column(db.Integer)
 
-    telemetry = db.relationship("Participant_Telemetry", backref="participant")
+    telemetry = db.relationship("Participant_Telemetry", backref="participant", uselist=False)
 
     def __init__(self, **kwargs):
         super(Participant, self).__init__(**kwargs)
@@ -152,30 +166,28 @@ class Participant_Telemetry(db.Model):
     participant_id = db.Column(db.String(128), db.ForeignKey("participant.id"))
 
     total_damage_dealt = db.Column(db.Integer)
-    total_damage_received = db.Column(db.Integer)
+    total_actual_damage_dealt = db.Column(db.Integer)
 
     max_damage_dealt = db.Column(db.Integer)
-    max_damage_received = db.Column(db.Integer)
-
-    hero_damage_dealt = db.Column(db.Integer)
-    hero_damage_received = db.Column(db.Integer)
+    max_actual_damage_dealt = db.Column(db.Integer)
 
     kraken_damage = db.Column(db.Integer)
     turret_damage = db.Column(db.Integer)
 
     default_attacks = db.Column(db.Integer)
 
-    ability_a_lvl = db.Column(db.Integer)
-    ability_b_lvl = db.Column(db.Integer)
-    ability_c_lvl = db.Column(db.Integer)
+    damage_to_heroes = db.Column(db.PickleType)
+    actual_damage_to_heroes = db.Column(db.PickleType)
 
     ability_order = db.Column(db.PickleType)
-
-    ability_a_used = db.Column(db.Integer)
-    ability_b_used = db.Column(db.Integer)
-    ability_c_used = db.Column(db.Integer)
+    ability_usage = db.Column(db.PickleType)
 
     item_damage = db.Column(db.PickleType)
+
+    damage_curve = db.Column(db.PickleType)
+    xp_curve = db.Column(db.PickleType)
+    item_bought = db.Column(db.PickleType)
+    level_up = db.Column(db.PickleType)
 
     def __init__(self, **kwargs):
         super(Participant_Telemetry, self).__init__(**kwargs)
