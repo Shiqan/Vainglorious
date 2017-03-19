@@ -82,7 +82,6 @@ class Match(db.Model):
 
     def __init__(self, **kwargs):
         super(Match, self).__init__(**kwargs)
-        # do custom initialization here
 
 
 class Match_Telemetry(db.Model):
@@ -115,7 +114,6 @@ class Roster(db.Model):
 
     def __init__(self, **kwargs):
         super(Roster, self).__init__(**kwargs)
-        # do custom initialization here
 
 class Participant(db.Model):
     __tablename__ = "participant"
@@ -156,7 +154,6 @@ class Participant(db.Model):
 
     def __init__(self, **kwargs):
         super(Participant, self).__init__(**kwargs)
-        # do custom initialization here
 
 
 class Participant_Telemetry(db.Model):
@@ -210,4 +207,3 @@ class Player(db.Model):
 
     def __init__(self, **kwargs):
         super(Player, self).__init__(**kwargs)
-        # do custom initialization here

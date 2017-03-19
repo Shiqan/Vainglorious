@@ -39,6 +39,7 @@ def process_samples():
             if f.lower().endswith((".json")):
                 json_data = open(os.path.join(root, f), 'r').read()
                 m = json.loads(json_data)
+                actors = []
                 if m['data']['attributes']['gameMode'] in ['ranked', 'casual']:
                     skill = []
                     for roster in m['data']['relationships']['rosters']['data']:
@@ -47,9 +48,10 @@ def process_samples():
                             participant_data = [i for i in m['included'] if i['id'] == participant['id']]
                             skill.append(participant_data[0]['attributes']['stats']['skillTier'])
 
-                    if (sum(skill) / len(skill)) > 25:
-                        download_telemetry(
-                            [i for i in m['included'] if i['id'] == m['data']['relationships']['assets']['data'][0]['id']][0], m['data']['id'])
+                    if (sum(skill) / len(skill)) > 26:
+                        if m['data']['relationships']['assets']['data']:
+                            download_telemetry(
+                                [i for i in m['included'] if i['id'] == m['data']['relationships']['assets']['data'][0]['id']][0], m['data']['id'])
                         process_match(m['data'])
 
                         for roster in m['data']['relationships']['rosters']['data']:
@@ -68,6 +70,13 @@ def process_samples():
 
                                 process_participant(participant_data[0], roster['id'])
 
+                                participant_id = participant_data[0]['id']
+                                participant_actor = participant_data[0]['attributes']['actor']
+                                actors.append(
+                                    (participant_id, participant_actor, roster_data[0]['attributes']['stats']['side']))
+
+                        process_telemetry(m['data']['id'], actors)
+
 
 def download_telemetry(telemetry, id):
     r = requests.get(telemetry['attributes']['URL'])
@@ -80,6 +89,10 @@ def download_telemetry(telemetry, id):
 def process_telemetry(match_id, actors=list()):
     app.logger.info("Process telemetry {0} with {1}".format(match_id, actors))
     root = 'D:\\\\vainglory\\telemetry'
+
+    if not os.path.isfile(os.path.join(root, match_id+".json")):
+        return
+
     json_data = open(os.path.join(root, match_id)+".json", 'r').read()
     m = json.loads(json_data)
 
@@ -725,6 +738,8 @@ def update_hero_details():
                     ability_lvls[i[0]] = i[1]
                     _ability_order.append(i[0])
 
+                ability_lvls = sorted(six.iteritems(ability_lvls))
+                print(ability_lvls)
                 ability_order[', '.join(_ability_order)] += 1
                 ability_lvl[str(ability_lvls)] += 1
 
@@ -748,7 +763,7 @@ def update_hero_details():
         single_enemies = single_enemies.most_common(10)
         single_teammates = single_teammates.most_common(10)
 
-        ability_lvl = ability_lvl.most_common(10)
+        ability_lvl = ability_lvl.most_common(3)
         ability_order = ability_order.most_common(10)
 
 

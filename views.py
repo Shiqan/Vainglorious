@@ -106,9 +106,10 @@ def view_hero(hero):
     max_actual_damage_dealt=hero_details['max_actual_damage_dealt']
     turret_damage=hero_details['turret_damage']
     kraken_damage=hero_details['kraken_damage']
-    ability_lvl=hero_details['ability_lvl']
+    ability_lvl=[(eval(i[0]), i[1]) for i in (hero_details['ability_lvl'])]
     ability_used=hero_details['ability_used']
     ability_order=hero_details['ability_order']
+    abilities = [i for i in ability_used.keys() if i != "Withdraw"]
 
     winrates = process_data.read_from_file(os.path.join(__location__, 'data/winrates_vs.json'))
     winrates = winrates[latest][hero]
@@ -121,7 +122,7 @@ def view_hero(hero):
                            total_actual_damage_dealt=total_actual_damage_dealt,
                            max_actual_damage_dealt=max_actual_damage_dealt,
                            turret_damage=turret_damage, kraken_damage=kraken_damage, ability_lvl=ability_lvl,
-                           ability_used=ability_used, ability_order=ability_order
+                           ability_used=ability_used, ability_order=ability_order, abilities=abilities
                            )
 
 

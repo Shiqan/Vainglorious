@@ -83,16 +83,19 @@
 					<div class="row">
 						<div class="css-carousel2 col-xs-12">
 							{% for ability, n in ability_used.iteritems() %}
+								{% if ability != "Withdraw" %}
 								<div class="col-md-3 col-sm-6">
 									<div class="card">
 										<div class="card-body no-padding">
 											<div class="alert alert-callout alert-success no-margin">
+												<img class="pull-right img-circle" src="/static/img/abilities/{{ id_to_ability_img(hero, ability) }}" width="75px" height="75px"/>
 												<strong class="text-xl"> {{ n }} </strong><br/>
 												<span class="opacity-50"> {{ id_to_ability(hero, ability) }} </span>
 											</div>
 										</div>
 									</div>
 								</div>
+								{% endif %}
 							{% endfor %}
 							<div class="col-md-3 col-sm-6">
 								<div class="card">
@@ -242,7 +245,54 @@
 									</div>
 								</div>
 								<div class="card-body">
-									{{ ability_lvl }}
+									<div class="col-sm-6 col-xs-12">
+										{% for ability_upgrades in ability_lvl %}
+											<ul class="list divider-full-bleed">
+												{% for i in abilities %}
+													<li class="tile">
+														<a class="tile-content ink-reaction">
+															<div class="tile-icon">
+																<img src="/static/img/abilities/{{ id_to_ability_img(hero, i) }}" alt="">
+															</div>
+															<div class="tile-text">{{ id_to_ability(hero, i) }}</div>
+														</a>
+														{% for j in ability_upgrades[0] %}
+															{% if i == j[0] %}
+																<a class="btn btn-flat ink-reaction">
+																	<span> {{ j[1] }} </span>
+																</a>
+															{% endif %}
+														{% endfor %}
+													</li>
+												{% endfor %}
+											</ul>
+											<br>
+										{% endfor %}
+									</div>
+									<div class="col-sm-6 col-xs-12">
+										{# ability_order #}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-sm-6 col-xs-12">
+							<div class="card">
+								<div class="card-head">
+									<header class="text-primary"> Power Spikes </header>
+									<div class="tools">
+										<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
+									</div>
+								</div>
+								<div class="card-body">
+									<div class="col-sm-6 col-xs-12">
+										damage curve
+									</div>
+									<div class="col-sm-6 col-xs-12">
+										xp curve
+									</div>
 								</div>
 							</div>
 						</div>
@@ -272,10 +322,10 @@
 											<td> {{ v['win'] }} </td>
 											<td> {{'%0.2f'| format(v['ratio'])}}% </td>
 											<td class="text-right">
-												<button type="button" class="btn btn-icon-toggle" data-toggle="tooltip" data-placement="top" data-original-title="vainsocial" data-url="https://alpha.vainsocial.com/players/eu/{{p}}"><i class="fa share-square"></i></button>
+												<button type="button" class="btn btn-icon-toggle" data-toggle="tooltip" data-placement="top" data-original-title="vainsocial" data-url="https://alpha.vainsocial.com/players/eu/{{p}}"><i class="fa fa-share-square"></i></button>
 												<button type="button" class="btn btn-icon-toggle" data-toggle="tooltip" data-placement="top" data-original-title="vain.gg" data-url="http://vain.gg/eu/{{p}}"><i class="fa fa-share-square-o"></i></button>
 												<button type="button" class="btn btn-icon-toggle" data-toggle="tooltip" data-placement="top" data-original-title="vgminer" data-url="http://www.vgminer.com/DataMine/PlayerData?playerName={{p}}&region=EU"><i class="fa fa-share"></i></button>
-												<button type="button" class="btn btn-icon-toggle" data-toggle="tooltip" data-placement="top" data-original-title="vainaura" data-url="https://vainaura.com/stats/index.php?userName={{p}}&region=eu"><i class="fa external-link"></i></button>
+												<button type="button" class="btn btn-icon-toggle" data-toggle="tooltip" data-placement="top" data-original-title="vainaura" data-url="https://vainaura.com/stats/index.php?userName={{p}}&region=eu"><i class="fa fa-external-link"></i></button>
 											</td>
 										</tr>
 									{% endfor %}
@@ -284,18 +334,29 @@
 						</div>
 						<!-- END BEST PLAYERS -->
 
-						<div class="col-lg-offset-1 col-lg-3 col-xs-12">
-							<div class="card">
-								<div id="roles" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+						<div class="col-lg-offset-1 col-lg-3">
+							<div class="col-lg-12 col-md-6 col-xs-12">
+								<div class="card">
+									<div id="roles" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+								</div>
 							</div>
-							<div class="card">
-								<div id="buildpath" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+
+							<div class="col-lg-12 col-md-6 col-xs-12">
+								<div class="card">
+									<div id="buildpath" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+								</div>
 							</div>
-							<div class="card">
-								<div id="skins" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+
+							<div class="col-lg-12 col-md-6 col-xs-12">
+								<div class="card">
+									<div id="skins" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+								</div>
 							</div>
-							<div class="card">
-								<div id="cs" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+
+							<div class="col-lg-12 col-sm-6 col-xs-12">
+								<div class="card">
+									<div id="cs" class="height-6" data-colors="#9C27B0,#2196F3,#0aa89e,#FF9800"></div>
+								</div>
 							</div>
 						</div>
 					</div>

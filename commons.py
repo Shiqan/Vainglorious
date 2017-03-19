@@ -64,10 +64,12 @@ def id_to_hero(id):
 
 
 @app.context_processor
-def id_to_ability():
-    def _id_to_ability(hero, ability):
+def jinja_functions():
+    def id_to_ability(hero, ability):
         return strings.abilities[strings.heroes_inv[hero]].get(ability, ability)
-    return dict(id_to_ability=_id_to_ability)
+    def id_to_ability_img(hero, ability):
+        return strings.abilities_img[strings.heroes_inv[hero]].get(ability, ability)
+    return dict(id_to_ability=id_to_ability, id_to_ability_img=id_to_ability_img)
 
 
 
