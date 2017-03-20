@@ -83,7 +83,7 @@
 					<div class="row">
 						<div class="css-carousel2 col-xs-12">
 							{% for ability, n in ability_used.iteritems() %}
-								{% if ability != "Withdraw" %}
+								{% if ability in abilities %}
 								<div class="col-md-3 col-sm-6">
 									<div class="card">
 										<div class="card-body no-padding">

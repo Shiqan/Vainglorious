@@ -739,7 +739,6 @@ def update_hero_details():
                     _ability_order.append(i[0])
 
                 ability_lvls = sorted(six.iteritems(ability_lvls))
-                print(ability_lvls)
                 ability_order[', '.join(_ability_order)] += 1
                 ability_lvl[str(ability_lvls)] += 1
 

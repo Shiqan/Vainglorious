@@ -109,7 +109,7 @@ def view_hero(hero):
     ability_lvl=[(eval(i[0]), i[1]) for i in (hero_details['ability_lvl'])]
     ability_used=hero_details['ability_used']
     ability_order=hero_details['ability_order']
-    abilities = [i for i in ability_used.keys() if i != "Withdraw"]
+    abilities = strings.abilities[strings.heroes_inv[hero]].keys() # TODO combine the different ability names...
 
     winrates = process_data.read_from_file(os.path.join(__location__, 'data/winrates_vs.json'))
     winrates = winrates[latest][hero]

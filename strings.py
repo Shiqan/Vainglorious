@@ -158,3 +158,20 @@ abilities_img = {
     "*Vox*": {"HERO_ABILITY_VOX_A_NAME": "vox_a.png", "HERO_ABILITY_VOX_B_NAME": "vox_b.png", "HERO_ABILITY_VOX_C_NAME": "vox_c.png"},
     "*Grumpjaw*": {"HERO_ABILITY_GRUMPJAW_A_NAME": "grumpjaw_a.png", "HERO_ABILITY_GRUMPJAW_B_NAME": "grumpjaw_b.png", "HERO_ABILITY_GRUMPJAW_C_NAME": "grumpjaw_c.png"}
 }
+
+non_heroes = {
+    "*JungleMinion_GoldMiner*": "Gold Miner",
+    "*JungleMinion_CrystalMiner*" : "Crystal Miner",
+    "*Neutral_JungleMinion_DefaultBig*": "Back Minion",
+    "*Neutral_JungleMinion_DefaultSmall*": "Shop Minion",
+    "*JungleMinion_TreeEnt*": " Treant",
+    "*LeadMinion*": "Lane Lead Minion",
+    "*TankMinion*": "Lane Tank Minion",
+    "*RangedMinion*" : "Lane Ranged Minion",
+    "*Kraken_Captured*": "Captured Kraken",
+    "*Kraken_Jungle*" : "Kraken",
+    "*Turret*" : "Turret",
+    "*VainTurret*" : "Vain Turret",
+    "*VainCrystalAway*": "Vain Crystal",
+    "*FortressMinion*" : "Fortress Wolf"
+    }

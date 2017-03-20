@@ -16,7 +16,7 @@
 					<div class="col-xs-12">
 						<div class="card">
 							<div class="card-head">
-								<header class="text-primary">Testing telemetry map</header>
+								<header class="text-primary">Testing heatmap</header>
 								<div class="tools">
 									<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
 								</div>
@@ -138,7 +138,15 @@ function transformY(y) {
 
 // Add a jquery ui slider and interact with it
 $(document).ready(function () {
-	drawHeatmap();
+	var imageObj = new Image();
+    imageObj.onload = function() {
+
+		// Add the image to the canvas
+		context.drawImage(imageObj, 0, 0, width, height);
+		drawHeatmap();
+    };
+    imageObj.src = '/static/img/vainglory-map.png';
+
 });
 
 </script>
