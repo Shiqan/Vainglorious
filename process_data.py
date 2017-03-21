@@ -79,11 +79,15 @@ def process_samples():
 
 
 def download_telemetry(telemetry, id):
-    r = requests.get(telemetry['attributes']['URL'])
-    root = 'D:\\\\vainglory\\telemetry'
-    f = open(os.path.join(root, '{0}.json'.format(id)), 'w+')
-    json.dump(r.json(), f)
-    f.close()
+    try:
+        r = requests.get(telemetry['attributes']['URL'])
+        root = 'D:\\\\vainglory\\telemetry'
+        f = open(os.path.join(root, '{0}.json'.format(id)), 'w+')
+        json.dump(r.json(), f)
+        f.close()
+    except Exception as e:
+        app.logger.error("Error when downloading telemetry for match {0}: {1}".format(id, e))
+        return
 
 
 def process_telemetry(match_id, actors=list()):
