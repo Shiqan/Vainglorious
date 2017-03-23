@@ -7,9 +7,10 @@ appname = "Vainglorious Meta"
 app = Flask(__name__)
 db = SQLAlchemy(app)
 
-cache = Cache(app,config={'CACHE_TYPE': 'simple'})
+cache = Cache(config={'CACHE_TYPE': 'simple'})
 
 app.config.from_object('config.DevelopmentConfig')
+cache.init_app(app)
 # app.config.from_object('config.ProductionConfig')
 # app.config.from_envvar('YOURAPPLICATION_SETTINGS  ')
 app.secret_key = 'anotherplaintextpasswordftw'

@@ -11,31 +11,66 @@
 		<section>
 
 			<div class="section-body">
+				<div class="container">
+							<h2 class="text-light text-center">Heatmaps Proof of Concept</h2>
+							<br>
 
-				<div class="row">
-					<div class="col-xs-12">
-						<div class="card">
-							<div class="card-head">
-								<header class="text-primary">Testing heatmap</header>
-								<div class="tools">
-									<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
-								</div>
-							</div>
-							<div class="card-body heatmap">
-								<canvas class="heatmap-canvas" id="telemtry_map" width="840" height="400"></canvas>
-							</div>
+							<!-- BEGIN FIXED TIMELINE -->
+							<ul class="timeline collapse-lg timeline-hairline">
+								<li class="timeline-inverted">
+									<div class="timeline-circ circ-xl style-primary"><i class="fa fa-dot-circle-o"></i></div>
+									<div class="timeline-entry">
+										<div class="card style-default-bright">
+											<div class="card-body small-padding">
+												<img class="img-circle img-responsive pull-left width-1" src="../../assets/img/avatar9.jpg?1404026744" alt="">
+												<span class="text-medium"> First <span class="text-primary"> 4 minutes</span></span><br>
+												<span class="opacity-50">
+
+												</span>
+											</div><!--end .card-body -->
+											<div class="card-body telemtry_map">
+												<canvas class="heatmap-canvas" id="telemtry_map" width="840" height="400"></canvas>
+											</div>
+										</div><!--end .card -->
+									</div><!--end .timeline-entry -->
+								</li>
+								<li>
+									<div class="timeline-circ circ-xl style-accent"><i class="fa fa-heartbeat"></i></div>
+									<div class="timeline-entry">
+										<div class="card style-default-bright">
+											<div class="card-body small-padding">
+												<img class="img-circle img-responsive pull-left width-1" src="../../assets/img/avatar7.jpg?1404026721" alt="">
+												<span class="text-medium"> Jungle <span class="text-primary"> intensified </span></span><br>
+												<span class="opacity-50">
+
+												</span>
+											</div><!--end .card-body -->
+											<div class="card-body telemtry_map2">
+												<canvas class="heatmap-canvas" id="telemtry_map2" width="840" height="400"></canvas>
+											</div><!--end .card-body -->
+										</div><!--end .card -->
+									</div><!--end .timeline-entry -->
+								</li>
+								<li>
+									<div class="timeline-circ circ-xl style-default-dark"><i class="fa fa-globe"></i></div>
+									<div class="timeline-entry">
+										<div class="card style-default-dark">
+											<div class="card-body small-padding">
+												<img class="img-circle img-responsive pull-left width-1" src="../../assets/img/avatar7.jpg?1404026721" alt="">
+												<span class="text-medium"> Kraken <span class="text-primary"> awakened </span></span><br>
+												<span class="opacity-50">
+												</span>
+											</div><!--end .card-body -->
+											<div class="card-body telemtry_map3">
+												<canvas class="heatmap-canvas" id="telemtry_map3" width="840" height="400"></canvas>
+											</div><!--end .card-body -->
+										</div><!--end .card -->
+									</div><!--end .timeline-entry -->
+								</li>
+							</ul>
+							<!-- END FIXED TIMELINE -->
+
 						</div>
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="col-md-12">
-						<div id="timeline"></div>
-					</div>
-      			</div>
-
-				<div id="results"></div>
-				<div id="event_container" class="hide"></div>
 			</div>
 
 
@@ -51,18 +86,11 @@
 <script src="/static/js/libs/heatmap.min.js"></script>
 
 <script>
-var heatmapInstance = h337.create({
-  // only container is required, the rest will be defaults
-  container: document.querySelector('.heatmap')
-});
 
-
-// now generate some random data
 var points = [];
 var max = 0;
 var width = 840;
 var height = 400;
-var len=200;
 
 var container = "telemtry_map";
 var canvas = document.getElementById(container);
@@ -72,11 +100,19 @@ var context = canvas.getContext('2d');
 var radius = 6;
 var minion_radius = 4;
 
-function drawHeatmap() {
+start_time = new Date(data[0].time).getTime() / 1000
+end_time = new Date(data.slice(-1)[0].time).getTime() / 1000
+
+function drawHeatmap(context, heatmapInstance, timespan) {
 	for (i = 0; i < data.length; i++) {
 		item = data[i];
 
-		if (item.type == "KillActor" || item.type == "NPCkillNPC" ) {
+		var time = new Date(item.time).getTime() / 1000;
+		// calculate the time difference
+		var diffMs = (time - start_time);
+		var diffMins = Math.floor(diffMs/60);
+
+		if (diffMins < timespan && (item.type == "KillActor" || item.type == "NPCkillNPC") ) {
 			x = transformX(item.payload.Position[0]);
 			y = transformY(item.payload.Position[2]);
 
@@ -86,8 +122,6 @@ function drawHeatmap() {
 				context.fillStyle = 'black';
 				context.fill();
 				context.stroke();
-
-				console.log(x,y);
 
 				var val = Math.floor(Math.random()*100);
 				max = Math.max(max, val);
@@ -104,7 +138,7 @@ function drawHeatmap() {
 				context.fill();
 				context.stroke();
 
-				var val = Math.floor(Math.random()*100);
+				var val = Math.floor(Math.random()*timespan);
 				max = Math.max(max, val);
 				var point = {
 					x: x,
@@ -138,14 +172,30 @@ function transformY(y) {
 
 // Add a jquery ui slider and interact with it
 $(document).ready(function () {
-	var imageObj = new Image();
-    imageObj.onload = function() {
+	var containers = {telemtry_map: 4, telemtry_map2: 15, telemtry_map3: 999};
 
-		// Add the image to the canvas
-		context.drawImage(imageObj, 0, 0, width, height);
-		drawHeatmap();
-    };
-    imageObj.src = '/static/img/vainglory-map.png';
+	$.each(containers, function (key, val) {
+		var canvas = document.getElementById(key);
+		var context = canvas.getContext('2d');
+
+		var heatmapInstance = h337.create({
+		  // only container is required, the rest will be defaults
+		  container: document.querySelector('.'+key)
+		});
+
+		console.log("#"+key);
+
+		var imageObj = new Image();
+    	imageObj.onload = function() {
+			// Add the image to the canvas
+			context.drawImage(imageObj, 0, 0, width, height);
+			drawHeatmap(context, heatmapInstance, val);
+		};
+    	imageObj.src = '/static/img/vainglory-map.png';
+	});
+
+
+
 
 });
 

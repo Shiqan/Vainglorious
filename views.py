@@ -5,6 +5,7 @@ import pprint
 from commons import *
 import process_data
 import six
+from flask_app import cache
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -12,8 +13,9 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 # METHODS
 # ------------------
 
-@app.route('/')
 
+@cache.memoize()
+@app.route('/')
 @app.route('/index/')
 def index():
     feeds = process_data.read_from_file(os.path.join(__location__, 'data/data.json'))
@@ -77,6 +79,7 @@ def index():
                            gold_miners=gold_miners, lowest_player_lvl=lowest_player_lvl, surrendered=surrendered)
 
 
+@cache.memoize()
 @app.route('/hero/<hero>/')
 def view_hero(hero):
     app.logger.info(hero)
@@ -126,6 +129,7 @@ def view_hero(hero):
                            )
 
 
+@cache.memoize()
 @app.route('/tierlist/')
 def tierlist():
     tierlist = process_data.read_from_file(os.path.join(__location__, 'data/tierlist.json'))
@@ -136,6 +140,7 @@ def tierlist():
     return render_template('tierlist.html', tierlist=tierlist)
 
 
+@cache.memoize()
 @app.route('/winrates/')
 def winrates():
     winrates = process_data.read_from_file(os.path.join(__location__, 'data/winrates_vs.json'))

@@ -20,3 +20,4 @@ class DevelopmentConfig(Config):
         hostname="localhost:3306",
         databasename="vainglory"
     )
+    CACHE_TYPE = "null"
