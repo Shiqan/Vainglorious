@@ -142,7 +142,7 @@ abilities_img = {
     "*Hero016*": {"HERO_ABILITY_RONA_A_NAME": "rona_a.png", "HERO_ABILITY_RONA_B_NAME": "rona_b.png", "HERO_ABILITY_RONA_C_NAME": "rona_c.png"},
     "*Idris*": {"HERO_ABILITY_IDRIS_A_NAME": "idris_a.png", "HERO_ABILITY_IDRIS_B_NAME": "idris_b.png", "HERO_ABILITY_IDRIS_C_NAME": "idris_c.png"},
     "*Joule*": {"HERO_ABILITY_JOULE_RHAPSODY_CANNONS": "joule_a.jpg", "HERO_ABILITY_JOULE_RHAPSODY_POWERSLIDE": "joule_b.jpg", "HERO_ABILITY_JOULE_ORBITAL_NUKE": "joule_c.jpg"},
-    "*Kestrel*": {"HERO_ABILITY_KESTREL_A_NAME": "kestrel_a.png", "HERO_ABILITY_KESTREL_B_NAME": "kestrel_b.png", "HERO_ABILITY_KESTREL_C_NAME": "kestrel_c.png"},
+    "*Kestrel*": {"HERO_ABILITY_KESTREL_A_NAME": "kestrel_a.jpg", "HERO_ABILITY_KESTREL_B_NAME": "kestrel_b.jpg", "HERO_ABILITY_KESTREL_C_NAME": "kestrel_c.jpg"},
     "*Koshka*": {"HERO_ABILITY_KOSHKA_POUNCE_NAME": "koshka_a.png", "HERO_ABILITY_KOSHKA_TWIRL_NAME": "koshka_b.png", "HERO_ABILITY_KOSHKA_FRENZY_NAME": "koshka_c.png"},
     "*Lance*": {"HERO_ABILITY_LANCE_A_NAME": "lance_a.png", "HERO_ABILITY_LANCE_B_NAME": "lance_b.png", "HERO_ABILITY_LANCE_C_NAME": "lance_c.png"},
     "*Lyra*": {"HERO_ABILITY_LYRA_A_NAME": "lyra_a.png", "HERO_ABILITY_LYRA_B_NAME": "lyra_b.png", "HERO_ABILITY_LYRA_C_NAME": "lyra_c.png"},
