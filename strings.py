@@ -96,7 +96,7 @@ abilities = {
     "*Alpha*": {"HERO_ABILITY_ALPHA_A_NAME": "Prime Directive", "HERO_ABILITY_ALPHA_B_NAME": "Core Charge", "HERO_ABILITY_ALPHA_C_NAME": "Termniation Protocol"},
     "*Ardan*": {"HERO_ABILITY_ARDAN_A": "Vanguard", "HERO_ABILITY_ARDAN_B": "Blood for Blood", "HERO_ABILITY_ARDAN_C": "Gauntlet"},
     "*Baron*": {"HERO_ABILITY_BARON_A_NAME": "Porcupine Mortar", "HERO_ABILITY_BARON_B_NAME": "Jump Jets", "HERO_ABILITY_BARON_C_NAME": "Ion Cannon"},
-    "*Blackfeather*": {"HERO_ABILITY_HERO021_A_NAME": "Feints of Hearth", "HERO_ABILITY_HERO021_B_NAME": "On Point", "HERO_ABILITY_HERO021_C_NAME": "Rose Offensive"},
+    "*Blackfeather*": {"HERO_ABILITY_HERO021_A_NAME": "Feint of Hearth", "HERO_ABILITY_HERO021_B_NAME": "On Point", "HERO_ABILITY_HERO021_C_NAME": "Rose Offensive"},
     "*Catherine*": {"HERO_ABILITY_CATHERINE_ASSASSINS_CHARGE_NAME": "Merciless Pursuit", "HERO_ABILITY_CATHERINE_ARCANE_SHIELD_NAME": "Stormguard", "HERO_ABILITY_CATHERINE_DEADLY_GRACE_NAME": "Blast Tremor"},
     "*Celeste*": {"HERO_ABILITY_CELESTE_A_NAME": "Heliogenesis", "HERO_ABILITY_CELESTE_B_NAME": "Core Collapse", "HERO_ABILITY_CELESTE_C_NAME": "Solar Storm"},
     "*Flicker*": {"HERO_ABILITY_HERO036_A_NAME": "Binding Light", "HERO_ABILITY_HERO036_B_NAME": "Fairy Dust", "HERO_ABILITY_HERO036_C_NAME": "Mooncloak"},
