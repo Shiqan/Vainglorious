@@ -22,4 +22,3 @@ import models, views
 # def teardown_request(exception=None):
 #     print exception
 
-

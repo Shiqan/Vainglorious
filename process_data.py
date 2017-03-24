@@ -75,7 +75,7 @@ def process_samples():
                                 actors.append(
                                     (participant_id, participant_actor, roster_data[0]['attributes']['stats']['side']))
 
-                        process_telemetry(m['data']['id'], actors)
+                        # process_telemetry(m['data']['id'], actors)
 
 
 def download_telemetry(telemetry, id):
@@ -450,6 +450,19 @@ def save_to_file_tierlist(file, lane, jungle, protector):
         json.dump(feeds, f)
 
 
+def save_to_file_facts(file, facts):
+    date = commons.get_today()
+    feeds = read_from_file(file)
+
+    with open(file, 'w') as f:
+        if date not in feeds:
+            feeds[date] = []
+
+        for fact in facts:
+            feeds[date].append(fact)
+        json.dump(feeds, f)
+
+
 def update_json_files():
     update_data()
     update_tierlist()
@@ -461,10 +474,10 @@ def update_data():
     app.logger.info("Generate data.json")
     games = Match.query.count()
     players = Player.query.count()
-    potions = sum([i["Halcyon Potion"] for i, in db.session.query(Participant.itemUses).all() if "Halcyon Potion" in i])
-    infusions = sum([i["Weapon Infusion"] for i, in db.session.query(Participant.itemUses).all() if "Weapon Infusion" in i])
-    fountains = sum([i["Fountain of Renewal"] for i, in db.session.query(Participant.itemUses).all() if "Fountain of Renewal" in i])
-    mines = sum([i["Scout Trap"] for i, in db.session.query(Participant.itemUses).all() if "Scout Trap" in i])
+    potions = sum([i["Halcyon Potion"] for i in db.session.query(Participant.itemUses).all() if "Halcyon Potion" in i])
+    infusions = sum([i["Weapon Infusion"] for i in db.session.query(Participant.itemUses).all() if "Weapon Infusion" in i])
+    fountains = sum([i["Fountain of Renewal"] for i in db.session.query(Participant.itemUses).all() if "Fountain of Renewal" in i])
+    mines = sum([i["Scout Trap"] for i in db.session.query(Participant.itemUses).all() if "Scout Trap" in i])
     krakens = sum([i[0] for i in db.session.query(Participant.krakenCaptures, ).group_by(Participant.roster_id).all()])
     turrets = sum([i[0] for i in db.session.query(Participant.turrentCaptures, ).group_by(Participant.roster_id).all()])
     minions = float(db.session.query(func.sum(Participant.minionKills)).scalar())
@@ -540,8 +553,24 @@ def update_data():
              'mines': mines, 'minions': minions, 'blue_side_winrate': blue_side_winrate, 'red_side_winrate': red_side_winrate,
              'afks': afks, 'afks_per_match': afks_per_match, 'great_karma': great_karma, 'crystal_sentries': crystal_sentries,
              'gold_miners': gold_miners, 'lowest_player_lvl': lowest_player_lvl, 'surrendered': surrendered}
-
     save_to_file(os.path.join(__location__, 'data/data.json'), hero_stats, facts)
+
+    fact_list = list()
+    fact_list.append("there are {0} games played with average skill tier Vainglorious?".format(games))
+    fact_list.append("there are {0} players with skill tier Vainglorious?".format(players))
+    fact_list.append("there are {0} potions used?".format(potions))
+    fact_list.append("there are {0} krakens unleashed?".format(krakens))
+    fact_list.append("there are {0} turrets destroyed?".format(krakens))
+    fact_list.append("there are {0} minions killed?".format(minions))
+    fact_list.append("the average duration of a match is {0}?".format(avg_duration))
+    fact_list.append("the maximum of deaths by a single player is {0}?".format(max_deaths))
+    fact_list.append("the maximum of kills by a single player is {0}?".format(max_kills))
+    fact_list.append("there are {0} weapon infusions used?".format(infusions))
+    fact_list.append("there are {0} fountains of renewal used?".format(krakens))
+    fact_list.append("the winrate of blue side is {0:.0f}% ?".format(blue_side_winrate))
+    fact_list.append("{0} games ended with a surrender?".format(surrendered))
+    save_to_file_facts(os.path.join(__location__, 'data/facts.json'), fact_list)
+
 
 
 def update_tierlist():
@@ -576,6 +605,8 @@ def update_winrates():
     app.logger.info("Update winrates.json")
     matches = db.session.query(Participant).all()
     winrates_vs_heroes = {}
+    fact_list = list()
+
     for m in matches:
         hero = strings.heroes[m.actor].lower()
 
@@ -616,6 +647,9 @@ def update_winrates():
                 ratio = 0
             winrates_vs_heroes[hero][teammate]['ratio_with'] = ratio
 
+            fact_list.append("{0} has a winrate of {1}% with {2}?".format(hero.title(),  ratio, teammate))
+            fact_list.append("{0} has a played {1} times with {2}?".format(hero.title(),  total, teammate))
+
         for enemy in winrates_vs_heroes[hero].keys():
             total = winrates_vs_heroes[hero][enemy]['total_against']
             won = winrates_vs_heroes[hero][enemy]['won_against']
@@ -625,6 +659,10 @@ def update_winrates():
                 ratio = 0
             winrates_vs_heroes[hero][enemy]['ratio_against'] = ratio
 
+            fact_list.append("{0} has a winrate of {1}% against {2}?".format(hero.title(),  ratio, enemy))
+            fact_list.append("{0} has a played {1} times against {2}?".format(hero.title(), total, enemy))
+
+    save_to_file_facts(os.path.join(__location__, 'data/facts.json'), fact_list)
     save_to_file_winrates(os.path.join(__location__, 'data/winrates_vs.json'), winrates_vs_heroes)
 
 
@@ -632,8 +670,10 @@ def update_hero_details():
     app.logger.info("Update hero_details.json")
     hero_details = {}
     games = Match.query.count()
+    fact_list = list()
 
     for hero, actor in six.iteritems(strings.heroes_inv):
+
         matches = db.session.query(Participant).filter_by(actor=actor).all()
         playrate = (len(matches) / games) * 100
         matches_won = 0
@@ -780,4 +820,18 @@ def update_hero_details():
                               'turret_damage': turret_damage, 'kraken_damage': kraken_damage, 'ability_lvl': ability_lvl,
                               'ability_used': ability_used, 'ability_order': ability_order}
 
+        hero = hero.title()
+        fact_list.append("{0} dealt {1} to the Kraken?".format(hero, kraken_damage))
+        fact_list.append("{0} dealt {1} to turrets?".format(hero, turret_damage))
+        fact_list.append("{0} dealt {1} damage in total?".format(hero, total_damage_dealt))
+        fact_list.append("{0} did {1} damage with one attack / ability?".format(hero, max_damage_dealt))
+        fact_list.append("{0} has played {1} matches?".format(hero, len(matches)))
+        fact_list.append("{0} has won {1} matchse?".format(hero, matches_won))
+        fact_list.append("{0} is played in {1}% of the matches?".format(hero, matches_won))
+        fact_list.append("{0} most used skin is {1}?".format(hero, skins[0][0]))
+        fact_list.append("{0} plays most games with {1}?".format(hero, single_teammates[0][0]))
+        fact_list.append("{0} plays most games against {1}?".format(hero, single_enemies[0][0]))
+        fact_list.append("{0} most bought item is {1}?".format(hero, items[0][0]))
+
+    save_to_file_facts(os.path.join(__location__, 'data/facts.json'), fact_list)
     save_to_file_winrates(os.path.join(__location__, 'data/hero_details.json'), hero_details)

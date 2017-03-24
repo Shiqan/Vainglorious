@@ -1,6 +1,6 @@
 import os
 
-from flask import render_template, request
+from flask import render_template, request, jsonify
 import pprint
 from commons import *
 import process_data
@@ -162,6 +162,16 @@ def about():
 @app.route('/fact/')
 def fact():
     return render_template('fact.html')
+
+
+@app.route('/ajax_fact/')
+def ajax_fact():
+    facts = process_data.read_from_file(os.path.join(__location__, 'data/facts.json'))
+    latest = get_latest(facts.keys())
+    facts = facts[latest]
+    fact = random.choice(facts)
+
+    return jsonify(fact=fact)
 
 # ------------------
 # ERROR HANDLERS

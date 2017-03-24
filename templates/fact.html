@@ -1,7 +1,22 @@
 {% extends "layout.html" %}
 {% block title %} Fact {% endblock %}
 
-{% block css %}{% endblock %}
+{% block css %}
+<style>
+.icon-refresh-animate {
+	animation-name: rotateThis;
+	animation-duration: .5s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+}
+
+@keyframes rotateThis {
+	from { transform: scale( 1 ) rotate( 0deg );   }
+	to   { transform: scale( 1 ) rotate( 360deg ); }
+}
+
+</style>
+{% endblock %}
 
 {% block content %}
 
@@ -12,11 +27,53 @@
 				<div class="row">
 					<div class="col-xs-12">
 						<h1 class="text-light text-center">Random Fact generator</h1>
-						<h2 class="text-center"><span class="text-xl">ola </span></h2>
+						<h2 class="text-center"><span id="result" class="text-xl"></span></h2>
+						<a id="update" href="#"><i class="fa fa-refresh icon-refresh"></i></a>
                     </div>
                 </div>
             </div>
         </section>
     </div>
+
+
 <!-- END CONTENT -->
+{% endblock %}
+
+{% block js %}
+<script>
+$(document).ready(function() {
+	$.ajax({
+		url: '/ajax_fact',
+		type: 'GET',
+		success: function(response) {
+			$("#result").html(response.fact);
+		},
+		error: function(error) {
+			console.log(error);
+		}
+	});
+
+	$('#update').click(function() {
+	        var $icon = $( this ).find( ".icon-refresh" ),
+          animateClass = "icon-refresh-animate";
+
+        $icon.addClass( animateClass );
+
+		$.ajax({
+			url: '/ajax_fact',
+			type: 'GET',
+			success: function(response) {
+				$("#result").html(response.fact);
+			},
+			error: function(error) {
+				console.log(error);
+			}
+		});
+
+		window.setTimeout( function() {
+          $icon.removeClass( animateClass );
+        }, 500 );
+	});
+});
+</script>
 {% endblock %}
