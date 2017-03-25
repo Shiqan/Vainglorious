@@ -26,7 +26,7 @@
 			<div class="section-body  contain-lg">
 				<div class="row">
 					<div class="col-xs-12">
-						<h1 class="text-light text-center">Random Fact generator</h1>
+						<h1 class="text-light text-center">Did you know that</h1>
 						<h2 class="text-center"><span id="result" class="text-xl"></span></h2>
 						<a id="update" href="#"><i class="fa fa-refresh icon-refresh"></i></a>
                     </div>
@@ -41,17 +41,21 @@
 
 {% block js %}
 <script>
-$(document).ready(function() {
+function getFact() {
 	$.ajax({
 		url: '/ajax_fact',
 		type: 'GET',
 		success: function(response) {
-			$("#result").html(response.fact);
+			$("#result").html(response.fact + "?");
 		},
 		error: function(error) {
 			console.log(error);
 		}
 	});
+}
+
+$(document).ready(function() {
+	getFact();
 
 	$('#update').click(function() {
 	        var $icon = $( this ).find( ".icon-refresh" ),
@@ -59,16 +63,7 @@ $(document).ready(function() {
 
         $icon.addClass( animateClass );
 
-		$.ajax({
-			url: '/ajax_fact',
-			type: 'GET',
-			success: function(response) {
-				$("#result").html(response.fact);
-			},
-			error: function(error) {
-				console.log(error);
-			}
-		});
+		getFact();
 
 		window.setTimeout( function() {
           $icon.removeClass( animateClass );
