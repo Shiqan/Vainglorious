@@ -42,6 +42,6 @@ def query_matches():
 
 
 if __name__ == "__main__":
-    # samples()
+    samples()
     # query_matches()
     process_data.update_json_files()
