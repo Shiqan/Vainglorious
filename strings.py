@@ -175,3 +175,12 @@ non_heroes = {
     "*VainCrystalAway*": "Vain Crystal",
     "*FortressMinion*" : "Fortress Wolf"
     }
+
+
+regions = {
+    "eu": "Europe",
+    "na": "North America",
+    "sa": "South America",
+    "ea": "East Asia",
+    "sg": "South East Asia"
+}

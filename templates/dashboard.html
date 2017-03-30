@@ -316,7 +316,7 @@
 							<div class="card-head">
 								<header class="text-primary">Winrate over time</header>
 								<div class="tools">
-									<a href="/winrates/" class="btn btn-icon-toggle btn-default" data-toggle="tooltip" title="See more winrates"><i class="fa fa-reply"></i></a>
+									<a href="/winrates/{{region}}/" class="btn btn-icon-toggle btn-default" data-toggle="tooltip" title="See more winrates"><i class="fa fa-reply"></i></a>
 									<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
 								</div>
 							</div>
@@ -331,7 +331,7 @@
 							<div class="card-head">
 								<header class="text-primary">Tier list</header>
 								<div class="tools">
-									<a href="/tierlist/" class="btn btn-icon-toggle btn-default" data-toggle="tooltip" title="See entire list"><i class="fa fa-reply"></i></a>
+									<a href="/tierlist/{{region}}/" class="btn btn-icon-toggle btn-default" data-toggle="tooltip" title="See entire list"><i class="fa fa-reply"></i></a>
 									<a class="btn btn-icon-toggle btn-collapse"><i class="fa fa-angle-down"></i></a>
 								</div>
 							</div>
@@ -341,7 +341,7 @@
 									<ul class="list">
 									{% for hero in tierlist['protector'][:3] %}
 										<li class="tile">
-											<a class="tile-content ink-reaction" href="/hero/{{hero['name'] | lower }}">
+											<a class="tile-content ink-reaction" href="/hero/{{hero['name'] | lower }}/{{region}}/">
 												<div class="tile-icon">
 													<img src="/static/img/heroes/{{ hero['name'] | lower }}.png" alt="">
 												</div>
@@ -358,7 +358,7 @@
 									<ul class="list">
 										{% for hero in tierlist['jungle'][:3] %}
 											<li class="tile">
-												<a class="tile-content ink-reaction" href="/hero/{{hero['name'] | lower }}">
+												<a class="tile-content ink-reaction" href="/hero/{{hero['name'] | lower }}/{{region}}/">
 													<div class="tile-icon">
 														<img src="/static/img/heroes/{{ hero['name'] | lower }}.png" alt="">
 													</div>
@@ -374,7 +374,7 @@
 									<ul class="list">
 										{% for hero in tierlist['lane'][:3] %}
 											<li class="tile">
-												<a class="tile-content ink-reaction" href="/hero/{{hero['name'] | lower }}">
+												<a class="tile-content ink-reaction" href="/hero/{{hero['name'] | lower }}/{{region}}/">
 													<div class="tile-icon">
 														<img src="/static/img/heroes/{{ hero['name'] | lower }}.png" alt="">
 													</div>

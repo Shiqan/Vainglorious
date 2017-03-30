@@ -2,20 +2,22 @@ import os
 import sys
 
 import time
-
+import six
 import process_data
 from api import VaingloryApi
-from commons import get_yesterday, get_today
+import commons
+import strings
 
 api_key = os.environ.get('API_KEY', None)
 api = VaingloryApi(api_key)
 
 
 def samples():
-    s = api.sample(sort="-createdAt", createdAtStart="{0}T00:00:00Z".format(get_yesterday("%Y-%m-%d")),
-                   createdAtEnd="{0}T00:00:00Z".format(get_today("%Y-%m-%d")))
+    for region in six.iterkeys(strings.regions):
+        s = api.sample(region=region, sort="-createdAt", createdAtStart="{0}T00:00:00Z".format(commons.get_yesterday("%Y-%m-%d")),
+                   createdAtEnd="{0}T00:00:00Z".format(commons.get_today("%Y-%m-%d")))
 
-    process_data.download_samples(s)
+        process_data.download_samples(s)
     process_data.process_samples()
 
 
@@ -25,9 +27,9 @@ def query_matches():
     matches = []
     for batch in range(0, limit, max_limit):
         try:
-            response = api.matches(offset=batch, limit=max_limit,
-                                   createdAtStart="{0}T00:00:00Z".format(get_yesterday("%Y-%m-%d")),
-                                   createdAtEnd="{0}T00:00:00Z".format(get_today("%Y-%m-%d")), sort="-createdAt",
+            response = api.matches(region="eu", offset=batch, limit=max_limit,
+                                   createdAtStart="{0}T00:00:00Z".format(commons.get_yesterday("%Y-%m-%d")),
+                                   createdAtEnd="{0}T00:00:00Z".format(commons.get_today("%Y-%m-%d")), sort="-createdAt",
                                    gameMode="casual, ranked")
             matches.append(dict(response))
             limit -= max_limit

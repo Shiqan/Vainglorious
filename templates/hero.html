@@ -172,7 +172,7 @@
 											<div class="col-xs-12 icon-row">
 												{% for actor in team.split(', ') %}
 													<div class="col-xs-4">
-														<a class="ink-reaction" href="/hero/{{ actor|lower }}" data-toggle="tooltip" title="{{ actor }}">
+														<a class="ink-reaction" href="/hero/{{ actor|lower }}/{{region}}/" data-toggle="tooltip" title="{{ actor }}">
 															<img class="item-icon" src="/static/img/heroes/{{ actor|lower }}.png" alt="" />
 														</a>
 													</div>
@@ -198,7 +198,7 @@
 											<div class="col-xs-12 icon-row">
 												{% for actor in team.split(', ') %}
 													<div class="col-xs-4">
-														<a class="ink-reaction" href="/hero/{{ actor|lower }}" data-toggle="tooltip" title="{{ actor }}">
+														<a class="ink-reaction" href="/hero/{{ actor|lower }}/{{region}}/" data-toggle="tooltip" title="{{ actor }}">
 															<img class="item-icon" src="/static/img/heroes/{{ actor|lower }}.png" alt="" />
 														</a>
 													</div>

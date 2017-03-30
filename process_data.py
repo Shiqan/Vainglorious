@@ -238,7 +238,7 @@ def process_batch_query(matches):
                         participant_data = [i for i in batch['included'] if i['id'] == participant['id']]
                         skill.append(participant_data[0]['attributes']['stats']['skillTier'])
 
-                if (sum(skill)/len(skill)) > 25:
+                if (sum(skill)/len(skill)) > 26:
                     download_telemetry([i for i in batch['included'] if i['id'] == m['relationships']['assets']['data'][0]['id']][0], m['id'])
                     process_match(m)
 
@@ -464,72 +464,69 @@ def save_to_file_facts(file, facts):
 
 
 def update_json_files():
-    update_data()
-    update_tierlist()
-    update_winrates()
-    update_hero_details()
+    for region in six.iterkeys(strings.regions):
+        update_data(region)
+        update_tierlist(region)
+        update_winrates(region)
+        update_hero_details(region)
 
 
-def update_data():
-    app.logger.info("Generate data.json")
-    games = Match.query.count()
-    players = Player.query.count()
-    itemUses = [i for i, in db.session.query(Participant.itemUses).all() if i is not None]
+def update_data(region):
+    app.logger.info("Generate data.json for region {0}".format(region))
+    games = db.session.query(Match).filter_by(shardId=region).count()
+    players = Player.query.count() # TODO count number of players per region
+    itemUses = [i for i, in db.session.query(Participant.itemUses).join(Roster).join(Match).filter_by(shardId=region).all() if i is not None]
     potions = sum([i["Halcyon Potion"] for i in itemUses if "Halcyon Potion" in i])
     infusions = sum([i["Weapon Infusion"] for i in itemUses if "Weapon Infusion" in i])
     fountains = sum([i["Fountain of Renewal"] for i in itemUses if "Fountain of Renewal" in i])
     mines = sum([i["Scout Trap"] for i in itemUses if "Scout Trap" in i])
-    # potions = sum([i["Halcyon Potion"] for i, in db.session.query(Participant.itemUses).all() if "Halcyon Potion" in i])
-    # infusions = sum([i["Weapon Infusion"] for i, in db.session.query(Participant.itemUses).all() if "Weapon Infusion" in i])
-    # fountains = sum([i["Fountain of Renewal"] for i, in db.session.query(Participant.itemUses).all() if "Fountain of Renewal" in i])
-    # mines = sum([i["Scout Trap"] for i, in db.session.query(Participant.itemUses).all() if "Scout Trap" in i])
-    krakens = sum([i[0] for i in db.session.query(Participant.krakenCaptures, ).group_by(Participant.roster_id).all()])
-    turrets = sum([i[0] for i in db.session.query(Participant.turrentCaptures, ).group_by(Participant.roster_id).all()])
-    minions = float(db.session.query(func.sum(Participant.minionKills)).scalar())
-    kills = db.session.query(func.sum(Participant.kills)).scalar()
-    max_kills = db.session.query(func.max(Participant.kills)).scalar()
-    deaths = db.session.query(func.sum(Participant.deaths)).scalar()
-    max_deaths = db.session.query(func.max(Participant.deaths)).scalar()
+    krakens = sum([i[0] for i in db.session.query(Participant.krakenCaptures, ).join(Roster).join(Match).filter_by(shardId=region).group_by(Participant.roster_id).all()])
+    turrets = sum([i[0] for i in db.session.query(Participant.turrentCaptures, ).join(Roster).join(Match).filter_by(shardId=region).group_by(Participant.roster_id).all()])
+    minions = float(db.session.query(func.sum(Participant.minionKills)).join(Roster).join(Match).filter_by(shardId=region).scalar())
+    kills = db.session.query(func.sum(Participant.kills)).join(Roster).join(Match).filter_by(shardId=region).scalar()
+    max_kills = db.session.query(func.max(Participant.kills)).join(Roster).join(Match).filter_by(shardId=region).scalar()
+    deaths = db.session.query(func.sum(Participant.deaths)).join(Roster).join(Match).filter_by(shardId=region).scalar()
+    max_deaths = db.session.query(func.max(Participant.deaths)).join(Roster).join(Match).filter_by(shardId=region).scalar()
     died_by_minions = int(deaths - kills)
-    duration = int(db.session.query(func.sum(Match.duration).label("duration")).scalar())
+    duration = int(db.session.query(func.sum(Match.duration).label("duration")).filter_by(shardId=region).scalar())
     avg_duration = int(duration / games)
-    afks = db.session.query(func.count(Participant.wentAfk)).filter(Participant.wentAfk == 1).scalar()
+    afks = db.session.query(func.count(Participant.wentAfk)).join(Roster).join(Match).filter(Match.shardId == region, Participant.wentAfk == 1).scalar()
     afks_per_match = afks / games
 
-    blue_side_total = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "left/blue").scalar()
-    blue_side = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "left/blue", Participant.winner == 1).scalar()
-    red_side_total = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "right/red").scalar()
-    red_side = db.session.query(func.count(Roster.side)).join(Participant).filter(Roster.side == "right/red", Participant.winner == 1).scalar()
+    blue_side_total = db.session.query(func.count(Roster.side)).join(Participant).join(Match).filter(Match.shardId == region, Roster.side == "left/blue").scalar()
+    blue_side = db.session.query(func.count(Roster.side)).join(Participant).join(Match).filter(Match.shardId == region, Roster.side == "left/blue", Participant.winner == 1).scalar()
+    red_side_total = db.session.query(func.count(Roster.side)).join(Participant).join(Match).filter(Match.shardId == region, Roster.side == "right/red").scalar()
+    red_side = db.session.query(func.count(Roster.side)).join(Participant).join(Match).filter(Match.shardId == region, Roster.side == "right/red", Participant.winner == 1).scalar()
     red_side_winrate = red_side / red_side_total
     blue_side_winrate = blue_side / blue_side_total
 
-    great_karma = len([i[0] for i in db.session.query(Participant.karmaLevel).filter(Participant.karmaLevel == 2).group_by(Participant.player_id).all()])
-    crystal_sentries = sum([i[0] for i in db.session.query(Participant.crystalMineCaptures,).group_by(Participant.roster_id).all()])
-    gold_miners = sum([i[0] for i in db.session.query(Participant.goldMindCaptures,).group_by(Participant.roster_id).all()])
-    lowest_player_lvl = db.session.query(func.min(Participant.level)).scalar()
-    surrendered = db.session.query(func.count(Match.endGameReason)).filter(Match.endGameReason == "surrender").scalar()
+    great_karma = len([i[0] for i in db.session.query(Participant.karmaLevel).join(Roster).join(Match).filter(Match.shardId == region, Participant.karmaLevel == 2).group_by(Participant.player_id).all()])
+    crystal_sentries = sum([i[0] for i in db.session.query(Participant.crystalMineCaptures,).join(Roster).join(Match).filter(Match.shardId == region).group_by(Participant.roster_id).all()])
+    gold_miners = sum([i[0] for i in db.session.query(Participant.goldMindCaptures,).join(Roster).join(Match).filter(Match.shardId == region).group_by(Participant.roster_id).all()])
+    lowest_player_lvl = db.session.query(func.min(Participant.level)).join(Roster).join(Match).filter(Match.shardId == region).scalar()
+    surrendered = db.session.query(func.count(Match.endGameReason)).filter(Match.shardId == region, Match.endGameReason == "surrender").scalar()
 
-    avg_cs = [i[0] for i in db.session.query(Participant.farm).filter(Participant.actor.in_([h for h, r in six.iteritems(strings.hero_roles) if "Lane" in r])).all()]
+    avg_cs = [i[0] for i in db.session.query(Participant.farm).join(Roster).join(Match).filter(Match.shardId == region, Participant.actor.in_([h for h, r in six.iteritems(strings.hero_roles) if "Lane" in r])).all()]
     avg_cs = sum(avg_cs) / len(avg_cs)
 
-    heroes = db.session.query(Participant.actor, func.count(Participant.actor))\
+    heroes = db.session.query(Participant.actor, func.count(Participant.actor)).join(Roster).join(Match).filter(Match.shardId == region) \
         .group_by(Participant.actor).order_by(func.count(Participant.actor)).all()
 
-    heroes_win_rate = db.session.query(Participant.actor, func.sum(case([(Participant.winner == True, 1)], else_=0)).label("winrate"))\
-        .group_by(Participant.actor).order_by("winrate").all()
+    heroes_win_rate = db.session.query(Participant.actor, func.sum(case([(Participant.winner == True, 1)], else_=0)).label("winrate")) \
+        .join(Roster).join(Match).filter(Match.shardId == region).group_by(Participant.actor).order_by("winrate").all()
 
     heroes_win_rate = [(hero[0], (herowr[1] / hero[1]) * 100) for hero in heroes for herowr in heroes_win_rate if hero[0] == herowr[0]]
     heroes_win_rate = sorted(heroes_win_rate, key=operator.itemgetter(1), reverse=True)
 
     heroes_kda = db.session.query(Participant.actor, func.sum(Participant.kills).label("kills"),
                                   func.sum(Participant.deaths).label("deaths"),
-                                  func.sum(Participant.assists).label("assists"))\
-        .group_by(Participant.actor).all()
+                                  func.sum(Participant.assists).label("assists")) \
+        .join(Roster).join(Match).filter(Match.shardId == region).group_by(Participant.actor).all()
 
     heroes_cs = db.session.query(Participant.actor, func.sum(Participant.nonJungleMinionKills).label("lane"),
                                   func.sum(Participant.minionKills).label("jungle"),
                                   func.sum(Participant.farm).label("farm")) \
-        .group_by(Participant.actor).all()
+        .join(Roster).join(Match).filter(Match.shardId == region).group_by(Participant.actor).all()
 
     hero_stats = []
     for hero in heroes:
@@ -558,7 +555,7 @@ def update_data():
              'mines': mines, 'minions': minions, 'blue_side_winrate': blue_side_winrate, 'red_side_winrate': red_side_winrate,
              'afks': afks, 'afks_per_match': afks_per_match, 'great_karma': great_karma, 'crystal_sentries': crystal_sentries,
              'gold_miners': gold_miners, 'lowest_player_lvl': lowest_player_lvl, 'surrendered': surrendered}
-    save_to_file(os.path.join(__location__, 'data/data.json'), hero_stats, facts)
+    save_to_file(os.path.join(__location__, 'data/{region}/data.json'.format(region=region)), hero_stats, facts)
 
     fact_list = list()
     fact_list.append("there are {0} games played with average skill tier Vainglorious".format(games))
@@ -574,16 +571,16 @@ def update_data():
     fact_list.append("there are {0} fountains of renewal used".format(krakens))
     fact_list.append("the winrate of blue side is {0:.0f}% ".format(blue_side_winrate))
     fact_list.append("{0} games ended with a surrender".format(surrendered))
-    save_to_file_facts(os.path.join(__location__, 'data/facts.json'), fact_list)
+    save_to_file_facts(os.path.join(__location__, 'data/{region}/facts.json'.format(region=region)), fact_list)
 
 
-
-def update_tierlist():
-    app.logger.info("Update tierlist.json")
-    matches = db.session.query(Participant).all()
+def update_tierlist(region):
+    app.logger.info("Update tierlist.json for region {0}".format(region))
+    matches = db.session.query(Participant).join(Roster).join(Match).filter_by(shardId=region).all()
     tierlist_lane = Counter()
     tierlist_jungle = Counter()
     tierlist_protector = Counter()
+    fact_list = list()
 
     for m in matches:
         _items = sorted(m.items)
@@ -602,13 +599,18 @@ def update_tierlist():
             else:
                 tierlist_protector[entry] += 1
 
-    save_to_file_tierlist(os.path.join(__location__, 'data/tierlist.json'), tierlist_lane.most_common(30),
+    fact_list.append("the most used hero in lane is {0}".format(tierlist_lane.most_common(1)))
+    fact_list.append("the most used hero in the jungle is {0}".format(tierlist_jungle.most_common(1)))
+    fact_list.append("the most used hero as captain is {0}".format(tierlist_protector.most_common(1)))
+
+    save_to_file_facts(os.path.join(__location__, 'data/{region}/facts.json'.format(region=region)), fact_list)
+    save_to_file_tierlist(os.path.join(__location__, 'data/{region}/tierlist.json'.format(region=region)), tierlist_lane.most_common(30),
                                        tierlist_jungle.most_common(30), tierlist_protector.most_common(30))
 
 
-def update_winrates():
-    app.logger.info("Update winrates.json")
-    matches = db.session.query(Participant).all()
+def update_winrates(region):
+    app.logger.info("Update winrates.json for region {0}".format(region))
+    matches = db.session.query(Participant).join(Roster).join(Match).filter_by(shardId=region).all()
     winrates_vs_heroes = {}
     fact_list = list()
 
@@ -667,19 +669,19 @@ def update_winrates():
             fact_list.append("{0} has a winrate of {1}% against {2}".format(hero.title(),  ratio, enemy))
             fact_list.append("{0} has played {1} times against {2}".format(hero.title(), total, enemy))
 
-    save_to_file_facts(os.path.join(__location__, 'data/facts.json'), fact_list)
-    save_to_file_winrates(os.path.join(__location__, 'data/winrates_vs.json'), winrates_vs_heroes)
+    save_to_file_facts(os.path.join(__location__, 'data/{region}/facts.json'.format(region=region)), fact_list)
+    save_to_file_winrates(os.path.join(__location__, 'data/{region}/winrates_vs.json'.format(region=region)), winrates_vs_heroes)
 
 
-def update_hero_details():
-    app.logger.info("Update hero_details.json")
+def update_hero_details(region):
+    app.logger.info("Update hero_details.json for region {0}".format(region))
     hero_details = {}
-    games = Match.query.count()
+    games = db.session.query(Match).filter_by(shardId=region).count()
     fact_list = list()
 
     for hero, actor in six.iteritems(strings.heroes_inv):
 
-        matches = db.session.query(Participant).filter_by(actor=actor).all()
+        matches = db.session.query(Participant).join(Roster).join(Match).filter(Match.shardId==region, Participant.actor==actor).all()
         playrate = (len(matches) / games) * 100
         matches_won = 0
         kda = {'assists': 0, 'deaths': 0, 'kills': 0}
@@ -833,10 +835,18 @@ def update_hero_details():
         fact_list.append("{0} has played {1} matches".format(hero, len(matches)))
         fact_list.append("{0} has won {1} matchse".format(hero, matches_won))
         fact_list.append("{0} is played in {1}% of the matches".format(hero, matches_won))
-        fact_list.append("{0} most used skin is {1}".format(hero, skins[0][0]))
-        fact_list.append("{0} plays most games with {1}".format(hero, single_teammates[0][0]))
-        fact_list.append("{0} plays most games against {1}".format(hero, single_enemies[0][0]))
-        fact_list.append("{0} most bought item is {1}".format(hero, items[0][0]))
 
-    save_to_file_facts(os.path.join(__location__, 'data/facts.json'), fact_list)
-    save_to_file_winrates(os.path.join(__location__, 'data/hero_details.json'), hero_details)
+        if skins:
+            fact_list.append("{0} most used skin is {1}".format(hero, skins[0][0]))
+
+        if single_teammates:
+            fact_list.append("{0} plays most games with {1}".format(hero, single_teammates[0][0]))
+
+        if single_enemies:
+            fact_list.append("{0} plays most games against {1}".format(hero, single_enemies[0][0]))
+
+        if items:
+            fact_list.append("{0} most bought item is {1}".format(hero, items[0][0]))
+
+    save_to_file_facts(os.path.join(__location__, 'data/{region}/facts.json'.format(region=region)), fact_list)
+    save_to_file_winrates(os.path.join(__location__, 'data/{region}/hero_details.json'.format(region=region)), hero_details)

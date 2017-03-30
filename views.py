@@ -17,9 +17,10 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 @cache.memoize()
 @app.route('/')
 @app.route('/index/')
-def index():
-    feeds = process_data.read_from_file(os.path.join(__location__, 'data/data.json'))
-    tierlist = process_data.read_from_file(os.path.join(__location__, 'data/tierlist.json'))
+@app.route('/index/<region>/')
+def index(region="eu"):
+    feeds = process_data.read_from_file(os.path.join(__location__, 'data/{0}/data.json'.format(region)))
+    tierlist = process_data.read_from_file(os.path.join(__location__, 'data/{0}/tierlist.json'.format(region)))
 
     latest = get_latest(tierlist.keys())
 
@@ -69,7 +70,7 @@ def index():
         stats = sorted(six.iteritems(stats), key=lambda x: x[0])
         sorted_winrate_stats.append((hero, stats[-7:]))
 
-    return render_template('dashboard.html', games=games, players=players, potions=potions, krakens=krakens,
+    return render_template('dashboard.html', region=region, games=games, players=players, potions=potions, krakens=krakens,
                            duration=duration, avg_duration=avg_duration, died_by_minions=died_by_minions,
                            max_kills=max_kills, max_deaths=max_deaths, avg_cs=avg_cs,
                            infusions=infusions, fountains=fountains, mines=mines, minions=minions,
@@ -81,10 +82,11 @@ def index():
 
 @cache.memoize()
 @app.route('/hero/<hero>/')
-def view_hero(hero):
+@app.route('/hero/<hero>/<region>/')
+def view_hero(hero, region="eu"):
     app.logger.info(hero)
 
-    hero_details = process_data.read_from_file(os.path.join(__location__, 'data/hero_details.json'))
+    hero_details = process_data.read_from_file(os.path.join(__location__, 'data/{0}/hero_details.json'.format(region)))
     latest = get_latest(hero_details.keys())
 
     hero_details = hero_details[latest][hero]
@@ -114,10 +116,10 @@ def view_hero(hero):
     ability_order=hero_details['ability_order']
     abilities = strings.abilities[strings.heroes_inv[hero]].keys() # TODO combine the different ability names...
 
-    winrates = process_data.read_from_file(os.path.join(__location__, 'data/winrates_vs.json'))
+    winrates = process_data.read_from_file(os.path.join(__location__, 'data/{0}/winrates_vs.json'.format(region)))
     winrates = winrates[latest][hero]
 
-    return render_template('hero.html', hero=hero, matches_played=matches_played, matches_won=matches_won, playrate=playrate,
+    return render_template('hero.html', region=region, hero=hero, matches_played=matches_played, matches_won=matches_won, playrate=playrate,
                            kda=kda, items=items, builds=builds, players=players,
                            teammates=teammates, skins=skins, enemies=enemies,
                            single_teammates=single_teammates, single_enemies=single_enemies, cs=cs,
@@ -131,27 +133,30 @@ def view_hero(hero):
 
 @cache.memoize()
 @app.route('/tierlist/')
-def tierlist():
-    tierlist = process_data.read_from_file(os.path.join(__location__, 'data/tierlist.json'))
+@app.route('/tierlist/<region>/')
+def tierlist(region="eu"):
+    tierlist = process_data.read_from_file(os.path.join(__location__, 'data/{0}/tierlist.json'.format(region)))
     latest = get_latest(tierlist.keys())
 
     tierlist = tierlist[latest]
 
-    return render_template('tierlist.html', tierlist=tierlist)
+    return render_template('tierlist.html', region=region, tierlist=tierlist)
 
 
 @cache.memoize()
 @app.route('/winrates/')
-def winrates():
-    winrates = process_data.read_from_file(os.path.join(__location__, 'data/winrates_vs.json'))
+@app.route('/winrates/<region>/')
+def winrates(region="eu"):
+    winrates = process_data.read_from_file(os.path.join(__location__, 'data/{0}/winrates_vs.json'.format(region)))
     latest = get_latest(winrates.keys())
     winrates = winrates[latest]
-    return render_template('winrates.html', winrates=winrates)
+    return render_template('winrates.html', region=region, winrates=winrates)
 
 
 @app.route('/map/')
-def telemetry():
-    return render_template('telemetry.html', beta=True)
+@app.route('/map/<region>/')
+def telemetry(region="eu"):
+    return render_template('telemetry.html', region=region, beta=True)
 
 
 @app.route('/about/')
@@ -160,13 +165,15 @@ def about():
 
 
 @app.route('/fact/')
-def fact():
-    return render_template('fact.html')
+@app.route('/fact/<region>/')
+def fact(region="eu"):
+    return render_template('fact.html', region=region)
 
 
 @app.route('/ajax_fact/')
-def ajax_fact():
-    facts = process_data.read_from_file(os.path.join(__location__, 'data/facts.json'))
+@app.route('/ajax_fact/<region>/')
+def ajax_fact(region="eu"):
+    facts = process_data.read_from_file(os.path.join(__location__, 'data/{0}/facts.json'.format(region)))
     latest = get_latest(facts.keys())
     facts = facts[latest]
     fact = random.choice(facts)

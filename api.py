@@ -2,27 +2,26 @@ import requests
 from flask_app import app
 
 class VaingloryApi(object):
-    def __init__(self, key, datacenter="dc01", region="eu"):
+    def __init__(self, key, datacenter="dc01"):
         self.key = key
-        self.region = region
         self.datacenter = datacenter
-        self.url = "https://api.{datacenter}.gamelockerapp.com/shards/{region}/".format(datacenter=self.datacenter, region=self.region)
+        self.url = "https://api.{datacenter}.gamelockerapp.com/shards/".format(datacenter=self.datacenter)
 
-    def request(self, endpoint, params=None):
-        app.logger.info("Request {0} with params: {1}".format(endpoint, str(params)))
+    def request(self, endpoint, region, params=None):
+        app.logger.info("Request {0} on region {1} with params: {2}".format(endpoint, region, str(params)))
         headers = {
             "Authorization": "Bearer {}".format(self.key),
             "X-TITLE-ID": "semc-vainglory",
             "Accept": "application/vnd.api+json"
         }
-        response = requests.get(self.url + endpoint,
+        response = requests.get(self.url+"{0}/{1}".format(region, endpoint),
                             headers=headers,
                             params=params)
         response.raise_for_status()
         return response.json()
 
-    def query(self, endpoint, elid="", params=None):
-        return self.request(endpoint + "/" + elid, params=params)
+    def query(self, endpoint, region, elid="", params=None):
+        return self.request(endpoint + "/" + elid, region=region, params=params)
 
     def match(self, match_id):
         return self.query("matches", match_id)
@@ -30,7 +29,7 @@ class VaingloryApi(object):
     def player(self, player_id):
         return self.query("players", player_id)
 
-    def sample(self, offset=None, limit=None, sort=None, createdAtStart=None, createdAtEnd=None):
+    def sample(self, region, offset=None, limit=None, sort=None, createdAtStart=None, createdAtEnd=None):
         params = dict()
         if offset:
             params["page[offset]"] = offset
@@ -43,9 +42,9 @@ class VaingloryApi(object):
         if createdAtEnd:
             params["filter[createdAt-End]"] = createdAtEnd
 
-        return self.query("samples", params=params)
+        return self.query("samples", region=region, params=params)
 
-    def matches(self,
+    def matches(self, region,
                 offset=None, limit=None, sort=None,
                 createdAtStart=None, createdAtEnd=None,
                 player=None, playerId=None, team=None, gameMode=None):

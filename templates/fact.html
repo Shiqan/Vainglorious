@@ -43,7 +43,7 @@
 <script>
 function getFact() {
 	$.ajax({
-		url: '/ajax_fact',
+		url: '/ajax_fact/{{region}}/',
 		type: 'GET',
 		success: function(response) {
 			$("#result").html(response.fact + "?");

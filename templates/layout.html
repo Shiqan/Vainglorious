@@ -31,6 +31,13 @@
 		{% block css %} {% endblock %}
 		<style>
 
+.active-region {
+    text-decoration: none;
+    color: #252727;
+    background-color: #f5f5f5;
+}
+
+
 #loader-wrapper {
     position: fixed;
     top: 0;
@@ -176,16 +183,59 @@
 				<div class="headerbar-right">
 					<ul class="header-nav header-nav-options">
 						<li class="dropdown">
+							<a href="javascript:void(0);" class="btn btn-icon-toggle btn-default" data-toggle="dropdown" aria-expanded="false">
+								<i class="fa fa-globe"></i>
+							</a>
+							<ul class="dropdown-menu animation-expand">
+								<li class="dropdown-header">Region</li>
+								<li class="dropdown-progress {% if region == 'eu' %} active-region {% endif %}">
+									<a href="/index/eu/">
+										<div class="dropdown-label">
+											<span><strong>Europe</strong> {% if region != 'eu' %} <span class="pull-right"><i class="fa fa-arrow-right"></i></span>{% endif %} </span>
+										</div>
+									</a>
+								</li>
+								<li class="dropdown-progress {% if region == 'na' %} active-region {% endif %}">
+									<a href="/index/na/">
+										<div class="dropdown-label">
+											<span><strong>North America</strong>{% if region != 'na' %} <span class="pull-right"><i class="fa fa-arrow-right"></i></span>{% endif %}</span>
+										</div>
+									</a>
+								</li>
+								<li class="dropdown-progress {% if region == 'sa' %} active-region {% endif %}">
+									<a href="/index/sa/">
+										<div class="dropdown-label">
+											<span><strong>South America</strong>{% if region != 'sa' %} <span class="pull-right"><i class="fa fa-arrow-right"></i></span>{% endif %}</span>
+										</div>
+									</a>
+								</li>
+								<li class="dropdown-progress {% if region == 'sg' %} active-region {% endif %}">
+									<a href="/index/sg/">
+										<div class="dropdown-label">
+											<span><strong>South East Asia</strong>{% if region != 'sg' %} <span class="pull-right"><i class="fa fa-arrow-right"></i></span>{% endif %}</span>
+										</div>
+									</a>
+								</li>
+								<li class="dropdown-progress {% if region == 'ea' %} active-region {% endif %}">
+									<a href="/index/ea/">
+										<div class="dropdown-label">
+											<span><strong>East Asia</strong>{% if region != 'ea' %} <span class="pull-right"><i class="fa fa-arrow-right"></i></span>{% endif %}</span>
+										</div>
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li class="dropdown">
 							<a class="btn btn-icon-toggle btn-default" data-toggle="dropdown">
 								<i class="fa fa fa-ellipsis-v"></i>
 							</a>
 							<ul class="dropdown-menu animation-expand">
 								<li class="dropdown-header">Go to </li>
-								<li><a href="/winrates/">Winrates <span class="pull-right"><i class="fa fa-arrow-right"></i></span></a></li>
-								<li><a href="/tierlist/">Tierlist <span class="pull-right"><i class="fa fa-arrow-right"></i></span></a></li>
-								<li><a href="/map/">Heat maps <span class="pull-right"><i class="fa fa-arrow-right"></i></span></a></li>
+								<li><a href="/winrates/{{region}}/">Winrates <span class="pull-right"><i class="fa fa-arrow-right"></i></span></a></li>
+								<li><a href="/tierlist/{{region}}/">Tierlist <span class="pull-right"><i class="fa fa-arrow-right"></i></span></a></li>
+								<li><a href="/map/{{region}}/">Heat maps <span class="pull-right"><i class="fa fa-arrow-right"></i></span></a></li>
 								<li class="dropdown-header">Random fact generator </li>
-								<li><a href="/fact/"> Fact <span class="pull-right"><i class="fa fa-arrow-right"></i></span></a></li>
+								<li><a href="/fact/{{region}}/"> Fact <span class="pull-right"><i class="fa fa-arrow-right"></i></span></a></li>
 							</ul>
 						</li>
 					</ul>
