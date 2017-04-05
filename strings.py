@@ -184,3 +184,5 @@ regions = {
     "ea": "East Asia",
     "sg": "South East Asia"
 }
+
+regions_inv = {v: k for k, v in six.iteritems(regions)}

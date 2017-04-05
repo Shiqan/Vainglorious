@@ -163,6 +163,28 @@ def telemetry(region="eu"):
 def about():
     return render_template('about.html')
 
+@app.route('/compare/')
+@app.route('/compare/<region>/')
+def compare(region="eu"):
+
+    feeds_ea = process_data.read_from_file(os.path.join(__location__, 'data/{0}/data.json'.format("ea")))
+    feeds_eu = process_data.read_from_file(os.path.join(__location__, 'data/{0}/data.json'.format("eu")))
+    feeds_na = process_data.read_from_file(os.path.join(__location__, 'data/{0}/data.json'.format("na")))
+    feeds_sa = process_data.read_from_file(os.path.join(__location__, 'data/{0}/data.json'.format("sa")))
+    feeds_sg = process_data.read_from_file(os.path.join(__location__, 'data/{0}/data.json'.format("sg")))
+
+    latest = get_latest(feeds_eu.keys())
+    feeds = {"ea": feeds_ea, "eu": feeds_eu, "na": feeds_na, "sa": feeds_sa, "sg": feeds_sg}
+
+    best_heroes = {}
+    for r, feed in six.iteritems(feeds):
+        hero_stats = feed[latest]['data']
+        best_heroes[r] = sorted(hero_stats, key=lambda x: x['winrate'], reverse=True)[0]
+
+
+
+    return render_template('compare.html', region=region, best_heroes=best_heroes, ea=feeds_ea, eu=feeds_eu, na=feeds_na, sa=feeds_sa, sg=feeds_sg)
+
 
 @app.route('/fact/')
 @app.route('/fact/<region>/')

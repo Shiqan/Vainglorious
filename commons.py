@@ -9,9 +9,12 @@ def utility_processor():
     def get_random_quote():
         q = random.choice(strings.quotes)
         return "{0} - {1}".format(q[1], q[0])
-    return dict(appname=appname, random_quote=get_random_quote())
+    def id_to_ability(hero, ability):
+        return strings.abilities[strings.heroes_inv[hero]].get(ability, ability)
+    def id_to_ability_img(hero, ability):
+        return strings.abilities_img[strings.heroes_inv[hero]].get(ability, ability)
+    return dict(appname=appname, random_quote=get_random_quote(), id_to_ability=id_to_ability, id_to_ability_img=id_to_ability_img)
 
-# # --------- ITEM
 @app.template_filter('role_to_img')
 def role_to_img(role):
     if role == "Lane":
@@ -62,16 +65,9 @@ def seconds_to_minutes(time):
 def id_to_hero(id):
     return strings.heroes[id]
 
-
-@app.context_processor
-def jinja_functions():
-    def id_to_ability(hero, ability):
-        return strings.abilities[strings.heroes_inv[hero]].get(ability, ability)
-    def id_to_ability_img(hero, ability):
-        return strings.abilities_img[strings.heroes_inv[hero]].get(ability, ability)
-    return dict(id_to_ability=id_to_ability, id_to_ability_img=id_to_ability_img)
-
-
+@app.template_filter('convert_region')
+def id_to_region(id):
+    return strings.regions[id]
 
 @app.template_filter('format_number')
 def format_currency(value):

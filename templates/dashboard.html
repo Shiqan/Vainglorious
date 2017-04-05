@@ -452,7 +452,7 @@
 													 data-assists="{{ hero.assists }}"
 													 data-deaths="{{ hero.deaths }}"
 													 data-playrate="{{ hero.playrate }}"
-													 data-url="/hero/{{ name | lower }}/">
+													 data-url="/hero/{{ name | lower }}/{{ region }}/">
 														<div class="hovereffect">
 															<img class="img-responsive" src="/static/img/heroes/{{ name | lower }}_splash.png"  alt="">
 															<div class="overlay">
@@ -506,7 +506,7 @@
     										</thead>
     										<tbody>
     										    {% for game in hero_stats %}
-    										        <tr data-url="/hero/{{game.hero | lower }}/">
+    										        <tr data-url="/hero/{{game.hero | lower }}/{{ region }}/">
     										            <td class="ink-reaction alert alert-callout {% if game.winrate > 50 %} alert-success  {% else %} alert-danger {% endif %} "> {{ game.hero }} </td>
     										            <td class="ink-reaction"> {{'%0.2f'| format(game.winrate)}}% </td>
     										            <td class="ink-reaction"> {{'%0.2f'| format(game.playrate)}}% </td>
